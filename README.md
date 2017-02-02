@@ -13,9 +13,9 @@ Requirements
 
 * Vim 8.0
 * Git 1.9 or later
-* OS
-  Windows: tested
-  Linux: not tested
+* OS  
+  Windows: tested  
+  Linux: not tested  
   macOS: not tested
 
 
