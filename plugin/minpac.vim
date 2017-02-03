@@ -13,6 +13,7 @@ endif
 let g:loaded_minpac = 1
 
 let s:joblist = []
+let s:remain_jobs = 0
 
 " Get a list of package/plugin directories.
 function! minpac#getpackages(...)
@@ -136,7 +137,8 @@ function! s:job_exit_cb(name, job, errcode)
     echohl None
   endif
 
-  if len(s:joblist) == 0
+  let s:remain_jobs -= 1
+  if s:remain_jobs == 0
     echom 'Finished.'
   endif
 endfunction
@@ -166,6 +168,7 @@ function! s:start_job(cmds, name)
     echohl ErrorMsg
     echom 'Fail to execute: ' . a:cmds[0]
     echohl None
+    let s:remain_jobs -= 1
     return 1
   endif
   let s:joblist += [l:job]
@@ -196,6 +199,7 @@ function! s:update_single_plugin(name, force)
   else
     if l:pluginfo.frozen && !a:force
       echo 'Skipping ' . a:name
+      let s:remain_jobs -= 1
       return 0
     endif
 
@@ -221,6 +225,8 @@ function! minpac#update(...)
     echoerr 'Wrong parameter type. Must be a String or a List of Strings.'
     return
   endif
+
+  let s:remain_jobs += len(l:names)
 
   for l:name in l:names
     let ret = s:update_single_plugin(l:name, l:force)
