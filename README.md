@@ -75,12 +75,13 @@ Initialize minpac.
 
 `{opt}` is a Dictionary which specifies options.
 
-| option   | description |
-|----------|-------------|
-| `'dir'`  | Base directory. Default: the first directory of the `'packpath'` option. |
-| `'git'`  | Git command. Default: `'git'` |
+| option    | description |
+|-----------|-------------|
+| `'dir'`   | Base directory. Default: the first directory of the `'packpath'` option. |
+| `'git'`   | Git command. Default: `'git'` |
 | `'package_name'` | Package name. Default: `'minpac'` |
 | `'depth'` | Default clone depth. Default: 1 |
+| `'jobs'`  | Maximum job numbers. Default: 8 |
 
 All plugins will be installed under the following directory:
 
@@ -100,12 +101,12 @@ Register a plugin.
 
 `{opt}` is a Dictionary which specifies options.
 
-| option   | description |
-|----------|-------------|
-| `'name'` | Unique name of the plugin (`plugin_name`). Also used as a local directory name. Default: derived from the repository name. |
-| `'type'` | Type of the plugin. `'start'` or `'opt'`. Default: `'start'` |
+| option     | description |
+|------------|-------------|
+| `'name'`   | Unique name of the plugin (`plugin_name`). Also used as a local directory name. Default: derived from the repository name. |
+| `'type'`   | Type of the plugin. `'start'` or `'opt'`. Default: `'start'` |
 | `'frozen'` | If 1, the plugin will not be updated automatically. Default: 0 |
-| `'depth'` | If > 1, it is used as a depth to be cloned. Default: 1 or specified value by `minpac#init()`. |
+| `'depth'`  | If > 1, it is used as a depth to be cloned. Default: 1 or specified value by `minpac#init()`. |
 | `'branch'` | Used as a branch name to be cloned. Default: empty |
 
 #### minpac#update([{name}])
@@ -142,7 +143,7 @@ A dictionary with following items will be returned:
 | `'frozen'` | If 1, the plugin is frozen. |
 | `'type'`   | Type of the plugin. |
 | `'branch'` | Branch name to be cloned. |
-| `'depth'` | Depth to be cloned. |
+| `'depth'`  | Depth to be cloned. |
 
 License
 -------
