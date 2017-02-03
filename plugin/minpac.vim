@@ -133,6 +133,12 @@ function! s:job_exit_cb(name, job, errcode)
   echohl None
 endfunction
 
+function! s:job_err_cb(name, channel, message)
+  echohl WarningMsg
+  echom a:name . ': ' . a:message
+  echohl None
+endfunction
+
 function! s:start_job(cmds, name)
   if s:jobs > 0
     while len(s:joblist) >= s:jobs
@@ -146,7 +152,8 @@ function! s:start_job(cmds, name)
     let l:cmds = a:cmds
   endif
   let l:job = job_start(l:cmds, {'exit_cb': function('s:job_exit_cb', [a:name]),
-        \ 'in_io': 'null', 'out_io': 'null', 'err_io': 'null'})
+        \ 'in_io': 'null', 'out_io': 'null',
+        \ 'err_cb': function('s:job_err_cb', [a:name])})
   if job_status(l:job) ==# 'fail'
     echohl ErrorMsg
     echom 'Fail to execute: ' . a:cmds[0]
