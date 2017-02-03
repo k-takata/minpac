@@ -142,6 +142,9 @@ function! s:update_single_plugin(name, force)
   endif
   "let l:cmd = (is_win ? ['cmd', '/c'] : ['sh', '-c']) + [l:cmd . ' 2&>1']
   call system(l:cmd)
+  if isdirectory(l:dir . '/doc')
+    silent! execute 'helptags' l:dir . '/doc'
+  endif
   return 0
 endfunction
 
