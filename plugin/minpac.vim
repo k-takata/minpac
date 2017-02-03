@@ -140,7 +140,7 @@ function! s:update_single_plugin(name, force)
     echo 'Updating ' . a:name
     let l:cmd = '"' . s:gitcmd . '" -C "' . l:dir . '" pull --ff-only'
   endif
-  "let l:cmd = (is_win ? ['cmd', '/c'] : ['sh', '-c']) + [l:cmd . ' 2&>1']
+  "let l:cmd = [&shell, &shellcmdflag, l:cmd . ' 2&>1']
   call system(l:cmd)
   if isdirectory(l:dir . '/doc')
     silent! execute 'helptags' l:dir . '/doc'
