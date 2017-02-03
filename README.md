@@ -73,21 +73,76 @@ Usage
 
 Initialize minpac.
 
-#### minpac#add({name}, [{opt}])
+`{opt}` is a Dictionary which specifies options.
+
+| option   | description |
+|----------|-------------|
+| `'dir'`  | Base directory. Default: the first directory of the `'packpath'` option. |
+| `'git'`  | Git command. Default: `'git'` |
+| `'package_name'` | Package name. Default: `'minpac'` |
+| `'depth'` | Default clone depth. Default: 1 |
+
+All plugins will be installed under the following directory:
+
+    "start" plugins: <dir>/pack/<package_name>/start/<plugin_name>
+    "opt" plugins:   <dir>/pack/<package_name>/opt/<plugin_name>
+
+
+"start" plugins will be automatically loaded after processing your `.vimrc`, or you can load them explicitly using `:packloadall` command.
+"opt" plugins can be loaded with `:packadd` command.
+See `:help packages` for detail.
+
+#### minpac#add({url}, [{opt}])
 
 Register a plugin.
+
+`{url}` is a URL of a plugin. It can be a short form (`'<github-account>/<repository>'`) or a valid git URL.
+
+`{opt}` is a Dictionary which specifies options.
+
+| option   | description |
+|----------|-------------|
+| `'name'` | Unique name of the plugin (`plugin_name`). Also used as a local directory name. Default: derived from the repository name. |
+| `'type'` | Type of the plugin. `'start'` or `'opt'`. Default: `'start'` |
+| `'frozen'` | If 1, the plugin will not be updated automatically. Default: 0 |
+| `'depth'` | If > 1, it is used as a depth to be cloned. Default: 1 or specified value by `minpac#init()`. |
+| `'branch'` | Used as a branch name to be cloned. Default: empty |
 
 #### minpac#update([{name}])
 
 Install or update all plugins or the specified plugin.
 
+`{name}` is a unique name of a plugin (`plugin_name`).
+
+If `{name}` is omitted, all plugins will be installed or updated. Frozen plugins will be installed, but it will not be updated.
+
+If `{name}` is specified, only specified plugin will be installed or updated. Frozen plugin will be also updated.
+
 #### minpac#clean([{name}])
 
 Remove all plugins which are not registered, or remove the specified plugin.
 
+`{name}` is a name of a plugin. It can be a unique plugin name (`plugin_name`) or a plugin name with wildcards.
+
+If `{name}` is omitted, all plugins under the `minpac` directory will be checked. If unregistered plugins are found, they are listed and a prompt is shown. If you type `y`, they will be removed.
+
+If `{name}` is specified, matched plugins are listed (even they are registered with `minpac#add()`) and a prompt is shown. If you type `y`, they will be removed.
+
 #### minpac#getpluginfo({name})
 
 Get information of specified plugin. Mainly for debugging.
+
+`{name}` is a unique name of a plugin (`plugin_name`).
+A dictionary with following items will be returned:
+
+| item       | description |
+|------------|-------------|
+| `'url'`    | URL of the plugin repository.  |
+| `'dir'`    | Local directory of the plugin. |
+| `'frozen'` | If 1, the plugin is frozen. |
+| `'type'`   | Type of the plugin. |
+| `'branch'` | Branch name to be cloned. |
+| `'depth'` | Depth to be cloned. |
 
 License
 -------
