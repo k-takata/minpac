@@ -12,6 +12,7 @@ if exists('g:loaded_minpac')
 endif
 let g:loaded_minpac = 1
 
+let s:is_win = has('win32')
 
 " Get a list of package/plugin directories.
 function! minpac#getpackages(...)
@@ -105,9 +106,12 @@ function! minpac#add(plugname, ...)
   " Clone depth
   let l:clone_depth = get(opt, 'clone_depth', s:clone_depth)
 
+  " Branch
+  let l:branch = get(opt, 'branch', '')
+
   " Add to pluglist
   let s:pluglist[l:name] = {'url': l:url, 'type': l:type, 'dir': l:dir,
-        \ 'clone_depth': l:clone_depth, 'frozen': l:frozen}
+        \ 'clone_depth': l:clone_depth, 'frozen': l:frozen, 'branch': l:branch}
 endfunction
 
 
@@ -118,23 +122,27 @@ function! s:update_single_plugin(name, force)
     return 1
   endif
 
-  if s:pluglist[a:name].frozen && !a:force
-    echo 'Skipping ' . a:name
-    return 0
-  endif
-
   let l:dir = s:pluglist[a:name].dir
   let l:url = s:pluglist[a:name].url
   if !isdirectory(l:dir)
     echo 'Cloning ' . a:name
     let l:clone_depth = s:pluglist[a:name].clone_depth
-    let l:depth = (l:clone_depth > 0) ? '--depth=' . l:clone_depth : ''
-    let l:cmd = s:gitcmd . ' clone ' . l:depth . ' ' . l:url . ' ' . l:dir
+    let l:depthopt = (l:clone_depth > 0) ? ' --depth=' . l:clone_depth : ''
+    let l:branch = s:pluglist[a:name].clone_depth
+    let l:branchopt = (l:branch != '') ? ' -b ' . l:branch : ''
+    let l:cmd = '"' . s:gitcmd . '" clone' . l:depthopt . l:branchopt . ' "' . l:url . '" "' . l:dir . '"'
   else
+    if s:pluglist[a:name].frozen && !a:force
+      echo 'Skipping ' . a:name
+      return 0
+    endif
+
     echo 'Updating ' . a:name
-    let l:cmd = s:gitcmd . ' -C ' . l:dir . ' pull --ff-only'
+    let l:cmd = '"' . s:gitcmd . '" -C "' . l:dir . '" pull --ff-only'
   endif
-  return system(l:cmd)
+  "let l:cmd = (is_win ? ['cmd', '/c'] : ['sh', '-c']) + [l:cmd . ' 2&>1']
+  call system(l:cmd)
+  return 0
 endfunction
 
 
@@ -170,7 +178,7 @@ function! s:match_plugin(dir, packname, plugnames)
   else
     let l:pat = '/pack/' . a:packname . '/\%(start\|opt\)/' . l:plugname . '$'
   endif
-  if has('win32')
+  if s:is_win
     let l:pat = substitute(l:pat, '/', '[/\\\\]', 'g')
     " case insensitive matching
     return a:dir =~? l:pat
