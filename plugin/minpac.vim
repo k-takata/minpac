@@ -12,7 +12,6 @@ if exists('g:loaded_minpac')
 endif
 let g:loaded_minpac = 1
 
-let s:is_win = has('win32')
 
 " Get a list of package/plugin directories.
 function! minpac#getpackages(...)
@@ -115,6 +114,39 @@ function! minpac#add(plugname, ...)
 endfunction
 
 
+function! s:job_exit_cb(name, job, errcode)
+  if a:errcode == 0
+    let l:dir = s:pluglist[a:name].dir
+    if isdirectory(l:dir)
+      if isdirectory(l:dir . '/doc')
+        silent! execute 'helptags' l:dir . '/doc'
+      endif
+      echom 'Updated: ' . a:name
+      return
+    endif
+  endif
+  echohl ErrorMsg
+  echom 'Error while updating "' . a:name . '": ' . a:errcode
+  echohl None
+endfunction
+
+function! s:start_job(cmds, name)
+  if has('win32')
+    let l:cmds = join(map(a:cmds, {-> (v:val =~# ' ') ? '"' . v:val . '"' : v:val}), ' ')
+  else
+    let l:cmds = a:cmds
+  endif
+  let l:job = job_start(l:cmds, {'exit_cb': function('s:job_exit_cb', [a:name]),
+        \ 'in_io': 'null', 'out_io': 'null', 'err_io': 'null'})
+  if job_status(l:job) ==# 'fail'
+    echohl ErrorMsg
+    echom 'Fail to execute: ' . a:cmds[0]
+    echohl None
+    return 1
+  endif
+  return 0
+endfunction
+
 " Update a single plugin.
 function! s:update_single_plugin(name, force)
   if !has_key(s:pluglist, a:name)
@@ -122,30 +154,30 @@ function! s:update_single_plugin(name, force)
     return 1
   endif
 
-  let l:dir = s:pluglist[a:name].dir
-  let l:url = s:pluglist[a:name].url
+  let l:pluginfo = s:pluglist[a:name]
+  let l:dir = l:pluginfo.dir
+  let l:url = l:pluginfo.url
   if !isdirectory(l:dir)
     echo 'Cloning ' . a:name
-    let l:depth = s:pluglist[a:name].depth
-    let l:depthopt = (l:depth > 0) ? ' --depth=' . l:depth : ''
-    let l:branch = s:pluglist[a:name].depth
-    let l:branchopt = (l:branch != '') ? ' -b ' . l:branch : ''
-    let l:cmd = '"' . s:gitcmd . '" clone' . l:depthopt . l:branchopt . ' "' . l:url . '" "' . l:dir . '"'
+
+    let l:cmd = [s:gitcmd, 'clone']
+    if l:pluginfo.depth > 0
+      let l:cmd += ['--depth=' . l:pluginfo.depth]
+    endif
+    if l:pluginfo.branch > 0
+      let l:cmd += ['--branch=' . l:pluginfo.branch]
+    endif
+    let l:cmd += [l:url, l:dir]
   else
-    if s:pluglist[a:name].frozen && !a:force
+    if l:pluginfo.frozen && !a:force
       echo 'Skipping ' . a:name
       return 0
     endif
 
     echo 'Updating ' . a:name
-    let l:cmd = '"' . s:gitcmd . '" -C "' . l:dir . '" pull --ff-only'
+    let l:cmd = [s:gitcmd, '-C', l:dir, 'pull', '--ff-only']
   endif
-  "let l:cmd = [&shell, &shellcmdflag, l:cmd . ' 2&>1']
-  call system(l:cmd)
-  if isdirectory(l:dir . '/doc')
-    silent! execute 'helptags' l:dir . '/doc'
-  endif
-  return 0
+  return s:start_job(l:cmd, a:name)
 endfunction
 
 
@@ -181,7 +213,7 @@ function! s:match_plugin(dir, packname, plugnames)
   else
     let l:pat = '/pack/' . a:packname . '/\%(start\|opt\)/' . l:plugname . '$'
   endif
-  if s:is_win
+  if has('win32')
     let l:pat = substitute(l:pat, '/', '[/\\\\]', 'g')
     " case insensitive matching
     return a:dir =~? l:pat
@@ -231,7 +263,9 @@ function! minpac#clean(...)
     let err = 0
     for l:item in l:to_remove
       if delete(l:item, 'rf') != 0
-        echoerr 'Clean failed: ' . l:item
+        echohl ErrorMsg
+        echom 'Clean failed: ' . l:item
+        echohl None
         let err = 1
       endif
     endfor
@@ -250,8 +284,8 @@ function! minpac#getpluginfo(name)
 endfunction
 
 
-" Get a list of plugin information. Only for debugging.
-function! minpac#debug_getpluglist()
+" Get a list of plugin information. Only for internal use.
+function! minpac#getpluglist()
   return s:pluglist
 endfunction
 
