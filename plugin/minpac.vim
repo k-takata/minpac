@@ -39,7 +39,7 @@ function! minpac#init(...)
   let l:packdir = get(l:opt, 'dir', '')
   let s:gitcmd = get(l:opt, 'git', 'git')
   let s:package_name = get(l:opt, 'package_name', 'minpac')
-  let s:clone_depth = get(l:opt, 'clone_depth', 1)
+  let s:depth = get(l:opt, 'depth', 1)
 
   let s:pluglist = {}
 
@@ -104,14 +104,14 @@ function! minpac#add(plugname, ...)
   let l:frozen = get(opt, 'frozen', 0)
 
   " Clone depth
-  let l:clone_depth = get(opt, 'clone_depth', s:clone_depth)
+  let l:depth = get(opt, 'depth', s:depth)
 
   " Branch
   let l:branch = get(opt, 'branch', '')
 
   " Add to pluglist
   let s:pluglist[l:name] = {'url': l:url, 'type': l:type, 'dir': l:dir,
-        \ 'clone_depth': l:clone_depth, 'frozen': l:frozen, 'branch': l:branch}
+        \ 'depth': l:depth, 'frozen': l:frozen, 'branch': l:branch}
 endfunction
 
 
@@ -126,9 +126,9 @@ function! s:update_single_plugin(name, force)
   let l:url = s:pluglist[a:name].url
   if !isdirectory(l:dir)
     echo 'Cloning ' . a:name
-    let l:clone_depth = s:pluglist[a:name].clone_depth
-    let l:depthopt = (l:clone_depth > 0) ? ' --depth=' . l:clone_depth : ''
-    let l:branch = s:pluglist[a:name].clone_depth
+    let l:depth = s:pluglist[a:name].depth
+    let l:depthopt = (l:depth > 0) ? ' --depth=' . l:depth : ''
+    let l:branch = s:pluglist[a:name].depth
     let l:branchopt = (l:branch != '') ? ' -b ' . l:branch : ''
     let l:cmd = '"' . s:gitcmd . '" clone' . l:depthopt . l:branchopt . ' "' . l:url . '" "' . l:dir . '"'
   else
