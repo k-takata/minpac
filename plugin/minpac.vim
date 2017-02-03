@@ -244,6 +244,12 @@ function! minpac#clean(...)
 endfunction
 
 
+" Get information of specified plugin. Mainly for debugging.
+function! minpac#getpluginfo(name)
+  return s:pluglist[a:name]
+endfunction
+
+
 " Get a list of plugin information. Only for debugging.
 function! minpac#debug_getpluglist()
   return s:pluglist

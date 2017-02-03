@@ -85,6 +85,9 @@ Install or update all plugins or the specified plugin.
 
 Remove all plugins which are not registered, or remove the specified plugin.
 
+#### minpac#getpluginfo({name})
+
+Get information of specified plugin. Mainly for debugging.
 
 License
 -------
