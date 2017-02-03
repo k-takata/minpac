@@ -12,6 +12,7 @@ if exists('g:loaded_minpac')
 endif
 let g:loaded_minpac = 1
 
+let s:joblist = []
 
 " Get a list of package/plugin directories.
 function! minpac#getpackages(...)
@@ -39,6 +40,7 @@ function! minpac#init(...)
   let s:gitcmd = get(l:opt, 'git', 'git')
   let s:package_name = get(l:opt, 'package_name', 'minpac')
   let s:depth = get(l:opt, 'depth', 1)
+  let s:jobs = get(l:opt, 'jobs', 8)
 
   let s:pluglist = {}
 
@@ -115,6 +117,7 @@ endfunction
 
 
 function! s:job_exit_cb(name, job, errcode)
+  call filter(s:joblist, {-> v:val isnot a:job})
   if a:errcode == 0
     let l:dir = s:pluglist[a:name].dir
     if isdirectory(l:dir)
@@ -131,6 +134,12 @@ function! s:job_exit_cb(name, job, errcode)
 endfunction
 
 function! s:start_job(cmds, name)
+  if s:jobs > 0
+    while len(s:joblist) >= s:jobs
+      sleep 500m
+    endwhile
+  endif
+
   if has('win32')
     let l:cmds = join(map(a:cmds, {-> (v:val =~# ' ') ? '"' . v:val . '"' : v:val}), ' ')
   else
@@ -144,6 +153,7 @@ function! s:start_job(cmds, name)
     echohl None
     return 1
   endif
+  let s:joblist += [l:job]
   return 0
 endfunction
 
