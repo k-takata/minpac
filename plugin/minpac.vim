@@ -118,6 +118,8 @@ endfunction
 
 function! s:job_exit_cb(name, job, errcode)
   call filter(s:joblist, {-> v:val isnot a:job})
+
+  let l:err = 1
   if a:errcode == 0
     let l:dir = s:pluglist[a:name].dir
     if isdirectory(l:dir)
@@ -125,12 +127,18 @@ function! s:job_exit_cb(name, job, errcode)
         silent! execute 'helptags' l:dir . '/doc'
       endif
       echom 'Updated: ' . a:name
-      return
+      let l:err = 0
     endif
   endif
-  echohl ErrorMsg
-  echom 'Error while updating "' . a:name . '": ' . a:errcode
-  echohl None
+  if l:err
+    echohl ErrorMsg
+    echom 'Error while updating "' . a:name . '": ' . a:errcode
+    echohl None
+  endif
+
+  if len(s:joblist) == 0
+    echom 'Finished.'
+  endif
 endfunction
 
 function! s:job_err_cb(name, channel, message)
