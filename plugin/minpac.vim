@@ -151,6 +151,9 @@ endfunction
 
 function! s:start_job(cmds, name)
   if s:jobs > 0
+    if len(s:joblist) > 1
+      sleep 20m
+    endif
     while len(s:joblist) >= s:jobs
       sleep 500m
     endwhile
