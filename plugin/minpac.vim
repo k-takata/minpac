@@ -191,7 +191,7 @@ function! s:update_single_plugin(name, force)
   if !isdirectory(l:dir)
     echo 'Cloning ' . a:name
 
-    let l:cmd = [s:gitcmd, 'clone']
+    let l:cmd = [s:gitcmd, 'clone', '--quiet']
     if l:pluginfo.depth > 0
       let l:cmd += ['--depth=' . l:pluginfo.depth]
     endif
@@ -207,7 +207,7 @@ function! s:update_single_plugin(name, force)
     endif
 
     echo 'Updating ' . a:name
-    let l:cmd = [s:gitcmd, '-C', l:dir, 'pull', '--ff-only']
+    let l:cmd = [s:gitcmd, '-C', l:dir, 'pull', '--quiet', '--ff-only']
   endif
   return s:start_job(l:cmd, a:name)
 endfunction
