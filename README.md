@@ -4,8 +4,10 @@ minpac: A minimal package manager for Vim 8
 Overview
 --------
 
-Minpac is a minimal package manager for Vim 8. This uses the packages
-feature which was newly added on Vim 8.
+Minpac is a minimal package manager for Vim 8. This uses the
+[packages](http://vimhelp.appspot.com/repeat.txt.html#packages) feature and
+the [jobs](http://vimhelp.appspot.com/channel.txt.html#job-channel-overview)
+feature which have been newly added on Vim 8.
 
 
 Requirements
@@ -15,7 +17,7 @@ Requirements
 * Git 1.9 or later
 * OS  
   Windows: tested  
-  Linux: not tested  
+  Linux: tested  
   macOS: not tested
 
 
