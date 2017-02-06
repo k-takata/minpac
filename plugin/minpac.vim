@@ -20,7 +20,7 @@ endfunction
 
 
 " Initialize minpac.
-function! minpac#init(...)
+function! minpac#init(...) abort
   let l:opt = get(a:000, 0, {})
 
   let g:minpac#opt = {}
@@ -53,7 +53,7 @@ endfunction
 
 
 " Register the specified plugin.
-function! minpac#add(plugname, ...)
+function! minpac#add(plugname, ...) abort
   let l:opt = get(a:000, 0, {})
 
   " URL

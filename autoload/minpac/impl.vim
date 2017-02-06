@@ -11,7 +11,7 @@ let s:joblist = []
 let s:remain_jobs = 0
 
 " Get a list of package/plugin directories.
-function! minpac#impl#getpackages(args)
+function! minpac#impl#getpackages(args) abort
   let l:packname = get(a:args, 0, '')
   let l:packtype = get(a:args, 1, '')
   let l:plugname = get(a:args, 2, '')
@@ -29,14 +29,14 @@ function! minpac#impl#getpackages(args)
 endfunction
 
 
-function! s:decrement_job_count()
+function! s:decrement_job_count() abort
   let s:remain_jobs -= 1
   if s:remain_jobs == 0
     echom 'Finished.'
   endif
 endfunction
 
-function! s:job_exit_cb(name, job, errcode)
+function! s:job_exit_cb(name, job, errcode) abort
   call filter(s:joblist, {-> v:val isnot a:job})
 
   let l:err = 1
@@ -59,13 +59,13 @@ function! s:job_exit_cb(name, job, errcode)
   call s:decrement_job_count()
 endfunction
 
-function! s:job_err_cb(name, channel, message)
+function! s:job_err_cb(name, channel, message) abort
   echohl WarningMsg
   echom a:name . ': ' . a:message
   echohl None
 endfunction
 
-function! s:start_job(cmds, name)
+function! s:start_job(cmds, name) abort
   if g:minpac#opt.jobs > 0
     if len(s:joblist) > 1
       sleep 20m
@@ -95,7 +95,7 @@ function! s:start_job(cmds, name)
 endfunction
 
 " Update a single plugin.
-function! s:update_single_plugin(name, force)
+function! s:update_single_plugin(name, force) abort
   if !has_key(g:minpac#pluglist, a:name)
     echoerr 'Plugin not registered: ' . a:name
     return 1
@@ -128,7 +128,7 @@ function! s:update_single_plugin(name, force)
 endfunction
 
 " Update all or specified plugin(s).
-function! minpac#impl#update(args)
+function! minpac#impl#update(args) abort
   let l:force = 0
   if len(a:args) == 0
     let l:names = keys(g:minpac#pluglist)
@@ -156,7 +156,7 @@ endfunction
 
 
 " Check if the dir matches specified package name and plugin names.
-function! s:match_plugin(dir, packname, plugnames)
+function! s:match_plugin(dir, packname, plugnames) abort
   let l:plugname = '\%(' . join(a:plugnames, '\|') . '\)'
   let l:plugname = substitute(l:plugname, '\.', '\\.', 'g')
   let l:plugname = substitute(l:plugname, '\*', '.*', 'g')
@@ -176,7 +176,7 @@ function! s:match_plugin(dir, packname, plugnames)
 endfunction
 
 " Remove plugins that are not registered.
-function! minpac#impl#clean(args)
+function! minpac#impl#clean(args) abort
   let l:plugin_dirs = minpac#getpackages(g:minpac#opt.package_name)
 
   if len(a:args) > 0
