@@ -233,7 +233,11 @@ function! minpac#update(...)
     return
   endif
 
-  let s:remain_jobs += len(l:names)
+  if s:remain_jobs > 0
+    echom 'Previous update has not been finished.'
+    return
+  endif
+  let s:remain_jobs = len(l:names)
 
   for l:name in l:names
     let ret = s:update_single_plugin(l:name, l:force)
