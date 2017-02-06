@@ -66,10 +66,10 @@ function! s:job_err_cb(name, channel, message) abort
 endfunction
 
 function! s:start_job(cmds, name) abort
+  if len(s:joblist) > 1
+    sleep 20m
+  endif
   if g:minpac#opt.jobs > 0
-    if len(s:joblist) > 1
-      sleep 20m
-    endif
     while len(s:joblist) >= g:minpac#opt.jobs
       sleep 500m
     endwhile
