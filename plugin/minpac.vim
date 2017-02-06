@@ -195,14 +195,13 @@ function! s:update_single_plugin(name, force)
   if !isdirectory(l:dir)
     echo 'Cloning ' . a:name
 
-    let l:cmd = [s:gitcmd, 'clone', '--quiet']
+    let l:cmd = [s:gitcmd, 'clone', '--quiet', l:url, l:dir]
     if l:pluginfo.depth > 0
       let l:cmd += ['--depth=' . l:pluginfo.depth]
     endif
     if l:pluginfo.branch != ''
       let l:cmd += ['--branch=' . l:pluginfo.branch]
     endif
-    let l:cmd += [l:url, l:dir]
   else
     if l:pluginfo.frozen && !a:force
       echo 'Skipping ' . a:name
