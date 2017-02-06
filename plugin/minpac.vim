@@ -199,7 +199,7 @@ function! s:update_single_plugin(name, force)
     if l:pluginfo.depth > 0
       let l:cmd += ['--depth=' . l:pluginfo.depth]
     endif
-    if l:pluginfo.branch > 0
+    if l:pluginfo.branch != ''
       let l:cmd += ['--branch=' . l:pluginfo.branch]
     endif
     let l:cmd += [l:url, l:dir]
