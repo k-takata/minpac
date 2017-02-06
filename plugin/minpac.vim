@@ -57,7 +57,7 @@ function! minpac#add(plugname, ...) abort
   let l:opt = get(a:000, 0, {})
 
   " URL
-  if a:plugname =~# '^https?://'
+  if a:plugname =~# '^\%(https?://\|git@\)'
     let l:url = a:plugname
   else
     let l:url = 'https://github.com/' . a:plugname . '.git'
