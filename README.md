@@ -5,8 +5,8 @@ Overview
 --------
 
 Minpac is a minimal package manager for Vim 8. This uses the
-[packages](http://vimhelp.appspot.com/repeat.txt.html#packages) feature and
-the [jobs](http://vimhelp.appspot.com/channel.txt.html#job-channel-overview)
+[packages](http://vim-jp.org/vimdoc-en/repeat.html#packages) feature and
+the [jobs](http://vim-jp.org/vimdoc-en/channel.html#job-channel-overview)
 feature which have been newly added on Vim 8.
 
 
@@ -48,11 +48,15 @@ packadd minpac
 
 call minpac#init()
 
+" minpac must have {'type': 'opt'} so that it can be loaded with `packadd`.
 call minpac#add('k-takata/minpac', {'type': 'opt'})
+
+" Add other plugins here.
 call minpac#add('vim-jp/syntax-vim-ex')
+...
 
 " Load the plugins right now. (optional)
-packloadall
+"packloadall
 ```
 
 If you want to use `.vim` directory instead of `vimfiles` even on Windows,
@@ -65,6 +69,31 @@ packadd minpac
 call minpac#init()
 ...
 ```
+
+You can write a .vimrc which can be also used even if minpac is not installed.
+
+```vim
+" Try to load minpac.
+silent! packadd minpac
+
+if !exists('*minpac#init')
+  " minpac is not avalable.
+
+  " Minimal settings which are used when no plugins are loaded.
+  ...
+else
+  " minpac is avalable.
+  call minpac#init()
+  call minpac#add('k-takata/minpac', {'type': 'opt'})
+
+  " Additional plugins here.
+  ...
+
+  " Plugin settings here.
+  ...
+endif
+```
+
 
 Usage
 -----
@@ -120,6 +149,7 @@ Install or update all plugins or the specified plugin.
 If `{name}` is omitted, all plugins will be installed or updated. Frozen plugins will be installed, but it will not be updated.
 
 If `{name}` is specified, only specified plugin will be installed or updated. Frozen plugin will be also updated.
+`{name}` can also be a list of plugin names.
 
 #### minpac#clean([{name}])
 
@@ -130,6 +160,7 @@ Remove all plugins which are not registered, or remove the specified plugin.
 If `{name}` is omitted, all plugins under the `minpac` directory will be checked. If unregistered plugins are found, they are listed and a prompt is shown. If you type `y`, they will be removed.
 
 If `{name}` is specified, matched plugins are listed (even they are registered with `minpac#add()`) and a prompt is shown. If you type `y`, they will be removed.
+`{name}` can also be a list of plugin names.
 
 #### minpac#getpluginfo({name})
 
