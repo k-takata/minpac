@@ -79,7 +79,7 @@ silent! packadd minpac
 if !exists('*minpac#init')
   " minpac is not avalable.
 
-  " Minimal settings which are used when no plugins are loaded.
+  " Settings for plugin-less environment.
   ...
 else
   " minpac is avalable.
@@ -92,6 +92,9 @@ else
   " Plugin settings here.
   ...
 endif
+
+" Common settings here.
+...
 ```
 
 
@@ -109,8 +112,8 @@ Initialize minpac.
 | option    | description |
 |-----------|-------------|
 | `'dir'`   | Base directory. Default: the first directory of the `'packpath'` option. |
-| `'git'`   | Git command. Default: `'git'` |
 | `'package_name'` | Package name. Default: `'minpac'` |
+| `'git'`   | Git command. Default: `'git'` |
 | `'depth'` | Default clone depth. Default: 1 |
 | `'jobs'`  | Maximum job numbers. Default: 8 |
 
@@ -150,6 +153,8 @@ If `{name}` is omitted, all plugins will be installed or updated. Frozen plugins
 
 If `{name}` is specified, only specified plugin will be installed or updated. Frozen plugin will be also updated.
 `{name}` can also be a list of plugin names.
+
+You can check the results with `:message` command.
 
 #### minpac#clean([{name}])
 
