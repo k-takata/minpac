@@ -107,7 +107,7 @@ function! s:update_single_plugin(name, force) abort
   if !isdirectory(l:dir)
     echo 'Cloning ' . a:name
 
-    let l:cmd = [g:minpac#opt.gitcmd, 'clone', '--quiet', l:url, l:dir]
+    let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
     if l:pluginfo.depth > 0
       let l:cmd += ['--depth=' . l:pluginfo.depth]
     endif
@@ -122,7 +122,7 @@ function! s:update_single_plugin(name, force) abort
     endif
 
     echo 'Updating ' . a:name
-    let l:cmd = [g:minpac#opt.gitcmd, '-C', l:dir, 'pull', '--quiet', '--ff-only']
+    let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
   endif
   return s:start_job(l:cmd, a:name)
 endfunction

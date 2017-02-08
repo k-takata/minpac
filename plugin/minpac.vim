@@ -21,86 +21,71 @@ endfunction
 
 " Initialize minpac.
 function! minpac#init(...) abort
-  let l:opt = get(a:000, 0, {})
+  let l:opt = extend(copy(get(a:000, 0, {})),
+        \ {'dir': '', 'package_name': 'minpac', 'git': 'git', 'depth': 1, 'jobs': 8}, 'keep')
 
-  let g:minpac#opt = {}
-  let g:minpac#opt.gitcmd = get(l:opt, 'git', 'git')
-  let g:minpac#opt.package_name = get(l:opt, 'package_name', 'minpac')
-  let g:minpac#opt.depth = get(l:opt, 'depth', 1)
-  let g:minpac#opt.jobs = get(l:opt, 'jobs', 8)
-
+  let g:minpac#opt = l:opt
   let g:minpac#pluglist = {}
 
-  let l:packdir = get(l:opt, 'dir', '')
+  let l:packdir = l:opt.dir
   if l:packdir == ''
     " If 'dir' is not specified, the first directory of 'packpath' is used.
     let l:packdir = split(&packpath, ',')[0]
   endif
-  let g:minpac#opt.minpac_dir = l:packdir . '/pack/' . g:minpac#opt.package_name
-  let g:minpac#opt.minpac_start_dir = g:minpac#opt.minpac_dir . '/start'
-  let g:minpac#opt.minpac_opt_dir = g:minpac#opt.minpac_dir . '/opt'
+  let l:opt.minpac_dir = l:packdir . '/pack/' . l:opt.package_name
+  let l:opt.minpac_start_dir = l:opt.minpac_dir . '/start'
+  let l:opt.minpac_opt_dir = l:opt.minpac_dir . '/opt'
   if !isdirectory(l:packdir)
     echoerr 'Pack directory not available: ' . l:packdir
     return
   endif
-  if !isdirectory(g:minpac#opt.minpac_start_dir)
-    call mkdir(g:minpac#opt.minpac_start_dir, 'p')
+  if !isdirectory(l:opt.minpac_start_dir)
+    call mkdir(l:opt.minpac_start_dir, 'p')
   endif
-  if !isdirectory(g:minpac#opt.minpac_opt_dir)
-    call mkdir(g:minpac#opt.minpac_opt_dir, 'p')
+  if !isdirectory(l:opt.minpac_opt_dir)
+    call mkdir(l:opt.minpac_opt_dir, 'p')
   endif
 endfunction
 
 
 " Register the specified plugin.
 function! minpac#add(plugname, ...) abort
-  let l:opt = get(a:000, 0, {})
+  let l:opt = extend(copy(get(a:000, 0, {})),
+        \ {'name': '', 'type': 'start', 'depth': g:minpac#opt.depth,
+        \  'frozen': 0, 'branch': ''}, 'keep')
 
   " URL
   if a:plugname =~# '^\%(https?://\|git@\)'
-    let l:url = a:plugname
+    let l:opt.url = a:plugname
   else
-    let l:url = 'https://github.com/' . a:plugname . '.git'
+    let l:opt.url = 'https://github.com/' . a:plugname . '.git'
   endif
 
   " Name of the plugin
-  if l:url =~# '\.git$'
-    let l:name = matchstr(l:url, '.*/\zs[^/]\+\ze\.git$')
-  else
-    let l:name = matchstr(l:url, '.*/\zs[^/]\+$')
+  if l:opt.name == ''
+    if l:opt.url =~# '\.git$'
+      let l:opt.name = matchstr(l:opt.url, '.*/\zs[^/]\+\ze\.git$')
+    else
+      let l:opt.name = matchstr(l:opt.url, '.*/\zs[^/]\+$')
+    endif
   endif
-  let l:name = get(l:opt, 'name', l:name)
-  if l:name == ''
+  if l:opt.name == ''
     echoerr 'Cannot specify the plugin name.'
     return
   endif
 
-  " Loading type: 'start' or 'opt'
-  let l:type = get(l:opt, 'type', 'start')
-  if l:type !=# 'start' && l:type !=# 'opt'
-    echoerr "Wrong type (must be 'start' or 'opt'): " . l:type
+  " Loading type / Local directory
+  if l:opt.type ==# 'start'
+    let l:opt.dir = g:minpac#opt.minpac_start_dir . '/' . l:opt.name
+  elseif l:opt.type ==# 'opt'
+    let l:opt.dir = g:minpac#opt.minpac_opt_dir . '/' . l:opt.name
+  else
+    echoerr "Wrong type (must be 'start' or 'opt'): " . l:opt.type
     return
   endif
 
-  " Local directory
-  if l:type ==# 'start'
-    let l:dir = g:minpac#opt.minpac_start_dir . '/' . l:name
-  else
-    let l:dir = g:minpac#opt.minpac_opt_dir . '/' . l:name
-  endif
-
-  " Frozen
-  let l:frozen = get(l:opt, 'frozen', 0)
-
-  " Clone depth
-  let l:depth = get(l:opt, 'depth', g:minpac#opt.depth)
-
-  " Branch
-  let l:branch = get(l:opt, 'branch', '')
-
   " Add to pluglist
-  let g:minpac#pluglist[l:name] = {'url': l:url, 'type': l:type, 'dir': l:dir,
-        \ 'depth': l:depth, 'frozen': l:frozen, 'branch': l:branch}
+  let g:minpac#pluglist[l:opt.name] = l:opt
 endfunction
 
 
