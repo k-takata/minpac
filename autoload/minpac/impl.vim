@@ -36,14 +36,22 @@ function! s:decrement_job_count() abort
   endif
 endfunction
 
-function! s:job_exit_cb(name, job, errcode) abort
+function! s:job_exit_cb(name, seq, job, errcode) abort
   call filter(s:joblist, {-> v:val isnot a:job})
 
   let l:err = 1
   if a:errcode == 0
     let l:dir = g:minpac#pluglist[a:name].dir
     if isdirectory(l:dir)
-      if isdirectory(l:dir . '/doc')
+      " Successfully updated.
+      if a:seq == 0 && filereadable(l:dir . '/.gitmodules')
+        " Update git submodule.
+        let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
+              \ 'update', '--init', '--recursive']
+        call s:start_job(l:cmd, a:name, a:seq + 1)
+        return
+      elseif isdirectory(l:dir . '/doc')
+        " Generate helptags.
         silent! execute 'helptags' l:dir . '/doc'
       endif
       echom 'Updated: ' . a:name
@@ -65,7 +73,7 @@ function! s:job_err_cb(name, channel, message) abort
   echohl None
 endfunction
 
-function! s:start_job(cmds, name) abort
+function! s:start_job(cmds, name, seq) abort
   if len(s:joblist) > 1
     sleep 20m
   endif
@@ -80,7 +88,8 @@ function! s:start_job(cmds, name) abort
   else
     let l:cmds = a:cmds
   endif
-  let l:job = job_start(l:cmds, {'exit_cb': function('s:job_exit_cb', [a:name]),
+  let l:job = job_start(l:cmds, {
+        \ 'exit_cb': function('s:job_exit_cb', [a:name, a:seq]),
         \ 'in_io': 'null', 'out_io': 'null',
         \ 'err_cb': function('s:job_err_cb', [a:name])})
   if job_status(l:job) ==# 'fail'
@@ -124,7 +133,7 @@ function! s:update_single_plugin(name, force) abort
     echo 'Updating ' . a:name
     let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
   endif
-  return s:start_job(l:cmd, a:name)
+  return s:start_job(l:cmd, a:name, 0)
 endfunction
 
 " Update all or specified plugin(s).
