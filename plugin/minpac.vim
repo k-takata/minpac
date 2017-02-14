@@ -55,19 +55,16 @@ function! minpac#add(plugname, ...) abort
         \  'frozen': 0, 'branch': ''}, 'keep')
 
   " URL
-  if a:plugname =~# '^\%(https?://\|git@\)'
-    let l:opt.url = a:plugname
-  else
+  if a:plugname =~? '^[-._0-9a-z]\+\/[-._0-9a-z]\+$'
     let l:opt.url = 'https://github.com/' . a:plugname . '.git'
+  else
+    let l:opt.url = a:plugname
   endif
 
   " Name of the plugin
   if l:opt.name == ''
-    if l:opt.url =~# '\.git$'
-      let l:opt.name = matchstr(l:opt.url, '.*/\zs[^/]\+\ze\.git$')
-    else
-      let l:opt.name = matchstr(l:opt.url, '.*/\zs[^/]\+$')
-    endif
+    let l:opt.name = matchstr(l:opt.url, '[/\\]\zs[^/\\]\+$')
+    let l:opt.name = substitute(l:opt.name, '\.git$', '', '')
   endif
   if l:opt.name == ''
     echoerr 'Cannot specify the plugin name.'
