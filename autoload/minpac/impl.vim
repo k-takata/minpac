@@ -48,6 +48,7 @@ function! s:job_exit_cb(name, seq, job, errcode) abort
         " Update git submodule.
         let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
               \ 'update', '--init', '--recursive']
+        echom 'Updating submodules: ' . a:name
         call s:start_job(l:cmd, a:name, a:seq + 1)
         return
       elseif isdirectory(l:dir . '/doc')
