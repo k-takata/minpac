@@ -9,6 +9,14 @@ Minpac is a minimal package manager for Vim 8. This uses the
 the [jobs](http://vim-jp.org/vimdoc-en/channel.html#job-channel-overview)
 feature which have been newly added on Vim 8.
 
+Concept
+-------
+
+* Utilize Vim 8's packages feature.
+* Parallel install/update using Vim 8's jobs feature.
+* Simple.
+* Fast.
+
 
 Requirements
 ------------
@@ -23,6 +31,9 @@ Requirements
 
 Installation
 ------------
+
+Minpac should be installed under `pack/minpac/opt/` in the first directory
+in the `'packpath'` option.
 
 ### Windows
 
@@ -101,6 +112,20 @@ endif
 Usage
 -----
 
+### Commands
+
+Minpac doesn't provide any commands. Use the `:call` command to call minpac
+functions. E.g.:
+
+```vim
+" To install or update plugins:
+call minpac#update()
+
+" To uninstall unused plugins:
+call minpac#clean()
+```
+
+
 ### Functions
 
 #### minpac#init([{opt}])
@@ -117,7 +142,7 @@ Initialize minpac.
 | `'depth'` | Default clone depth. Default: 1 |
 | `'jobs'`  | Maximum job numbers. Default: 8 |
 
-All plugins will be installed under the following directory:
+All plugins will be installed under the following directories:
 
     "start" plugins: <dir>/pack/<package_name>/start/<plugin_name>
     "opt" plugins:   <dir>/pack/<package_name>/opt/<plugin_name>
