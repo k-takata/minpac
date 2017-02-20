@@ -108,6 +108,7 @@ endfunction
 function! s:update_single_plugin(name, force) abort
   if !has_key(g:minpac#pluglist, a:name)
     echoerr 'Plugin not registered: ' . a:name
+    call s:decrement_job_count()
     return 1
   endif
 
