@@ -70,7 +70,7 @@ endfunction
 
 function! s:job_err_cb(name, channel, message) abort
   echohl WarningMsg
-  echom a:name . ': ' . a:message
+  echom a:name . ': ' . join(a:message, "\n")
   echohl None
 endfunction
 
@@ -89,11 +89,13 @@ function! s:start_job(cmds, name, seq) abort
   else
     let l:cmds = a:cmds
   endif
-  let l:job = job_start(l:cmds, {
-        \ 'exit_cb': function('s:job_exit_cb', [a:name, a:seq]),
-        \ 'in_io': 'null', 'out_io': 'null',
-        \ 'err_cb': function('s:job_err_cb', [a:name])})
-  if job_status(l:job) ==# 'fail'
+  let l:job = minpac#job#start(l:cmds, {
+        \ 'on_stderr': function('s:job_err_cb'),
+        \ 'on_exit': function('s:job_exit_cb', [a:name]),
+        \ })
+  if l:job > 0
+    " It worked!
+  else
     echohl ErrorMsg
     echom 'Fail to execute: ' . a:cmds[0]
     echohl None
