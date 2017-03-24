@@ -70,7 +70,7 @@ endfunction
 
 function! s:job_err_cb(name, channel, message) abort
   echohl WarningMsg
-  echom a:name . ': ' . a:message
+  echom a:name . ': ' . join(a:message, "\n")
   echohl None
 endfunction
 
