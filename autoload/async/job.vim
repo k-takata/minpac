@@ -79,7 +79,7 @@ function! s:job_start(cmd, opts) abort
     let l:jobtype = ''
 
     if has_key(a:opts, 'type')
-        if type(a:opts.type, v:t_string)
+        if type(a:opts.type) == type('')
             if !s:job_supports_type(a:opts.type)
                 return s:job_error_unsupported_job_type
             endif
