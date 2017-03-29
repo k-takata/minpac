@@ -21,7 +21,8 @@ Concept
 Requirements
 ------------
 
-* Vim 8.0
+* Vim 8.0  
+  (Hopefully minpac will also work on NeoVim.)
 * Git 1.9 or later
 * OS  
   Windows: tested  
@@ -208,7 +209,16 @@ A dictionary with following items will be returned:
 | `'branch'` | Branch name to be cloned. |
 | `'depth'`  | Depth to be cloned. |
 
+
+Credit
+------
+
+Prabir Shrestha (as the author of [async.vim](https://github.com/prabirshrestha/async.vim))
+
+
 License
 -------
 
 VIM License
+
+(`autoload/minpac/job.vim` is the MIT License.)
