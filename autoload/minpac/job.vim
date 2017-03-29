@@ -166,15 +166,15 @@ function! s:job_send(jobid, data) abort
 endfunction
 
 " public apis {{{
-function! async#job#start(cmd, opts) abort
+function! minpac#job#start(cmd, opts) abort
     return s:job_start(a:cmd, a:opts)
 endfunction
 
-function! async#job#stop(jobid) abort
+function! minpac#job#stop(jobid) abort
     call s:job_stop(a:jobid)
 endfunction
 
-function! async#job#send(jobid, data) abort
+function! minpac#job#send(jobid, data) abort
     call s:job_send(a:jobid, a:data)
 endfunction
 " }}}
