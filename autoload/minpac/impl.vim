@@ -36,41 +36,43 @@ function! s:decrement_job_count() abort
   endif
 endfunction
 
-function! s:job_exit_cb(name, seq, job, errcode) abort
-  call filter(s:joblist, {-> v:val isnot a:job})
+function! s:job_exit_cb(id, errcode, event) dict abort
+  call filter(s:joblist, {-> v:val != a:id})
 
   let l:err = 1
   if a:errcode == 0
-    let l:dir = g:minpac#pluglist[a:name].dir
+    let l:dir = g:minpac#pluglist[self.name].dir
     if isdirectory(l:dir)
       " Successfully updated.
-      if a:seq == 0 && filereadable(l:dir . '/.gitmodules')
+      if self.seq == 0 && filereadable(l:dir . '/.gitmodules')
         " Update git submodule.
         let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
               \ 'update', '--init', '--recursive']
-        echom 'Updating submodules: ' . a:name
-        call s:start_job(l:cmd, a:name, a:seq + 1)
+        echom 'Updating submodules: ' . self.name
+        call s:start_job(l:cmd, self.name, self.seq + 1)
         return
       elseif isdirectory(l:dir . '/doc')
         " Generate helptags.
         silent! execute 'helptags' l:dir . '/doc'
       endif
-      echom 'Updated: ' . a:name
+      echom 'Updated: ' . self.name
       let l:err = 0
     endif
   endif
   if l:err
     echohl ErrorMsg
-    echom 'Error while updating "' . a:name . '": ' . a:errcode
+    echom 'Error while updating "' . self.name . '": ' . a:errcode
     echohl None
   endif
 
   call s:decrement_job_count()
 endfunction
 
-function! s:job_err_cb(name, channel, message) abort
+function! s:job_err_cb(id, message, event) dict abort
   echohl WarningMsg
-  echom a:name . ': ' . a:message
+  for l:line in a:message
+    echom self.name . ': ' . l:line
+  endfor
   echohl None
 endfunction
 
@@ -89,11 +91,14 @@ function! s:start_job(cmds, name, seq) abort
   else
     let l:cmds = a:cmds
   endif
-  let l:job = job_start(l:cmds, {
-        \ 'exit_cb': function('s:job_exit_cb', [a:name, a:seq]),
-        \ 'in_io': 'null', 'out_io': 'null',
-        \ 'err_cb': function('s:job_err_cb', [a:name])})
-  if job_status(l:job) ==# 'fail'
+  let l:job = minpac#job#start(l:cmds, {
+        \ 'on_stderr': function('s:job_err_cb'),
+        \ 'on_exit': function('s:job_exit_cb'),
+        \ 'name': a:name, 'seq': a:seq
+        \ })
+  if l:job > 0
+    " It worked!
+  else
     echohl ErrorMsg
     echom 'Fail to execute: ' . a:cmds[0]
     echohl None

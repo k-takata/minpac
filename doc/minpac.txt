@@ -39,6 +39,7 @@ CONCEPT						*minpac-concept*
 REQUIREMENTS					*minpac-requirements*
 
 * Vim 8.0
+  (Hopefully minpac will also work on NeoVim.)
 * Git 1.9 or later
 * OS
   Windows: tested
