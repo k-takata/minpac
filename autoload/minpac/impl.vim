@@ -165,9 +165,16 @@ function! minpac#impl#update(args) abort
   endif
   let s:remain_jobs = len(l:names)
 
-  for l:name in l:names
-    let ret = s:update_single_plugin(l:name, l:force)
-  endfor
+  let l:old_more = &more
+  set nomore
+
+  try
+    for l:name in l:names
+      let ret = s:update_single_plugin(l:name, l:force)
+    endfor
+  finally
+    let &more = l:old_more
+  endtry
 endfunction
 
 
