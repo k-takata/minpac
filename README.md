@@ -182,6 +182,8 @@ If `{name}` is specified, only specified plugin will be installed or updated. Fr
 
 You can check the results with `:message` command.
 
+Note: This resets the 'more' option temporarily to avoid jobs being interrupted.
+
 #### minpac#clean([{name}])
 
 Remove all plugins which are not registered, or remove the specified plugin.

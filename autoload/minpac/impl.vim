@@ -33,6 +33,12 @@ function! s:decrement_job_count() abort
   let s:remain_jobs -= 1
   if s:remain_jobs == 0
     echom 'Finished.'
+
+    " Restore the pager.
+    if exists('s:save_more')
+      let &more = s:save_more
+      unlet s:save_more
+    endif
   endif
 endfunction
 
@@ -164,6 +170,10 @@ function! minpac#impl#update(args) abort
     return
   endif
   let s:remain_jobs = len(l:names)
+
+  " Disable the pager temporarily to avoid jobs being interrupted.
+  let s:save_more = &more
+  set nomore
 
   for l:name in l:names
     let ret = s:update_single_plugin(l:name, l:force)
