@@ -29,6 +29,12 @@ function! minpac#impl#getpackages(args) abort
 endfunction
 
 
+function! s:echo_verbose(msg) abort
+  if g:minpac#opt.verbose > 0
+    echo a:msg
+  endif
+endfunction
+
 function! s:decrement_job_count() abort
   let s:remain_jobs -= 1
   if s:remain_jobs == 0
@@ -54,7 +60,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
         " Update git submodule.
         let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
               \ 'update', '--init', '--recursive']
-        echom 'Updating submodules: ' . self.name
+        call s:echo_verbose('Updating submodules: ' . self.name)
         call s:start_job(l:cmd, self.name, self.seq + 1)
         return
       elseif isdirectory(l:dir . '/doc')
@@ -127,7 +133,7 @@ function! s:update_single_plugin(name, force) abort
   let l:dir = l:pluginfo.dir
   let l:url = l:pluginfo.url
   if !isdirectory(l:dir)
-    echo 'Cloning ' . a:name
+    call s:echo_verbose('Cloning ' . a:name)
 
     let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
     if l:pluginfo.depth > 0
@@ -138,12 +144,12 @@ function! s:update_single_plugin(name, force) abort
     endif
   else
     if l:pluginfo.frozen && !a:force
-      echo 'Skipping ' . a:name
+      echom 'Skipped: ' . a:name
       call s:decrement_job_count()
       return 0
     endif
 
-    echo 'Updating ' . a:name
+    call s:echo_verbose('Updating ' . a:name)
     let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
   endif
   return s:start_job(l:cmd, a:name, 0)
