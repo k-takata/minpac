@@ -67,7 +67,11 @@ function! s:job_exit_cb(id, errcode, event) dict abort
         " Generate helptags.
         silent! execute 'helptags' l:dir . '/doc'
       endif
-      echom 'Updated: ' . self.name
+      if g:minpac#pluglist[self.name].installed
+        echom 'Updated: ' . self.name
+      else
+        echom 'Installed: ' . self.name
+      endif
       let l:err = 0
     endif
   endif
@@ -133,6 +137,7 @@ function! s:update_single_plugin(name, force) abort
   let l:dir = l:pluginfo.dir
   let l:url = l:pluginfo.url
   if !isdirectory(l:dir)
+    let l:pluginfo.installed = 0
     call s:echo_verbose('Cloning ' . a:name)
 
     let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
@@ -143,6 +148,7 @@ function! s:update_single_plugin(name, force) abort
       let l:cmd += ['--branch=' . l:pluginfo.branch]
     endif
   else
+    let l:pluginfo.installed = 1
     if l:pluginfo.frozen && !a:force
       echom 'Skipped: ' . a:name
       call s:decrement_job_count()
