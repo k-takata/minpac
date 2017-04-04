@@ -116,23 +116,23 @@ function! s:job_exit_cb(id, errcode, event) dict abort
   if a:errcode == 0
     let l:pluginfo = g:minpac#pluglist[self.name]
     let l:dir = l:pluginfo.dir
+    " Check if the plugin directory is available.
     if isdirectory(l:dir)
-      " Successfully updated.
-      if self.seq == 0 && filereadable(l:dir . '/.gitmodules')
-        " Update git submodule.
-        let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
-              \ 'update', '--init', '--recursive']
-        call s:echom_verbose('Updating submodules: ' . self.name)
-        call s:start_job(l:cmd, self.name, self.seq + 1)
-        return
-      endif
-
       " Check if it is actually updated.
       let l:updated = 1
       if l:pluginfo.revision != ''
         if l:pluginfo.revision ==# s:get_plugin_revision(self.name)
           let l:updated = 0
         endif
+      endif
+
+      if self.seq == 0 && filereadable(l:dir . '/.gitmodules') && l:updated
+        " Update git submodule.
+        let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
+              \ 'update', '--init', '--recursive']
+        call s:echom_verbose('Updating submodules: ' . self.name)
+        call s:start_job(l:cmd, self.name, self.seq + 1)
+        return
       endif
 
       if isdirectory(l:dir . '/doc') && l:updated
