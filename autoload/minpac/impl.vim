@@ -35,6 +35,67 @@ function! s:echo_verbose(msg) abort
   endif
 endfunction
 
+function! s:echom_verbose(msg) abort
+  if g:minpac#opt.verbose > 0
+    echom a:msg
+  endif
+endfunction
+
+
+if has('win32')
+  function! s:quote_cmds(cmds)
+    " If space is found, surround the argument with "".
+    " Assuming double quotations are not used elsewhere.
+    return join(map(a:cmds,
+          \ {-> (v:val =~# ' ') ? '"' . v:val . '"' : v:val}), ' ')
+  endfunction
+else
+  function! s:quote_cmds(cmds)
+    return a:cmds
+  endfunction
+endif
+
+function! s:system_out_cb(id, message, event) dict abort
+  let self.out += a:message
+endfunction
+
+function! s:system_exit_cb(id, errcode, event) dict abort
+  let self.errcode = a:errcode
+  let self.exited = 1
+endfunction
+
+" Replacement for system().
+" This doesn't open an extra window on MS-Windows.
+function! s:system(cmds) abort
+  let l:opt = {
+        \ 'on_stdout': function('s:system_out_cb'),
+        \ 'on_exit': function('s:system_exit_cb'),
+        \ 'out': [], 'errcode': -1, 'exited': 0
+        \ }
+  let l:job = minpac#job#start(s:quote_cmds(a:cmds), l:opt)
+  if l:job > 0
+    " It worked!
+    while !l:opt.exited
+      sleep 1m
+    endwhile
+  endif
+  return [l:opt.errcode, l:opt.out]
+endfunction
+
+" Get the revision of the specified plugin.
+function! s:get_plugin_revision(name) abort
+  let l:pluginfo = g:minpac#pluglist[a:name]
+  let l:dir = l:pluginfo.dir
+  let l:res = s:system([g:minpac#opt.git, '-C', l:dir, 'rev-parse', 'HEAD'])
+  if l:res[0] == 0
+    return l:res[1][0]
+  else
+    " Error
+    return ''
+  endif
+endfunction
+
+
 function! s:decrement_job_count() abort
   let s:remain_jobs -= 1
   if s:remain_jobs == 0
@@ -53,7 +114,8 @@ function! s:job_exit_cb(id, errcode, event) dict abort
 
   let l:err = 1
   if a:errcode == 0
-    let l:dir = g:minpac#pluglist[self.name].dir
+    let l:pluginfo = g:minpac#pluglist[self.name]
+    let l:dir = l:pluginfo.dir
     if isdirectory(l:dir)
       " Successfully updated.
       if self.seq == 0 && filereadable(l:dir . '/.gitmodules')
@@ -63,12 +125,26 @@ function! s:job_exit_cb(id, errcode, event) dict abort
         call s:echo_verbose('Updating submodules: ' . self.name)
         call s:start_job(l:cmd, self.name, self.seq + 1)
         return
-      elseif isdirectory(l:dir . '/doc')
+      endif
+
+      " Check if it is actually updated.
+      let l:updated = 1
+      if l:pluginfo.revision != ''
+        if l:pluginfo.revision ==# s:get_plugin_revision(self.name)
+          let l:updated = 0
+        endif
+      endif
+
+      if isdirectory(l:dir . '/doc') && l:updated
         " Generate helptags.
         silent! execute 'helptags' l:dir . '/doc'
       endif
-      if g:minpac#pluglist[self.name].installed
-        echom 'Updated: ' . self.name
+      if l:pluginfo.installed
+        if l:updated
+          echom 'Updated: ' . self.name
+        else
+          call s:echom_verbose('Already up-to-date: ' . self.name)
+        endif
       else
         echom 'Installed: ' . self.name
       endif
@@ -102,12 +178,7 @@ function! s:start_job(cmds, name, seq) abort
     endwhile
   endif
 
-  if has('win32')
-    let l:cmds = join(map(a:cmds, {-> (v:val =~# ' ') ? '"' . v:val . '"' : v:val}), ' ')
-  else
-    let l:cmds = a:cmds
-  endif
-  let l:job = minpac#job#start(l:cmds, {
+  let l:job = minpac#job#start(s:quote_cmds(a:cmds), {
         \ 'on_stderr': function('s:job_err_cb'),
         \ 'on_exit': function('s:job_exit_cb'),
         \ 'name': a:name, 'seq': a:seq
@@ -138,6 +209,7 @@ function! s:update_single_plugin(name, force) abort
   let l:url = l:pluginfo.url
   if !isdirectory(l:dir)
     let l:pluginfo.installed = 0
+    let l:pluginfo.revision = ''
     call s:echo_verbose('Cloning ' . a:name)
 
     let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
@@ -150,12 +222,13 @@ function! s:update_single_plugin(name, force) abort
   else
     let l:pluginfo.installed = 1
     if l:pluginfo.frozen && !a:force
-      echom 'Skipped: ' . a:name
+      call s:echom_verbose('Skipped: ' . a:name)
       call s:decrement_job_count()
       return 0
     endif
 
     call s:echo_verbose('Updating ' . a:name)
+    let l:pluginfo.revision = s:get_plugin_revision(a:name)
     let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
   endif
   return s:start_job(l:cmd, a:name, 0)
