@@ -173,7 +173,7 @@ minpac#add({url}, [{opt}])			*minpac#add()*
 	{opt} is a Dictionary which specifies options.
 
 		 Option		Description  ~
-		 name		Unique name of the plugin. *plugin_name*
+		 name		Unique name of the plugin. *minpac-plugin_name*
 				Also used as a local directory name.
 				Default: derived from the repository name.
 		 type		Type of the plugin.  "start" or "opt".
@@ -190,7 +190,7 @@ minpac#add({url}, [{opt}])			*minpac#add()*
 minpac#update([{name}])				*minpac#update()*
 	Install or update all plugins or the specified plugin.
 
-	{name} is a unique name of a plugin (|plugin_name|).
+	{name} is a unique name of a plugin (|minpac-plugin_name|).
 
 	If {name} is omitted, all plugins will be installed or updated.
 	Frozen plugins will be installed, but it will not be updated.
@@ -210,7 +210,7 @@ minpac#clean([{name}])				*minpac#clean()*
 	plugin.
 
 	{name} is a name of a plugin.  It can be a unique plugin name
-	(|plugin_name|) or a plugin name with wildcards.
+	(|minpac-plugin_name|) or a plugin name with wildcards.
 
 	If {name} is omitted, all plugins under the minpac directory will be
 	checked.  If unregistered plugins are found, they are listed and a
@@ -224,7 +224,7 @@ minpac#clean([{name}])				*minpac#clean()*
 minpac#getpluginfo({name})			*minpac#getpluginfo()*
 	Get information of specified plugin.  Mainly for debugging.
 
-	{name} is a unique name of a plugin (|plugin_name|).
+	{name} is a unique name of a plugin (|minpac-plugin_name|).
 	A dictionary with following items will be returned:
 
 		Item		Description ~
