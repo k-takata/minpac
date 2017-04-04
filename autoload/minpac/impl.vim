@@ -122,7 +122,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
         " Update git submodule.
         let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
               \ 'update', '--init', '--recursive']
-        call s:echo_verbose('Updating submodules: ' . self.name)
+        call s:echom_verbose('Updating submodules: ' . self.name)
         call s:start_job(l:cmd, self.name, self.seq + 1)
         return
       endif
