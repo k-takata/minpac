@@ -99,7 +99,11 @@ endfunction
 function! s:decrement_job_count() abort
   let s:remain_jobs -= 1
   if s:remain_jobs == 0
-    echom 'Finished.'
+    if s:updated_plugins == 0
+      echom 'All plugins are up to date.'
+    else
+      echom 'Finished.'
+    endif
 
     " Restore the pager.
     if exists('s:save_more')
@@ -126,19 +130,24 @@ function! s:job_exit_cb(id, errcode, event) dict abort
         endif
       endif
 
-      if self.seq == 0 && filereadable(l:dir . '/.gitmodules') && l:updated
-        " Update git submodule.
-        let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
-              \ 'update', '--init', '--recursive']
-        call s:echom_verbose('Updating submodules: ' . self.name)
-        call s:start_job(l:cmd, self.name, self.seq + 1)
-        return
+      if l:updated
+        if self.seq == 0 && filereadable(l:dir . '/.gitmodules')
+          " Update git submodule.
+          let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
+                \ 'update', '--init', '--recursive']
+          call s:echom_verbose('Updating submodules: ' . self.name)
+          call s:start_job(l:cmd, self.name, self.seq + 1)
+          return
+        endif
+
+        if isdirectory(l:dir . '/doc')
+          " Generate helptags.
+          silent! execute 'helptags' l:dir . '/doc'
+        endif
+
+        let s:updated_plugins += 1
       endif
 
-      if isdirectory(l:dir . '/doc') && l:updated
-        " Generate helptags.
-        silent! execute 'helptags' l:dir . '/doc'
-      endif
       if l:pluginfo.installed
         if l:updated
           echom 'Updated: ' . self.name
@@ -255,6 +264,7 @@ function! minpac#impl#update(args) abort
     return
   endif
   let s:remain_jobs = len(l:names)
+  let s:updated_plugins = 0
 
   " Disable the pager temporarily to avoid jobs being interrupted.
   let s:save_more = &more
