@@ -101,8 +101,10 @@ function! s:decrement_job_count() abort
   if s:remain_jobs == 0
     if s:updated_plugins == 0
       echom 'All plugins are up to date.'
+    elseif s:updated_plugins == 1
+      echom 'One plugin is updated (or newly installed).'
     else
-      echom 'Finished.'
+      echom s:updated_plugins . ' plugins are updated (or newly installed).'
     endif
 
     " Restore the pager.
