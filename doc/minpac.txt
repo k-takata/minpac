@@ -1,6 +1,6 @@
-*minpac.txt*	A minimal package manager for Vim 8
+*minpac.txt*	A minimal package manager for Vim 8 (and NeoVim)
 
-Version:	0.1
+Version:	0.2
 Author:		Ken Takata
 License:	The Vim License
 URL:		https://github.com/k-takata/minpac
@@ -21,9 +21,9 @@ USAGE				|minpac-usage|
 ==============================================================================
 OVERVIEW					*minpac-overview*
 
-Minpac is a minimal package manager for Vim 8.  This uses the |packages|
-feature and the jobs feature (|job-channel-overview|) feature which have been
-newly added on Vim 8.
+Minpac is a minimal package manager for Vim 8 (and NeoVim).  This uses the
+|packages| feature and the jobs feature (|job-channel-overview|) feature which
+have been newly added on Vim 8.
 
 
 ==============================================================================

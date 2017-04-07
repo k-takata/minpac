@@ -1,10 +1,10 @@
-minpac: A minimal package manager for Vim 8
-===========================================
+minpac: A minimal package manager for Vim 8 (and NeoVim)
+========================================================
 
 Overview
 --------
 
-Minpac is a minimal package manager for Vim 8. This uses the
+Minpac is a minimal package manager for Vim 8 (and NeoVim). This uses the
 [packages](http://vim-jp.org/vimdoc-en/repeat.html#packages) feature and
 the [jobs](http://vim-jp.org/vimdoc-en/channel.html#job-channel-overview)
 feature which have been newly added on Vim 8.
