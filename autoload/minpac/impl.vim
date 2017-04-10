@@ -318,7 +318,7 @@ function! minpac#impl#clean(args) abort
     " Remove all plugins that are not registered.
     let l:safelist = map(keys(g:minpac#pluglist),
           \ {-> g:minpac#pluglist[v:val].type . '/' . v:val})
-          \ + ['\%(start\|opt\)/minpac']  " Don't remove itself.
+          \ + ['opt/minpac']  " Don't remove itself.
     let l:to_remove = filter(l:plugin_dirs,
           \ {-> !s:match_plugin(v:val, g:minpac#opt.package_name, l:safelist)})
   endif
