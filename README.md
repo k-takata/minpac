@@ -21,7 +21,7 @@ Concept
 Requirements
 ------------
 
-* Vim 8.0  
+* Vim 8.0.0050 or later  
   (Hopefully minpac will also work on NeoVim.)
 * Git 1.9 or later
 * OS  
