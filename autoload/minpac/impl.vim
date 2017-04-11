@@ -115,6 +115,30 @@ function! s:decrement_job_count() abort
   endif
 endfunction
 
+function! s:invoke_hook(hooktype, name, hook) abort
+  if a:hook == ''
+    return
+  endif
+  let l:pluginfo = g:minpac#pluglist[a:name]
+  let l:cdcmd = haslocaldir() ? 'lcd' : 'cd'
+  let l:pwd = getcwd()
+  noautocmd execute l:cdcmd fnameescape(l:pluginfo.dir)
+  try
+    if type(a:hook) == v:t_func
+      call a:hook(a:hooktype, a:name)
+    elseif type(a:hook) == v:t_string
+      execute a:hook
+    endif
+  catch
+    echohl ErrorMsg
+    echom v:throwpoint
+    echom v:exception
+    echohl None
+  finally
+    noautocmd execute l:cdcmd fnameescape(l:pwd)
+  endtry
+endfunction
+
 function! s:job_exit_cb(id, errcode, event) dict abort
   call filter(s:joblist, {-> v:val != a:id})
 
@@ -146,6 +170,8 @@ function! s:job_exit_cb(id, errcode, event) dict abort
           " Generate helptags.
           silent! execute 'helptags' l:dir . '/doc'
         endif
+
+        call s:invoke_hook('post-update', self.name, l:pluginfo.do)
 
         let s:updated_plugins += 1
       endif

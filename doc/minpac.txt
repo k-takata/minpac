@@ -16,6 +16,7 @@ INSTALLATION			|minpac-installation|
 USAGE				|minpac-usage|
   COMMANDS			|minpac-commands|
   FUNCTIONS			|minpac-functions|
+  HOOKS				|minpac-hooks|
 
 
 ==============================================================================
@@ -185,6 +186,9 @@ minpac#add({url}, [{opt}])			*minpac#add()*
 				|minpac#init()|.
 		 branch		Used as a branch name to be cloned.
 				Default: empty
+		 do		Post-update hook.
+				See |minpac-post-update-hooks|.
+				Default: empty
 
 
 minpac#update([{name}])				*minpac#update()*
@@ -235,6 +239,42 @@ minpac#getpluginfo({name})			*minpac#getpluginfo()*
 		branch		Branch name to be cloned.
 		depth		Depth to be cloned.
 
+------------------------------------------------------------------------------
+HOOKS						*minpac-hooks*
+
+Currently, minpac supports only one type of hook: Post-update hooks.
+
+
+POST-UPDATE HOOKS				*minpac-post-update-hooks*
+
+If a plugin requires extra works (e.g. building a native module), you can use
+the post-update hooks.
+
+You can specify the hook with the `'do'` item in the option of the
+|minpac#add()| function. It can be a String or a Funcref.
+If a String is specified, it is executed as an Ex command.
+If a Funcref is specified, it is called with two arguments; {hooktype} and
+{name}.
+
+		Item		Description ~
+		{hooktype}	Type of the hook.  Currently, this is
+				'post-update'.
+		{name}		Name of the plugin.  |minpac-plugin_name|
+
+The current directory is set to the directory of the plugin, when the hook is
+invoked.
+
+E.g.: >
+
+	" Execute an Ex command as a hook.
+	call minpac#add('Shougo/vimproc.vim', {'do': 'silent! !make'})
+
+	" Execute a lambda function as a hook.
+	call minpac#add('Shougo/vimproc.vim', {'do': {hooktype, name -> system('make')}})
+
+	" Parameters for a lambda can be omitted, if you don't need them.
+	call minpac#add('Shougo/vimproc.vim', {'do': {-> system('make')}})
+<
 
 ==============================================================================
  vim:tw=78:ts=8:ft=help:norl:
