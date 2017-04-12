@@ -52,6 +52,10 @@ INSTALLATION					*minpac-installation*
 
 Minpac should be installed under "pack/minpac/opt/" in the first directory in
 the 'packpath' option.
+Plugins installed under "pack/*/start/" are automatically added to the
+'runtimepath' after .vimrc is sourced. However, minpac needs to be loaded
+before that. Therefore, minpac should be installed under "opt" directory, and
+should be loaded using `packadd minpac`.
 
 Windows ~
  >
