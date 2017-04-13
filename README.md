@@ -56,6 +56,8 @@ git clone https://github.com/k-takata/minpac.git
 
 ### Sample .vimrc
 
+#### Basic sample
+
 ```vim
 packadd minpac
 
@@ -72,6 +74,8 @@ call minpac#add('vim-jp/syntax-vim-ex')
 "packloadall
 ```
 
+#### Customizing 'packpath'
+
 If you want to use `.vim` directory instead of `vimfiles` even on Windows,
 you should add `~/.vim` on top of `'packpath'`:
 
@@ -83,6 +87,8 @@ call minpac#init()
 ...
 ```
 
+#### Advanced sample
+
 You can write a .vimrc which can be also used even if minpac is not installed.
 
 ```vim
@@ -90,12 +96,12 @@ You can write a .vimrc which can be also used even if minpac is not installed.
 silent! packadd minpac
 
 if !exists('*minpac#init')
-  " minpac is not avalable.
+  " minpac is not available.
 
   " Settings for plugin-less environment.
   ...
 else
-  " minpac is avalable.
+  " minpac is available.
   call minpac#init()
   call minpac#add('k-takata/minpac', {'type': 'opt'})
 
@@ -109,6 +115,48 @@ endif
 " Common settings here.
 ...
 ```
+
+#### Load minpac on demand
+
+Very interestingly, minpac doesn't need to be loaded every time. Unlike other plugin managers, it is needed only when updating, installing or cleaning the plugins. This is because minpac itself doesn't handle the runtime path.
+You can define a user command to load minpac, reload .vimrc to register the information of plugins, then call `minpac#update()` or `minpac#clean()`.
+
+```vim
+" For a paranoia.
+" Normally `:set nocp` is not needed, because it is done automatically
+" when .vimrc is found.
+if &compatible
+  " `:set nocp` has many side effects. Therefore this should be done
+  " only when 'compatible' is set.
+  set nocompatible
+endif
+
+if exists('*minpac#init')
+  " minpac is loaded.
+  call minpac#init()
+  call minpac#add('k-takata/minpac', {'type': 'opt'})
+
+  " Additional plugins here.
+  call minpac#add('vim-jp/syntax-vim-ex')
+  ...
+endif
+
+" Plugin settings here.
+...
+
+" Define user commands for updating/cleaning the plugins.
+" Each of them loads minpac, reloads .vimrc to register the
+" information of plugins, then performs the task.
+command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
+command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
+```
+
+Note that your .vimrc must be reloadable to use this. E.g.:
+
+* `:set nocompatible` should not be executed twice to avoid side effects.
+* `:function!` should be used to define a user function.
+* `:command!` should be used to define a user command.
+* `:augroup!` should be used properly to avoid the same autogroups are defined twice.
 
 
 Usage
