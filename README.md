@@ -255,6 +255,9 @@ endfunction
 call minpac#add('Shougo/vimproc.vim', {'do': function('s:hook')})
 ```
 
+The above examples execute the "make" command synchronously. If you want to execute an external command asynchronously, you should use the `job_start()` function on Vim 8 or the `jobstart()` function on NeoVim.
+You may also want to use the `minpac#job#start()` function, but this is mainly for internal use and the specification is subject to change without notice.
+
 
 Credit
 ------
