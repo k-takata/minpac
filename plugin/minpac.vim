@@ -64,7 +64,7 @@ function! minpac#add(plugname, ...) abort
   " Name of the plugin
   if l:opt.name == ''
     let l:opt.name = matchstr(l:opt.url, '[/\\]\zs[^/\\]\+$')
-    let l:opt.name = substitute(l:opt.name, '\.git$', '', '')
+    let l:opt.name = substitute(l:opt.name, '\C\.git$', '', '')
   endif
   if l:opt.name == ''
     echoerr 'Cannot specify the plugin name.'
