@@ -218,6 +218,7 @@ Register a plugin.
 | `'frozen'` | If 1, the plugin will not be updated automatically. Default: 0 |
 | `'depth'`  | If >= 1, it is used as a depth to be cloned. Default: 1 or specified value by `minpac#init()`. |
 | `'branch'` | Used as a branch name to be cloned. Default: empty |
+| `'do'`     | Post-update hook. See [Post-update hooks](#post-update-hooks). Default: empty |
 
 #### minpac#update([{name}])
 
@@ -247,7 +248,7 @@ If `{name}` is specified, matched plugins are listed (even they are registered w
 
 #### minpac#getpluginfo({name})
 
-Get information of specified plugin. Mainly for debugging.
+Get information of specified plugin.
 
 `{name}` is a unique name of a plugin (`plugin_name`).
 A dictionary with following items will be returned:
@@ -260,6 +261,51 @@ A dictionary with following items will be returned:
 | `'type'`   | Type of the plugin. |
 | `'branch'` | Branch name to be cloned. |
 | `'depth'`  | Depth to be cloned. |
+
+
+### Hooks
+
+Currently, minpac supports only one type of hook: Post-update hooks.
+
+
+#### Post-update hooks
+
+If a plugin requires extra works (e.g. building a native module), you can use the post-update hooks.
+
+You can specify the hook with the `'do'` item in the option of the `minpac#add()` function. It can be a String or a Funcref.
+If a String is specified, it is executed as an Ex command.
+If a Funcref is specified, it is called with two arguments; `hooktype` and `name`.
+
+| item       | description |
+|------------|-------------|
+| `hooktype` | Type of the hook. `'post-update'` for post-update hooks.  |
+| `name`     | Unique name of the plugin. (`plugin_name`) |
+
+The current directory is set to the directory of the plugin, when the hook is invoked.
+
+E.g.:
+
+```vim
+" Execute an Ex command as a hook.
+call minpac#add('Shougo/vimproc.vim', {'do': 'silent! !make'})
+
+" Execute a lambda function as a hook.
+" Parameters for a lambda can be omitted, if you don't need them.
+call minpac#add('Shougo/vimproc.vim', {'do': {-> system('make')}})
+
+" Of course, you can also use a normal user function as a hook.
+function! s:hook(hooktype, name)
+  echom a:hooktype
+  " You can use `minpac#getpluginfo()` to get the information about
+  " the plugin.
+  echom 'Directory:' minpac#getpluginfo(a:name).dir
+  call system('make')
+endfunction
+call minpac#add('Shougo/vimproc.vim', {'do': function('s:hook')})
+```
+
+The above examples execute the "make" command synchronously. If you want to execute an external command asynchronously, you should use the `job_start()` function on Vim 8 or the `jobstart()` function on NeoVim.
+You may also want to use the `minpac#job#start()` function, but this is mainly for internal use and the specification is subject to change without notice.
 
 
 Credit

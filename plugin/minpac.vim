@@ -52,7 +52,7 @@ endfunction
 function! minpac#add(plugname, ...) abort
   let l:opt = extend(copy(get(a:000, 0, {})),
         \ {'name': '', 'type': 'start', 'depth': g:minpac#opt.depth,
-        \  'frozen': 0, 'branch': ''}, 'keep')
+        \  'frozen': 0, 'branch': '', 'do': ''}, 'keep')
 
   " URL
   if a:plugname =~? '^[-._0-9a-z]\+\/[-._0-9a-z]\+$'
