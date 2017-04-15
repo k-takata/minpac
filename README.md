@@ -21,9 +21,8 @@ Concept
 Requirements
 ------------
 
-* Vim 8.0.0050 or later  
-  (Hopefully minpac will also work on NeoVim.)
-* Git 1.9 or later
+* Vim 8.0.0050+ (or NeoVim 0.2+)
+* Git 1.9+
 * OS  
   Windows: tested  
   Linux: tested  
@@ -178,11 +177,11 @@ call minpac#clean()
 
 ### Functions
 
-#### minpac#init([{opt}])
+#### minpac#init([{config}])
 
 Initialize minpac.
 
-`{opt}` is a Dictionary which specifies options.
+`{config}` is a Dictionary of options for configuring minpac.
 
 | option    | description |
 |-----------|-------------|
@@ -203,13 +202,13 @@ All plugins will be installed under the following directories:
 "opt" plugins can be loaded with `:packadd` command.
 See `:help packages` for detail.
 
-#### minpac#add({url}, [{opt}])
+#### minpac#add({url}, [{config}])
 
 Register a plugin.
 
 `{url}` is a URL of a plugin. It can be a short form (`'<github-account>/<repository>'`) or a valid git URL.
 
-`{opt}` is a Dictionary which specifies options.
+`{config}` is a Dictionary of options for configuring the plugin.
 
 | option     | description |
 |------------|-------------|
