@@ -194,10 +194,10 @@ functions.  E.g.: >
 ------------------------------------------------------------------------------
 FUNCTIONS					*minpac-functions*
 
-minpac#init([{opt}])				*minpac#init()*
+minpac#init([{config}])				*minpac#init()*
 	Initialize minpac.
 
-	`{opt}` is a Dictionary which specifies options.
+	`{config}` is a Dictionary of options for configuring minpac.
 
 		Option		Description ~
 		dir		Package directory.  Default: the first
@@ -220,13 +220,13 @@ minpac#init([{opt}])				*minpac#init()*
 	See |packages| for detail.
 
 
-minpac#add({url}, [{opt}])			*minpac#add()*
+minpac#add({url}, [{config}])			*minpac#add()*
 	Register a plugin.
 
 	{url} is a URL of a plugin.  It can be a short form
 	("<github-account>/<repository>") or a valid git URL.
 
-	{opt} is a Dictionary which specifies options.
+	{config} is a Dictionary of options for configuring the plugin.
 
 		 Option		Description  ~
 		 name		Unique name of the plugin. *minpac-plugin_name*
