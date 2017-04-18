@@ -246,17 +246,25 @@ minpac#add({url}, [{config}])			*minpac#add()*
 				Default: empty
 
 
-minpac#update([{name}])				*minpac#update()*
+minpac#update([{name}, [{config}]])			*minpac#update()*
 	Install or update all plugins or the specified plugin.
 
 	{name} is a unique name of a plugin (|minpac-plugin_name|).
 
-	If {name} is omitted, all plugins will be installed or updated.
-	Frozen plugins will be installed, but it will not be updated.
+	If {name} is omitted or an empty String, all plugins will be installed
+	or updated.  Frozen plugins will be installed, but it will not be
+	updated.
 
 	If {name} is specified, only specified plugin will be installed or
 	updated.  Frozen plugin will be also updated.  {name} can also be a
 	list of plugin names.
+
+	{config} is a Dictionary of options for configuring the function.
+
+		 Option		Description  ~
+		 do		Finish-update hook.
+				See |minpac-finish-update-hooks|.
+				Default: empty
 
 	You can check the results with `:message` command.
 
@@ -298,7 +306,8 @@ minpac#getpluginfo({name})			*minpac#getpluginfo()*
 ------------------------------------------------------------------------------
 HOOKS						*minpac-hooks*
 
-Currently, minpac supports only one type of hook: Post-update hooks.
+Currently, minpac supports two types of hook: Post-update hooks and Finish-
+update hooks.
 
 
 POST-UPDATE HOOKS				*minpac-post-update-hooks*
@@ -312,7 +321,7 @@ If a String is specified, it is executed as an Ex command.
 If a Funcref is specified, it is called with two arguments; {hooktype} and
 {name}.
 
-		Item		Description ~
+		Argument	Description ~
 		{hooktype}	Type of the hook.  'post-update' for post-
 				update hooks.
 		{name}		Name of the plugin.  |minpac-plugin_name|
@@ -346,5 +355,28 @@ function on Vim 8 or the |jobstart()| function on NeoVim.
 You may also want to use the `minpac#job#start()` function, but this is mainly
 for internal use and the specification is subject to change without notice.
 
+
+FINISH-UPDATE HOOKS				*minpac-finish-update-hooks*
+
+If you want to execute extra works after all plugins are updated, you can use
+the finish-update hooks.
+
+You can specify the hook with the `'do'` item in the option of the
+|minpac#update()| function. It can be a String or a Funcref.
+If a String is specified, it is executed as an Ex command.
+If a Funcref is specified, it is called with three arguments; {hooktype},
+{updated} and {installed}.
+
+		Argument	Description ~
+		{hooktype}	Type of the hook.  'finish-update' for finish-
+				update hooks.
+		{updated}	Number of the updated plugin.
+		{installed}	Number of the newly installed plugin.
+
+E.g.: >
+
+	" Quit Vim immediately after all updates are finished.
+	call minpac#update('', {'do': 'quit'})
+<
 ==============================================================================
  vim:tw=78:ts=8:ft=help:norl:

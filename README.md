@@ -219,16 +219,22 @@ Register a plugin.
 | `'branch'` | Used as a branch name to be cloned. Default: empty |
 | `'do'`     | Post-update hook. See [Post-update hooks](#post-update-hooks). Default: empty |
 
-#### minpac#update([{name}])
+#### minpac#update([{name}, [{config}]])
 
 Install or update all plugins or the specified plugin.
 
 `{name}` is a unique name of a plugin (`plugin_name`).
 
-If `{name}` is omitted, all plugins will be installed or updated. Frozen plugins will be installed, but it will not be updated.
+If `{name}` is omitted or an empty String, all plugins will be installed or updated. Frozen plugins will be installed, but it will not be updated.
 
 If `{name}` is specified, only specified plugin will be installed or updated. Frozen plugin will be also updated.
 `{name}` can also be a list of plugin names.
+
+`{config}` is a Dictionary of options for configuring the function.
+
+| option | description |
+|--------|-------------|
+| `'do'` | Finish-update hook. See [Finish-update hooks](#finish-update-hooks). Default: empty |
 
 You can check the results with `:message` command.
 
@@ -264,7 +270,7 @@ A dictionary with following items will be returned:
 
 ### Hooks
 
-Currently, minpac supports only one type of hook: Post-update hooks.
+Currently, minpac supports two types of hook: Post-update hooks and Finish-update hooks.
 
 
 #### Post-update hooks
@@ -275,7 +281,7 @@ You can specify the hook with the `'do'` item in the option of the `minpac#add()
 If a String is specified, it is executed as an Ex command.
 If a Funcref is specified, it is called with two arguments; `hooktype` and `name`.
 
-| item       | description |
+| argument   | description |
 |------------|-------------|
 | `hooktype` | Type of the hook. `'post-update'` for post-update hooks.  |
 | `name`     | Unique name of the plugin. (`plugin_name`) |
@@ -306,6 +312,26 @@ call minpac#add('Shougo/vimproc.vim', {'do': function('s:hook')})
 The above examples execute the "make" command synchronously. If you want to execute an external command asynchronously, you should use the `job_start()` function on Vim 8 or the `jobstart()` function on NeoVim.
 You may also want to use the `minpac#job#start()` function, but this is mainly for internal use and the specification is subject to change without notice.
 
+#### Finish-update hooks
+
+If you want to execute extra works after all plugins are updated, you can use the finish-update hooks.
+
+You can specify the hook with the `'do'` item in the option of the `minpac#update()` function. It can be a String or a Funcref.
+If a String is specified, it is executed as an Ex command.
+If a Funcref is specified, it is called with three arguments; `hooktype`, `updated` and `installed`.
+
+| argument   | description |
+|------------|-------------|
+| `hooktype` | Type of the hook. `'finish-update'` for finish-update hooks.  |
+| `updated`  | Number of the updated plugin. |
+| `installed`| Number of the newly installed plugin. |
+
+E.g.:
+
+```vim
+" Quit Vim immediately after all updates are finished.
+call minpac#update('', {'do': 'quit'})
+```
 
 Credit
 ------
