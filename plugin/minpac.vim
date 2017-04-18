@@ -19,6 +19,15 @@ function! minpac#getpackages(...)
 endfunction
 
 
+function! s:ensure_initialization() abort
+  if !exists('g:minpac#opt')
+    echohl WarningMsg
+    echom 'Minpac has not been initialized. Use the default values.'
+    echohl None
+    call minpac#init()
+  endif
+endfunction
+
 " Initialize minpac.
 function! minpac#init(...) abort
   let l:opt = extend(copy(get(a:000, 0, {})),
@@ -50,6 +59,7 @@ endfunction
 
 " Register the specified plugin.
 function! minpac#add(plugname, ...) abort
+  call s:ensure_initialization()
   let l:opt = extend(copy(get(a:000, 0, {})),
         \ {'name': '', 'type': 'start', 'depth': g:minpac#opt.depth,
         \  'frozen': 0, 'branch': '', 'do': ''}, 'keep')
@@ -88,18 +98,21 @@ endfunction
 
 " Update all or specified plugin(s).
 function! minpac#update(...)
+  call s:ensure_initialization()
   return minpac#impl#update(a:000)
 endfunction
 
 
 " Remove plugins that are not registered.
 function! minpac#clean(...)
+  call s:ensure_initialization()
   return minpac#impl#clean(a:000)
 endfunction
 
 
 " Get information of specified plugin. Mainly for debugging.
 function! minpac#getpluginfo(name)
+  call s:ensure_initialization()
   return g:minpac#pluglist[a:name]
 endfunction
 
