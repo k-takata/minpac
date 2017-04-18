@@ -238,7 +238,7 @@ Note: This resets the 'more' option temporarily to avoid jobs being interrupted.
 
 Remove all plugins which are not registered, or remove the specified plugin.
 
-`{name}` is a name of a plugin. It can be a unique plugin name (`plugin_name`) or a plugin name with wildcards.
+`{name}` is a name of a plugin. It can be a unique plugin name (`plugin_name`) or a plugin name with wildcards (`*` and `?` are supported).
 
 If `{name}` is omitted, all plugins under the `minpac` directory will be checked. If unregistered plugins are found, they are listed and a prompt is shown. If you type `y`, they will be removed.
 

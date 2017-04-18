@@ -269,7 +269,8 @@ minpac#clean([{name}])				*minpac#clean()*
 	plugin.
 
 	{name} is a name of a plugin.  It can be a unique plugin name
-	(|minpac-plugin_name|) or a plugin name with wildcards.
+	(|minpac-plugin_name|) or a plugin name with wildcards ("*" and "?"
+	are supported).
 
 	If {name} is omitted, all plugins under the minpac directory will be
 	checked.  If unregistered plugins are found, they are listed and a
