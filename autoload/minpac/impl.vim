@@ -295,7 +295,9 @@ function! minpac#impl#update(args) abort
   let s:updated_plugins = 0
 
   " Disable the pager temporarily to avoid jobs being interrupted.
-  let s:save_more = &more
+  if !exists('s:save_more')
+    let s:save_more = &more
+  endif
   set nomore
 
   for l:name in l:names
