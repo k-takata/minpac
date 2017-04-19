@@ -1,0 +1,17 @@
+language: generic
+sudo: false
+
+install:
+  - python3 tools/dl-vim-appimage.py -n GVim.AppImage
+  - chmod +x GVim.AppImage
+  - mkdir ~/.local/share/appimagekit
+  - touch ~/.local/share/appimagekit/GVim_no_desktopintegration
+
+addons:
+  apt:
+    packages:
+      - python3
+
+script:
+  - cd test
+  - make VIMPROG=../GVim.AppImage
