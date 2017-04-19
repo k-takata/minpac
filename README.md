@@ -1,10 +1,10 @@
-minpac: A minimal package manager for Vim 8 (and NeoVim)
+minpac: A minimal package manager for Vim 8 (and Neovim)
 ========================================================
 
 Overview
 --------
 
-Minpac is a minimal package manager for Vim 8 (and NeoVim). This uses the
+Minpac is a minimal package manager for Vim 8 (and Neovim). This uses the
 [packages](http://vim-jp.org/vimdoc-en/repeat.html#packages) feature and
 the [jobs](http://vim-jp.org/vimdoc-en/channel.html#job-channel-overview)
 feature which have been newly added on Vim 8.
@@ -21,7 +21,7 @@ Concept
 Requirements
 ------------
 
-* Vim 8.0.0050+ (or NeoVim 0.2+)
+* Vim 8.0.0050+ (or Neovim 0.2+)
 * Git 1.9+
 * OS  
   Windows: tested  
@@ -303,7 +303,7 @@ endfunction
 call minpac#add('Shougo/vimproc.vim', {'do': function('s:hook')})
 ```
 
-The above examples execute the "make" command synchronously. If you want to execute an external command asynchronously, you should use the `job_start()` function on Vim 8 or the `jobstart()` function on NeoVim.
+The above examples execute the "make" command synchronously. If you want to execute an external command asynchronously, you should use the `job_start()` function on Vim 8 or the `jobstart()` function on Neovim.
 You may also want to use the `minpac#job#start()` function, but this is mainly for internal use and the specification is subject to change without notice.
 
 
