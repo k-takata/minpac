@@ -60,4 +60,4 @@ for asset in rel_info['assets']:
     urllib.request.urlretrieve(asset['browser_download_url'], name)
     # Set timestamp
     asset_time = time.strptime(asset['updated_at'], '%Y-%m-%dT%H:%M:%SZ')
-    os.utime(name, times=(time.time(), calendar.timegm(asset_time)))
+    os.utime(name, (time.time(), calendar.timegm(asset_time)))
