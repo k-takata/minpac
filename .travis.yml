@@ -8,7 +8,7 @@ env:
 install:
   - python3 tools/dl-vim-appimage.py -n GVim.AppImage
   - chmod +x GVim.AppImage
-  - mkdir ~/.local/share/appimagekit
+  - mkdir -p ~/.local/share/appimagekit
   - touch ~/.local/share/appimagekit/GVim_no_desktopintegration
 
 addons:
