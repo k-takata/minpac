@@ -1,0 +1,4 @@
+messages
+test.log
+*.res
+/pack/
