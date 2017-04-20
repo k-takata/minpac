@@ -1,3 +1,6 @@
+set rtp^=..
+set packpath^=.
+runtime plugin/minpac.vim
 
 func Test_minpac()
   call minpac#init()
