@@ -41,7 +41,7 @@ newtestssilent: $(NEW_TESTS)
 
 .vim.res:
 	@echo "$(RUN_VIMTEST)" > vimcmd
-	$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim > /dev/null
+	$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim
 	@rm vimcmd
 
 # vim: ts=8 sw=8 sts=8
