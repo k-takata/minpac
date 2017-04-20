@@ -99,6 +99,9 @@ endfunction
 function! s:decrement_job_count() abort
   let s:remain_jobs -= 1
   if s:remain_jobs == 0
+    " `minpac#update()` is finished.
+    call s:invoke_hook('finish-update', [s:updated_plugins, s:installed_plugins], s:finish_update_hook)
+
     let l:mes = 'All plugins are up to date.'
     if s:updated_plugins != 0 || s:installed_plugins != 0
       let l:mes .= ' (Updated: ' . s:updated_plugins . ', Newly installed: ' . s:installed_plugins . ')'
@@ -113,17 +116,21 @@ function! s:decrement_job_count() abort
   endif
 endfunction
 
-function! s:invoke_hook(hooktype, name, hook) abort
+function! s:invoke_hook(hooktype, args, hook) abort
   if a:hook == ''
     return
   endif
-  let l:pluginfo = g:minpac#pluglist[a:name]
-  let l:cdcmd = haslocaldir() ? 'lcd' : 'cd'
-  let l:pwd = getcwd()
-  noautocmd execute l:cdcmd fnameescape(l:pluginfo.dir)
+
+  if a:hooktype ==# 'post-update'
+    let l:name = a:args[0]
+    let l:pluginfo = g:minpac#pluglist[l:name]
+    let l:cdcmd = haslocaldir() ? 'lcd' : 'cd'
+    let l:pwd = getcwd()
+    noautocmd execute l:cdcmd fnameescape(l:pluginfo.dir)
+  endif
   try
     if type(a:hook) == v:t_func
-      call a:hook(a:hooktype, a:name)
+      call call(a:hook, [a:hooktype] + a:args)
     elseif type(a:hook) == v:t_string
       execute a:hook
     endif
@@ -133,7 +140,9 @@ function! s:invoke_hook(hooktype, name, hook) abort
     echom v:exception
     echohl None
   finally
-    noautocmd execute l:cdcmd fnameescape(l:pwd)
+    if a:hooktype ==# 'post-update'
+      noautocmd execute l:cdcmd fnameescape(l:pwd)
+    endif
   endtry
 endfunction
 
@@ -169,7 +178,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
           silent! execute 'helptags' l:dir . '/doc'
         endif
 
-        call s:invoke_hook('post-update', self.name, l:pluginfo.do)
+        call s:invoke_hook('post-update', [self.name], l:pluginfo.do)
       endif
 
       if l:pluginfo.installed
@@ -271,8 +280,11 @@ endfunction
 
 " Update all or specified plugin(s).
 function! minpac#impl#update(args) abort
+  let l:opt = extend(copy(get(a:args, 1, {})),
+        \ {'do': ''}, 'keep')
+
   let l:force = 0
-  if len(a:args) == 0
+  if len(a:args) == 0 || (type(a:args[0]) == v:t_string && a:args[0] == '')
     let l:names = keys(g:minpac#pluglist)
   elseif type(a:args[0]) == v:t_string
     let l:names = [a:args[0]]
@@ -292,6 +304,7 @@ function! minpac#impl#update(args) abort
   let s:remain_jobs = len(l:names)
   let s:updated_plugins = 0
   let s:installed_plugins = 0
+  let s:finish_update_hook = l:opt.do
 
   " Disable the pager temporarily to avoid jobs being interrupted.
   if !exists('s:save_more')
