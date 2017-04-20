@@ -22,6 +22,7 @@ func Test_minpac_init()
   call assert_equal(8, g:minpac#opt.jobs)
   call assert_equal(0, g:minpac#opt.verbose)
   call assert_equal({}, minpac#getpluglist())
+
   let g:minpac#pluglist.foo = 'bar'
 
   " Change settings
@@ -52,6 +53,7 @@ func Test_minpac_add()
   call assert_equal('start', p.type)
   call assert_equal('', p.branch)
   call assert_equal(1, p.depth)
+  call assert_equal('', p.do)
 
   " With configuration
   call minpac#add('k-takata/minpac', {'type': 'opt', 'frozen': 1, 'branch': 'master', 'depth': 10})
@@ -62,6 +64,7 @@ func Test_minpac_add()
   call assert_equal('opt', p.type)
   call assert_equal('master', p.branch)
   call assert_equal(10, p.depth)
+  call assert_equal('', p.do)
 
   " SSH URL
   call minpac#add('git@github.com:k-takata/minpac.git', {'name': 'm'})
@@ -146,6 +149,45 @@ endfunc
 
 " Tests for minpac#update()
 func Test_minpac_update()
+  call delete('pack', 'rf')
+
+  call minpac#init()
+
+  " minpac#update() with hooks using Strings.
+  call minpac#add('k-takata/minpac', {'type': 'opt',
+	\ 'do': 'let g:post_update = 1'})
+  let g:post_update = 0
+  let g:finish_update = 0
+  call minpac#update('', {'do': 'let g:finish_update = 1'})
+  while g:finish_update == 0
+    sleep 1
+  endwhile
+  call assert_equal(1, g:post_update)
+  call assert_true(isdirectory('pack/minpac/opt/minpac'))
+
+  " minpac#update() with hooks using Funcrefs.
+  let l:post_update = 0
+  call minpac#add('k-takata/hg-vim', {'do': {hooktype, name -> [
+	\ assert_equal('post-update', hooktype, 'hooktype'),
+	\ assert_equal('hg-vim', name, 'name'),
+	\ execute('let l:post_update = 1'),
+	\ l:post_update
+	\ ]}})
+  let l:finish_update = 0
+  call minpac#update('', {'do': {hooktype, updated, installed -> [
+	\ assert_equal('finish-update', hooktype, 'hooktype'),
+	\ assert_equal(0, updated, 'updated'),
+	\ assert_equal(1, installed, 'installed'),
+	\ execute('let l:finish_update = 1'),
+	\ l:finish_update
+	\ ]}})
+  while l:finish_update == 0
+    sleep 1
+  endwhile
+  call assert_equal(1, l:post_update)
+  call assert_true(isdirectory('pack/minpac/start/hg-vim'))
+
+  call delete('pack', 'rf')
 endfunc
 
 " Tests for minpac#clean()
