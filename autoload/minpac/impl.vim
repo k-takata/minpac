@@ -99,13 +99,11 @@ endfunction
 function! s:decrement_job_count() abort
   let s:remain_jobs -= 1
   if s:remain_jobs == 0
-    if s:updated_plugins == 0
-      echom 'All plugins are up to date.'
-    elseif s:updated_plugins == 1
-      echom 'One plugin is updated (or newly installed).'
-    else
-      echom s:updated_plugins . ' plugins are updated (or newly installed).'
+    let l:mes = 'All plugins are up to date.'
+    if s:updated_plugins != 0 || s:installed_plugins != 0
+      let l:mes .= ' (Updated: ' . s:updated_plugins . ', Newly installed: ' . s:installed_plugins . ')'
     endif
+    echom l:mes
 
     " Restore the pager.
     if exists('s:save_more')
@@ -148,7 +146,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     let l:dir = l:pluginfo.dir
     " Check if the plugin directory is available.
     if isdirectory(l:dir)
-      " Check if it is actually updated.
+      " Check if it is actually updated (or installed).
       let l:updated = 1
       if l:pluginfo.revision != ''
         if l:pluginfo.revision ==# s:get_plugin_revision(self.name)
@@ -172,17 +170,17 @@ function! s:job_exit_cb(id, errcode, event) dict abort
         endif
 
         call s:invoke_hook('post-update', self.name, l:pluginfo.do)
-
-        let s:updated_plugins += 1
       endif
 
       if l:pluginfo.installed
         if l:updated
+          let s:updated_plugins += 1
           echom 'Updated: ' . self.name
         else
           call s:echom_verbose('Already up-to-date: ' . self.name)
         endif
       else
+        let s:installed_plugins += 1
         echom 'Installed: ' . self.name
       endif
       let l:err = 0
@@ -293,6 +291,7 @@ function! minpac#impl#update(args) abort
   endif
   let s:remain_jobs = len(l:names)
   let s:updated_plugins = 0
+  let s:installed_plugins = 0
 
   " Disable the pager temporarily to avoid jobs being interrupted.
   if !exists('s:save_more')
