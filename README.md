@@ -189,7 +189,7 @@ Initialize minpac.
 | `'package_name'` | Package name. Default: `'minpac'` |
 | `'git'`   | Git command. Default: `'git'` |
 | `'depth'` | Default clone depth. Default: 1 |
-| `'jobs'`  | Maximum job numbers. Default: 8 |
+| `'jobs'`  | Maximum job numbers. If <= 0, unlimited. Default: 8 |
 | `'verbose'` | If > 0, show verbose log. Default: 0 |
 
 All plugins will be installed under the following directories:
