@@ -1,6 +1,10 @@
 language: generic
 sudo: false
 
+cache:
+  directories:
+    - $HOME/opt
+
 env:
   global:
     - OPT=$HOME/opt
@@ -8,9 +12,18 @@ env:
 install: |
   git clone --depth 1 https://github.com/vim/vim
   cd vim
+  echo -n 'Vim version: '
+  git describe --tags | tee vim-ver.txt
+  if [ -e $OPT/vim-ver.txt ]; then
+    if diff $OPT/vim-ver.txt vim-ver.txt; then
+      cd -
+      return
+    fi
+  fi
   ./configure --prefix=$OPT --with-features=huge --disable-gui
   make
   make install
+  cp vim-ver.txt $OPT
   cd -
 
 script:
