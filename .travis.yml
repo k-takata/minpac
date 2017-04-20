@@ -1,0 +1,20 @@
+language: generic
+sudo: false
+
+env:
+  global:
+    - OPT=$HOME/opt
+
+install: |
+  git clone --depth 1 https://github.com/vim/vim
+  cd vim
+  ./configure --prefix=$OPT --with-features=huge --disable-gui
+  make
+  make install
+  cd -
+
+script:
+  - cd test
+  - make VIMPROG=$OPT/bin/vim
+
+# vim: ts=2 sw=2 sts=2 et

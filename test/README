@@ -1,0 +1,3 @@
+Tests in this directory are based on Vim 8.0's tests.
+
+See: https://github.com/vim/vim/blob/master/src/testdir/

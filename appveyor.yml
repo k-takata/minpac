@@ -1,0 +1,18 @@
+version: '1.0.{build}'
+
+shallow_clone: true
+
+environment:
+  AUTH_TOKEN:
+    secure: wdTzzL05DoG4BZIgqlc3y/Ff50ZOTjfaqMazhdMLcXmxYYbmeCsI9PN01TJCQMaw
+
+build_script:
+  - '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'
+  - py tools\dl-kaoriya-vim.py --arch win64 --filename vim.zip
+  - 7z x vim.zip > nul
+
+test_script:
+  - cd test
+  - nmake -f Make_win.mak VIMPROG=%APPVEYOR_BUILD_FOLDER%\vim80-kaoriya-win64\gvim.exe
+
+# vim: ts=2 sw=2 sts=2 et
