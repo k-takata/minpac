@@ -3,23 +3,18 @@ sudo: false
 
 env:
   global:
-    secure: MMF7vP0YuZ1B942y2ukFtl4KOwaKZShjnHm7tpZi+eCNDAwm1EJopL3sEclW7JEDjOROqsLLn1Y7JFCCwmrreUFwMdAdJaEzAQ/+fkhdd5AuSq2tI6cE41m0A0ic/hcb3kLLQvs7Qda9CAsuuk0tdKtcYLkXHeFc/z+Ea2KzBAueiXORu0c8OXxFI//GP8qNmZtYz30v95pzZWiB/e3nBE/eHbZdxNy6Hl0V3gJtY30AP/jh0QpYH8Alf3eNRbYEf7ATa2+2O6DxwnKSnMBXHMqhJnj5bFinnkWZktVO+tqwmgSSgsE71PlAOl7gSEvzm3TdNs/I6ng6tA61xAgkZrWGGfwdCVb0vrM6INIOKsZvUw46sPMdOhZyf/w7ql5GlsipcPrJ0ag8qCIz7Jk/ekvZKU+d00R+0wOYMQnG7PP74tbERolVvZJlHuctJ1AvrMV54C30Cdqjq5oeaPdSjSRpEr6QgI5Ei5aPZYKXJ8FBC/tTpp8s0rgIzA0y+pAcXRS/griyS3yxaP/ZWGkU1+SBnfPaCgmubKmTnKc4xWvpaT7dG3iqlbIzhSA5HXm1N9AhnNrMTsfZbDCUSZIAwLa/3PsYTKhiWu0giNeqYJW+xxs1QpyDmeHqTyPJkbU9285GjWiY6MgoWdb5ttvGNI25rXmdvXs6wJahAkaDCx0=
+    - OPT=$HOME/opt
 
-install:
-  - python3 tools/dl-vim-appimage.py -n GVim.AppImage
-  - chmod +x GVim.AppImage
-  - mkdir -p ~/.local/share/appimagekit
-  - touch ~/.local/share/appimagekit/GVim_no_desktopintegration
-
-addons:
-  apt:
-    packages:
-      - python3
-
-# Start virtual framebuffer to be able to test the GUI. Does not work on OS X.
-before_script:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export DISPLAY=:99.0 && sh -e /etc/init.d/xvfb start && sleep 3; fi
+install: |
+  git clone --depth 1 https://github.com/vim/vim
+  cd vim
+  ./configure --prefix=$OPT --with-features=huge --disable-gui
+  make
+  make install
+  cd -
 
 script:
   - cd test
-  - make VIMPROG=../GVim.AppImage
+  - make VIMPROG=$OPT/bin/vim
+
+# vim: set ts=2 sw=2 sts=2 et :
