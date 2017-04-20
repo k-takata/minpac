@@ -15,4 +15,4 @@ test_script:
   - cd test
   - nmake -f Make_win.mak VIMPROG=%APPVEYOR_BUILD_FOLDER%\vim80-kaoriya-win64\gvim.exe
 
-# vim: set ts=2 sw=2 sts=2 et :
+# vim: ts=2 sw=2 sts=2 et
