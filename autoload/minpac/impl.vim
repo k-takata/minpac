@@ -311,7 +311,7 @@ function! s:match_plugin(dir, packname, plugnames) abort
   let l:plugname = '\%(' . join(a:plugnames, '\|') . '\)'
   let l:plugname = substitute(l:plugname, '\.', '\\.', 'g')
   let l:plugname = substitute(l:plugname, '\*', '.*', 'g')
-  let l:plugname = substitute(l:plugname, '\?', '.', 'g')
+  let l:plugname = substitute(l:plugname, '?', '.', 'g')
   if l:plugname =~ '/'
     let l:pat = '/pack/' . a:packname . '/' . l:plugname . '$'
   else
