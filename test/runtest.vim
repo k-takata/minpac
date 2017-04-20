@@ -97,7 +97,9 @@ func RunTheTest(test)
   set noshowmode
 
   " Clear any overrides.
-  call test_override('ALL', 0)
+  if exists("*test_override")
+    call test_override('ALL', 0)
+  endif
 
   if exists("*SetUp")
     try
@@ -218,18 +220,6 @@ endif
 
 " Names of flaky tests.
 let s:flaky = [
-      \ 'Test_client_server()',
-      \ 'Test_close_and_exit_cb()',
-      \ 'Test_collapse_buffers()',
-      \ 'Test_communicate()',
-      \ 'Test_exit_callback_interval()',
-      \ 'Test_nb_basic()',
-      \ 'Test_oneshot()',
-      \ 'Test_pipe_through_sort_all()',
-      \ 'Test_pipe_through_sort_some()',
-      \ 'Test_quoteplus()',
-      \ 'Test_quotestar()',
-      \ 'Test_reltime()',
       \ ]
 
 " Locate Test_ functions and execute them.
