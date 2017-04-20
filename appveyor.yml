@@ -9,6 +9,7 @@ environment:
 build_script:
   - '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'
   - py tools\dl-kaoriya-vim.py --arch win64 --filename vim.zip
+  - curl -i -H "Authorization: token %AUTH_TOKEN%" https://api.github.com/user | grep RateLimit
   - 7z x vim.zip > nul
 
 test_script:
