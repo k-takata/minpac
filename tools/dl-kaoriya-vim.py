@@ -47,9 +47,13 @@ try:
     response = urllib.request.urlopen(request)
 except urllib.error.HTTPError as err:
     print('GitHub release not found. (%s)' % err.reason, file=sys.stderr)
+    print('X-RateLimit-Limit:', response.getheader('X-RateLimit-Limit'))
+    print('X-RateLimit-Remaining:', response.getheader('X-RateLimit-Remaining'))
     exit(1)
 
 rel_info = json.load(io.StringIO(str(response.read(), 'utf-8')))
+print('X-RateLimit-Limit:', response.getheader('X-RateLimit-Limit'))
+print('X-RateLimit-Remaining:', response.getheader('X-RateLimit-Remaining'))
 print('Last release:', rel_info['name'])
 print('Created at:', rel_info['created_at'])
 
