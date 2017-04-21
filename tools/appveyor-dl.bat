@@ -20,3 +20,4 @@ if "%DL%"=="yes" (
 	if not ERRORLEVEL 1 copy /y release-info.txt downloads > nul
 )
 7z x downloads\vim.zip > nul
+set APPVEYOR_CACHE_ENTRY_ZIP_ARGS=-tzip -mx=1 -ux2z2
