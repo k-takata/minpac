@@ -16,6 +16,6 @@ if exist downloads\release-info.txt (
 )
 if "%DL%"=="yes" (
 	py tools\dl-kaoriya-vim.py --arch win64 --filename downloads\vim.zip --force
-	if not ERRORLEVEL 1 copy /y release-info.txt downloads
+	if not ERRORLEVEL 1 copy /y release-info.txt downloads > nul
 )
 7z x downloads\vim.zip > nul
