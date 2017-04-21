@@ -20,6 +20,7 @@ if "%DL%"=="yes" (
 	if not ERRORLEVEL 1 (
 		copy /y release-info.txt downloads > nul
 		curl -X DELETE -H "Authorization: Bearer %API_TOKEN%" %APPVEYOR_API_URL%/api/projects/%APPVEYOR_ACCOUNT_NAME%/%APPVEYOR_PROJECT_SLUG%/buildcache
+		echo %APPVEYOR_API_URL%/api/projects/%APPVEYOR_ACCOUNT_NAME%/%APPVEYOR_PROJECT_SLUG%/buildcache
 	)
 )
 7z x downloads\vim.zip > nul
