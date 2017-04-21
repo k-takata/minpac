@@ -29,4 +29,3 @@ if "%DL%"=="yes" (
 	)
 )
 7z x downloads\vim.zip > nul
-rem set APPVEYOR_CACHE_ENTRY_ZIP_ARGS=-tzip -mx=1 -ux2z2
