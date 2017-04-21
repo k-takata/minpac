@@ -5,6 +5,8 @@ shallow_clone: true
 environment:
   AUTH_TOKEN:
     secure: wdTzzL05DoG4BZIgqlc3y/Ff50ZOTjfaqMazhdMLcXmxYYbmeCsI9PN01TJCQMaw
+  API_TOKEN:
+    secure: iUTvK78Ch5hfdoqFtPOMeQj96cGeeyenSfCRJxLb650=
 
 build_script:
   - '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'

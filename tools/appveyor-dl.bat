@@ -17,7 +17,10 @@ if exist downloads\release-info.txt (
 )
 if "%DL%"=="yes" (
 	py tools\dl-kaoriya-vim.py --arch win64 --filename downloads\vim.zip --force
-	if not ERRORLEVEL 1 copy /y release-info.txt downloads > nul
+	if not ERRORLEVEL 1 (
+		copy /y release-info.txt downloads > nul
+		curl -X DELETE -H "Authorization: Bearer %API_TOKEN%" %APPVEYOR_API_URL%/api/projects/%APPVEYOR_ACCOUNT_NAME%/%APPVEYOR_PROJECT_SLUG%/buildcache
+	)
 )
 7z x downloads\vim.zip > nul
-set APPVEYOR_CACHE_ENTRY_ZIP_ARGS=-tzip -mx=1 -ux2z2
+rem set APPVEYOR_CACHE_ENTRY_ZIP_ARGS=-tzip -mx=1 -ux2z2
