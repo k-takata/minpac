@@ -18,6 +18,8 @@ gh_release_url = 'https://api.github.com/repos/' + repo_name + '/releases/latest
 # Parse arguments
 parser = argparse.ArgumentParser(
         description='Download the latest KaoriYa Vim from the GitHub release')
+parser.add_argument('-c', '--check', action='store_true',
+        help='only check the release')
 parser.add_argument('-f', '--force', action='store_true',
         help='overwrite the download file')
 parser.add_argument('-n', '--filename', type=str, action='store',
@@ -53,6 +55,9 @@ rel_info = json.load(io.StringIO(str(response.read(), 'utf-8')))
 print('Last release:', rel_info['name'])
 print('Created at:', rel_info['created_at'])
 
+if args.check:
+    exit(0)
+
 # Download the files
 for asset in rel_info['assets']:
     if args.filename:
@@ -69,3 +74,5 @@ for asset in rel_info['assets']:
     # Set timestamp
     asset_time = time.strptime(asset['updated_at'], '%Y-%m-%dT%H:%M:%SZ')
     os.utime(name, times=(time.time(), calendar.timegm(asset_time)))
+
+exit(0)

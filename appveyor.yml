@@ -8,11 +8,13 @@ environment:
 
 build_script:
   - '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'
-  - py tools\dl-kaoriya-vim.py --arch win64 --filename vim.zip
-  - 7z x vim.zip > nul
+  - tools\appveyor-dl.bat
 
 test_script:
   - cd test
   - nmake -f Make_win.mak VIMPROG=%APPVEYOR_BUILD_FOLDER%\vim80-kaoriya-win64\gvim.exe
+
+cache:
+  - downloads -> appveyor.yml
 
 # vim: sw=2 sts=2 et
