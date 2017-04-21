@@ -2,8 +2,13 @@ rem @echo off
 
 if not exist downloads\nul mkdir downloads
 set DL=no
+dir downloads
 if exist downloads\release-info.txt (
+	echo "old info:"
+	type downloads\release-info.txt
 	py tools\dl-kaoriya-vim.py -c > release-info.txt
+	echo "new info:"
+	type release-info.txt
 	\cygwin64\bin\diff downloads\release-info.txt release-info.txt
 	if ERRORLEVEL 1 set DL=yes
 ) else (
