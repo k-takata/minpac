@@ -3,9 +3,9 @@ version: '1.0.{build}'
 shallow_clone: true
 
 environment:
-  AUTH_TOKEN:
+  AUTH_TOKEN: # for GitHub
     secure: wdTzzL05DoG4BZIgqlc3y/Ff50ZOTjfaqMazhdMLcXmxYYbmeCsI9PN01TJCQMaw
-  API_TOKEN:
+  API_TOKEN:  # for AppVeyor
     secure: iUTvK78Ch5hfdoqFtPOMeQj96cGeeyenSfCRJxLb650=
 
 build_script:
