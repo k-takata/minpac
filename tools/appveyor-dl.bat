@@ -4,6 +4,7 @@ set CACHED=yes
 set DL=yes
 py tools\dl-kaoriya-vim.py -c > release-info.txt
 if ERRORLEVEL 1 (
+	rem Maybe this is a PR build and reaches the limit rate of GitHub API.
 	set DL=no
 ) else if exist downloads\release-info.txt (
 	\cygwin64\bin\diff downloads\release-info.txt release-info.txt > nul
@@ -19,7 +20,8 @@ if "%DL%"=="yes" (
 		move /y vim.zip downloads > nul
 		copy /y release-info.txt downloads > nul
 		if "%CACHED%"=="yes" (
-			rem Invalidate the cache
+			rem It doesn't seem that AppVeyor updates the cache.
+			rem Invalidate the cache for a workaround.
 			curl -X DELETE -i -H "Authorization: Bearer %API_TOKEN%" https://ci.appveyor.com/api/projects/%APPVEYOR_ACCOUNT_NAME%/%APPVEYOR_PROJECT_SLUG%/buildcache > nul
 		)
 	)
