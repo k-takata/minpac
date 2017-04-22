@@ -1,30 +1,24 @@
-rem @echo off
+@echo off
 
 set CACHED=yes
-if not exist downloads\nul (
-	mkdir downloads
-	set CACHED=no
-)
 set DL=no
-dir downloads
 py tools\dl-kaoriya-vim.py -c > release-info.txt
-rem echo "foobar" > downloads\release-info.txt
 if exist downloads\release-info.txt (
-	echo "old info:"
-	type downloads\release-info.txt
-	echo "new info:"
-	type release-info.txt
-	\cygwin64\bin\diff downloads\release-info.txt release-info.txt
+	\cygwin64\bin\diff downloads\release-info.txt release-info.txt > nul
 	if ERRORLEVEL 1 set DL=yes
 ) else (
+	mkdir downloads
+	set CACHED=no
 	set DL=yes
 )
 if "%DL%"=="yes" (
-	py tools\dl-kaoriya-vim.py --arch win64 --filename downloads\vim.zip --force
+	py tools\dl-kaoriya-vim.py --arch win64 --filename vim.zip --force
 	if not ERRORLEVEL 1 (
+		move /y vim.zip downloads > nul
 		copy /y release-info.txt downloads > nul
 		if "%CACHED%"=="yes" (
-			curl -X DELETE -i -H "Authorization: Bearer %API_TOKEN%" https://ci.appveyor.com/api/projects/%APPVEYOR_ACCOUNT_NAME%/%APPVEYOR_PROJECT_SLUG%/buildcache
+			rem Invalidate the cache
+			curl -X DELETE -i -H "Authorization: Bearer %API_TOKEN%" https://ci.appveyor.com/api/projects/%APPVEYOR_ACCOUNT_NAME%/%APPVEYOR_PROJECT_SLUG%/buildcache > nul
 		)
 	)
 )
