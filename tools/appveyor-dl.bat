@@ -3,7 +3,9 @@
 set CACHED=yes
 set DL=yes
 py tools\dl-kaoriya-vim.py -c > release-info.txt
-if exist downloads\release-info.txt (
+if ERRORLEVEL 1 (
+	set DL=no
+) else if exist downloads\release-info.txt (
 	\cygwin64\bin\diff downloads\release-info.txt release-info.txt > nul
 	if not ERRORLEVEL 1 set DL=no
 ) else (
