@@ -102,11 +102,17 @@ function! s:decrement_job_count() abort
     " `minpac#update()` is finished.
     call s:invoke_hook('finish-update', [s:updated_plugins, s:installed_plugins], s:finish_update_hook)
 
-    let l:mes = 'All plugins are up to date.'
-    if s:updated_plugins != 0 || s:installed_plugins != 0
-      let l:mes .= ' (Updated: ' . s:updated_plugins . ', Newly installed: ' . s:installed_plugins . ')'
+    if s:error_plugins != 0
+      echohl WarningMsg
+      echom 'Error plugins: ' . s:error_plugins
+      echohl None
+    else
+      let l:mes = 'All plugins are up to date.'
+      if s:updated_plugins != 0 || s:installed_plugins != 0
+        let l:mes .= ' (Updated: ' . s:updated_plugins . ', Newly installed: ' . s:installed_plugins . ')'
+      endif
+      echom l:mes
     endif
-    echom l:mes
 
     " Restore the pager.
     if exists('s:save_more')
@@ -196,6 +202,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     endif
   endif
   if l:err
+    let s:error_plugins += 1
     echohl ErrorMsg
     echom 'Error while updating "' . self.name . '": ' . a:errcode
     echohl None
@@ -207,7 +214,7 @@ endfunction
 function! s:job_err_cb(id, message, event) dict abort
   echohl WarningMsg
   for l:line in a:message
-    echom self.name . ': ' . l:line
+    call s:echom_verbose(self.name . ': ' . l:line)
   endfor
   echohl None
 endfunction
@@ -302,6 +309,7 @@ function! minpac#impl#update(args) abort
     return
   endif
   let s:remain_jobs = len(l:names)
+  let s:error_plugins = 0
   let s:updated_plugins = 0
   let s:installed_plugins = 0
   let s:finish_update_hook = l:opt.do
