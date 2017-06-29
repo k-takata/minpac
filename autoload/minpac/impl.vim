@@ -29,14 +29,14 @@ function! minpac#impl#getpackages(args) abort
 endfunction
 
 
-function! s:echo_verbose(msg) abort
-  if g:minpac#opt.verbose > 0
+function! s:echo_verbose(level, msg) abort
+  if g:minpac#opt.verbose >= a:level
     echo a:msg
   endif
 endfunction
 
-function! s:echom_verbose(msg) abort
-  if g:minpac#opt.verbose > 0
+function! s:echom_verbose(level, msg) abort
+  if g:minpac#opt.verbose >= a:level
     echom a:msg
   endif
 endfunction
@@ -102,6 +102,7 @@ function! s:decrement_job_count() abort
     " `minpac#update()` is finished.
     call s:invoke_hook('finish-update', [s:updated_plugins, s:installed_plugins], s:finish_update_hook)
 
+    " Show the status.
     if s:error_plugins != 0
       echohl WarningMsg
       echom 'Error plugins: ' . s:error_plugins
@@ -174,7 +175,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
           " Update git submodule.
           let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
                 \ 'update', '--init', '--recursive']
-          call s:echom_verbose('Updating submodules: ' . self.name)
+          call s:echom_verbose(3, 'Updating submodules: ' . self.name)
           call s:start_job(l:cmd, self.name, self.seq + 1)
           return
         endif
@@ -190,13 +191,13 @@ function! s:job_exit_cb(id, errcode, event) dict abort
       if l:pluginfo.installed
         if l:updated
           let s:updated_plugins += 1
-          echom 'Updated: ' . self.name
+          call s:echom_verbose(1, 'Updated: ' . self.name)
         else
-          call s:echom_verbose('Already up-to-date: ' . self.name)
+          call s:echom_verbose(3, 'Already up-to-date: ' . self.name)
         endif
       else
         let s:installed_plugins += 1
-        echom 'Installed: ' . self.name
+        call s:echom_verbose(1, 'Installed: ' . self.name)
       endif
       let l:err = 0
     endif
@@ -204,7 +205,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
   if l:err
     let s:error_plugins += 1
     echohl ErrorMsg
-    echom 'Error while updating "' . self.name . '": ' . a:errcode
+    call s:echom_verbose(1, 'Error while updating "' . self.name . '".  Error code: ' . a:errcode)
     echohl None
   endif
 
@@ -214,7 +215,7 @@ endfunction
 function! s:job_err_cb(id, message, event) dict abort
   echohl WarningMsg
   for l:line in a:message
-    call s:echom_verbose(self.name . ': ' . l:line)
+    call s:echom_verbose(2, self.name . ': ' . l:line)
   endfor
   echohl None
 endfunction
@@ -261,7 +262,7 @@ function! s:update_single_plugin(name, force) abort
   if !isdirectory(l:dir)
     let l:pluginfo.installed = 0
     let l:pluginfo.revision = ''
-    call s:echo_verbose('Cloning ' . a:name)
+    call s:echo_verbose(3, 'Cloning ' . a:name)
 
     let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
     if l:pluginfo.depth > 0
@@ -273,12 +274,12 @@ function! s:update_single_plugin(name, force) abort
   else
     let l:pluginfo.installed = 1
     if l:pluginfo.frozen && !a:force
-      call s:echom_verbose('Skipped: ' . a:name)
+      call s:echom_verbose(3, 'Skipped: ' . a:name)
       call s:decrement_job_count()
       return 0
     endif
 
-    call s:echo_verbose('Updating ' . a:name)
+    call s:echo_verbose(3, 'Updating ' . a:name)
     let l:pluginfo.revision = s:get_plugin_revision(a:name)
     let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
   endif
