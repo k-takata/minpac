@@ -153,6 +153,14 @@ function! s:invoke_hook(hooktype, args, hook) abort
   endtry
 endfunction
 
+function! s:generate_helptags(dir, force) abort
+  if isdirectory(a:dir . '/doc')
+    if a:force || len(glob(a:dir . '/doc/tags*', 1, 1)) == 0
+      silent! execute 'helptags' a:dir . '/doc'
+    endif
+  endif
+endfunction
+
 function! s:job_exit_cb(id, errcode, event) dict abort
   call filter(s:joblist, {-> v:val != a:id})
 
@@ -180,12 +188,12 @@ function! s:job_exit_cb(id, errcode, event) dict abort
           return
         endif
 
-        if isdirectory(l:dir . '/doc')
-          " Generate helptags.
-          silent! execute 'helptags' l:dir . '/doc'
-        endif
+        call s:generate_helptags(l:dir, 1)
 
         call s:invoke_hook('post-update', [self.name], l:pluginfo.do)
+      else
+        " Even the plugin is not updated, generate helptags if it is not found.
+        call s:generate_helptags(l:dir, 0)
       endif
 
       if l:pluginfo.installed
