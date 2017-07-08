@@ -270,6 +270,38 @@ A dictionary with following items will be returned:
 | `'branch'` | Branch name to be cloned. |
 | `'depth'`  | Depth to be cloned. |
 
+#### minpac#getpackages([{packname}[, {packtype}[, {plugname}[, {nameonly}]]]])
+
+Get a list of plugins under the package directories.
+
+`{packname}` specifies a package name. Wildcards can be used. If omitted or an empty string is specified, `"*"` is used.
+
+`{packtype}` is a type of the package. `"*"`, `"start"`, `"opt"` or `"NONE"` can be used.
+If `"*"` is specified, both start and opt packages are listed.
+If omitted or an empty string is specified, `"*"` is used.
+If `"NONE"` is specified, package directories are listed instead of plugin directories.
+
+`{plugname}` specifies a plugin name. Wildcards can be used. If omitted or an empty string is specified, `"*"` is used.
+
+If `{nameonly}` is 1, plugin (or package) names are listed instead of the direcotries. Default is 0.
+
+E.g.:
+
+```vim
+" List the all plugin directories under the package directories.
+" Includes plugins under "dist" package.
+echo minpac#getpackages()
+
+" List directories of "start" plugins under "minpac" package.
+echo minpac#getpackages("minpac", "start")
+
+" List plugin names under "minpac" package.
+echo minpac#getpackages("minpac", "", "", 1)
+
+" List package names.
+echo minpac#getpackages("", "NAME", "", 1)
+```
+
 
 ### Hooks
 
