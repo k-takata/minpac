@@ -4,7 +4,7 @@
 
 # Options for protecting the tests against undesirable interaction with the
 # environment
-NO_PLUGINS = --noplugin --not-a-term
+NO_PLUGINS = --noplugin # --not-a-term
 NO_INITS = -U NONE $(NO_PLUGINS)
 
 # Tests using runtest.vim.
