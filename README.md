@@ -368,6 +368,17 @@ E.g.:
 call minpac#update('', {'do': 'quit'})
 ```
 
+Similar projects
+----------------
+
+There are some other plugin managers built on top of the Vim 8's packages feature.
+
+* [pack](https://github.com/maralla/pack): written in Rust
+* [infect](https://github.com/csexton/infect): written in Ruby
+* [vim-pck](https://github.com/nicodebo/vim-pck): written in Python
+* [vim8-pack](https://github.com/mkarpoff/vim8-pack): written in Bash
+
+
 Credit
 ------
 
