@@ -5,29 +5,49 @@ cache:
   directories:
     - $HOME/opt
 
-env:
-  global:
-    - OPT=$HOME/opt
+matrix:
+  include:
+    - os: linux
+      env: VIM=vim OPT=$HOME/opt VIMPROG=$OPT/bin/$VIM
+    - os: linux
+      env: VIM=nvim VIMPROG=$VIM
+    - os: osx
+      env: VIM=vim PACKAGE=vim VIMPROG=$VIM
+    - os: osx
+      env: VIM=nvim PACKAGE=neovim VIMPROG=$VIM
+
 
 install: |
-  git clone --depth 1 https://github.com/vim/vim
-  cd vim
-  echo -n 'Vim version: '
-  git describe --tags | tee vim-ver.txt
-  if [ -e $OPT/vim-ver.txt ]; then
-    if diff $OPT/vim-ver.txt vim-ver.txt; then
+  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    if [ "$VIM" = "vim" ]; then
+      git clone --depth 1 https://github.com/vim/vim
+      cd vim
+      echo -n 'Vim version: '
+      git describe --tags | tee vim-ver.txt
+      if [ -e $OPT/vim-ver.txt ]; then
+        if diff $OPT/vim-ver.txt vim-ver.txt; then
+          cd -
+          return
+        fi
+      fi
+      ./configure --prefix=$OPT --with-features=huge --disable-gui
+      make
+      make install
+      cp vim-ver.txt $OPT
       cd -
-      return
+    elif [ "$VIM" = "nvim" ]; then
+      # https://github.com/neovim/bot-ci#setting-up-integration-builds
+      eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
     fi
+  elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    brew update
+    brew upgrade
+    brew install $PACKAGE
+    $VIM --version
   fi
-  ./configure --prefix=$OPT --with-features=huge --disable-gui
-  make
-  make install
-  cp vim-ver.txt $OPT
-  cd -
 
 script:
   - cd test
-  - make VIMPROG=$OPT/bin/vim
+  - make VIMPROG=$VIMPROG
 
 # vim: sw=2 sts=2 et
