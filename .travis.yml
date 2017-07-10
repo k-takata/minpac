@@ -4,6 +4,7 @@ sudo: false
 cache:
   directories:
     - $HOME/opt
+    - $HOME/Library/Caches/Homebrew
 
 matrix:
   include:
@@ -41,7 +42,7 @@ install: |
     fi
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
     brew update
-    brew upgrade
+    #brew upgrade
     brew install $PACKAGE
     $VIM --version
   fi
