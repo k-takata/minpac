@@ -3,21 +3,23 @@ version: '1.0.{build}'
 shallow_clone: true
 
 environment:
-  VIMPROG: '%APPVEYOR_BUILD_FOLDER%\vim80-kaoriya-win64\gvim.exe'
-  AUTH_TOKEN: # for GitHub
-    secure: wdTzzL05DoG4BZIgqlc3y/Ff50ZOTjfaqMazhdMLcXmxYYbmeCsI9PN01TJCQMaw
-  API_TOKEN:  # for AppVeyor
-    secure: iUTvK78Ch5hfdoqFtPOMeQj96cGeeyenSfCRJxLb650=
+  global:
+    AUTH_TOKEN: # for GitHub
+      secure: wdTzzL05DoG4BZIgqlc3y/Ff50ZOTjfaqMazhdMLcXmxYYbmeCsI9PN01TJCQMaw
+    API_TOKEN:  # for AppVeyor
+      secure: iUTvK78Ch5hfdoqFtPOMeQj96cGeeyenSfCRJxLb650=
+
+  matrix:
+    - env: win64
+      VIMPROG: '%APPVEYOR_BUILD_FOLDER%\vim80-kaoriya-win64\gvim.exe'
+    - env: cygwin64
+      VIMPROG: '/usr/bin/vim'
 
 build_script:
-  - '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'
-  - tools\appveyor-dl.bat
-  - '%VIMPROG% -u NONE -c "redir @a | ver | 0put a | wq" ver.txt'
-  - type ver.txt
+  - tools\appveyor.bat build
 
 test_script:
-  - cd test
-  - nmake -f Make_win.mak VIMPROG=%VIMPROG%
+  - tools\appveyor.bat test
 
 cache:
   - downloads -> appveyor.yml
