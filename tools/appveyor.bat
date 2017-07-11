@@ -48,7 +48,9 @@ goto :eof
 :cygwin64_test
 @echo on
 cd test
-bash -lc "make VIMPROG=$VIMPROG"
+bash -lc "which make"
+rem bash -lc "make VIMPROG=$VIMPROG --trace"
+make VIMPROG=%VIMPROG% test_minpac.res --trace -p
 
 @echo off
 goto :eof
