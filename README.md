@@ -26,10 +26,7 @@ Requirements
 
 * Vim 8.0.0050+ (or Neovim 0.2+)
 * Git 1.9+
-* OS  
-  Windows: tested  
-  Linux: tested  
-  macOS: not tested
+* OS: Windows, Linux or macOS
 
 
 Installation
