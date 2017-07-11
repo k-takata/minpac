@@ -5,10 +5,16 @@ cache:
   directories:
     - $HOME/opt
 
+env:
+  global:
+    - OPT=$HOME/opt
+    - CACHE=$OPT/cache
+    - BREWCACHE=$HOME/Library/Caches/Homebrew
+
 matrix:
   include:
     - os: linux
-      env: VIM=vim OPT=$HOME/opt VIMPROG=$OPT/bin/$VIM
+      env: VIM=vim VIMPROG=$OPT/bin/$VIM
     - os: linux
       env: VIM=nvim VIMPROG=$VIM
     - os: osx
@@ -40,9 +46,21 @@ install: |
       eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
     fi
   elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    if [ -d $CACHE ]; then
+      if [ "$(echo $CACHE/*)" != "$CACHE/*" ]; then
+        cp $CACHE/* $BREWCACHE
+      fi
+    else
+      mkdir $CACHE -p
+    fi
+    (cd $BREWCACHE; ls > $HOME/list1.txt)
     brew update
-    brew upgrade
+    #brew upgrade
     brew install $PACKAGE
+    brew cleanup -s
+    (cd $BREWCACHE; ls > $HOME/list2.txt)
+    comm -1 -3 $HOME/list1.txt $HOME/list2.txt | (cd $BREWCACHE; xargs -I{} cp {} $CACHE)
+    comm -2 -3 $HOME/list1.txt $HOME/list2.txt | (cd $CACHE; xargs rm -rf)
     $VIM --version
   fi
 
