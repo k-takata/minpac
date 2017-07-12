@@ -202,7 +202,7 @@ All plugins will be installed under the following directories:
 "opt" plugins can be loaded with `:packadd` command.
 See `:help packages` for detail.
 
-#### minpac#add({url}, [{config}])
+#### minpac#add({url}[, {config}])
 
 Register a plugin.
 
@@ -219,7 +219,7 @@ Register a plugin.
 | `'branch'` | Used as a branch name to be cloned. Default: empty |
 | `'do'`     | Post-update hook. See [Post-update hooks](#post-update-hooks). Default: empty |
 
-#### minpac#update([{name}, [{config}]])
+#### minpac#update([{name}[, {config}]])
 
 Install or update all plugins or the specified plugin.
 

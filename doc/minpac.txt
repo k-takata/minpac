@@ -218,7 +218,7 @@ minpac#init([{config}])				*minpac#init()*
 	See |packages| for detail.
 
 
-minpac#add({url}, [{config}])			*minpac#add()*
+minpac#add({url}[, {config}])			*minpac#add()*
 	Register a plugin.
 
 	{url} is a URL of a plugin.  It can be a short form
@@ -244,7 +244,7 @@ minpac#add({url}, [{config}])			*minpac#add()*
 				Default: empty
 
 
-minpac#update([{name}, [{config}]])			*minpac#update()*
+minpac#update([{name}[, {config}]])			*minpac#update()*
 	Install or update all plugins or the specified plugin.
 
 	{name} is a unique name of a plugin (|minpac-plugin_name|).
