@@ -1,0 +1,10 @@
+language: viml
+sudo: required
+dist: trusty
+
+script:
+    - pip install --user --upgrade vim-vint
+    - python --version
+    - vim --version
+    - vint --version
+    - vint autoload

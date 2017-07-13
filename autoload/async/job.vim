@@ -26,19 +26,19 @@ function! s:job_supports_type(type) abort
     return index(s:job_supported_types(), a:type) >= 0
 endfunction
 
-function! s:out_cb(job, data, jobid, opts) abort
+function! s:out_cb(jobid, opts, job, data) abort
     if has_key(a:opts, 'on_stdout')
         call a:opts.on_stdout(a:jobid, split(a:data, "\n", 1), 'stdout')
     endif
 endfunction
 
-function! s:err_cb(job, data, jobid, opts) abort
+function! s:err_cb(jobid, opts, job, data) abort
     if has_key(a:opts, 'on_stderr')
         call a:opts.on_stderr(a:jobid, split(a:data, "\n", 1), 'stderr')
     endif
 endfunction
 
-function! s:exit_cb(job, status, jobid, opts) abort
+function! s:exit_cb(jobid, opts, job, status) abort
     if has_key(a:opts, 'on_exit')
         call a:opts.on_exit(a:jobid, a:status, 'exit')
     endif
@@ -98,7 +98,7 @@ function! s:job_start(cmd, opts) abort
         endfor
     endif
 
-    if l:jobtype == ''
+    if l:jobtype ==? ''
         return s:job_error_unsupported_job_type
     endif
 
@@ -121,12 +121,12 @@ function! s:job_start(cmd, opts) abort
         let s:jobidseq = s:jobidseq + 1
         let l:jobid = s:jobidseq
         let l:job  = job_start(a:cmd, {
-            \ 'out_cb': {job,data->s:out_cb(job, data, l:jobid, a:opts)},
-            \ 'err_cb': {job,data->s:err_cb(job, data, l:jobid, a:opts)},
-            \ 'exit_cb': {job,data->s:exit_cb(job, data, l:jobid, a:opts)},
+            \ 'out_cb': function('s:out_cb', [l:jobid, a:opts]),
+            \ 'err_cb': function('s:err_cb', [l:jobid, a:opts]),
+            \ 'exit_cb': function('s:exit_cb', [l:jobid, a:opts]),
             \ 'mode': 'raw',
         \})
-        if job_status(l:job) != 'run'
+        if job_status(l:job) !=? 'run'
             return -1
         endif
         let s:jobs[l:jobid] = {
