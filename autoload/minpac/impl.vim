@@ -84,6 +84,7 @@ function! s:system(cmds) abort
     while !l:opt.exited
       sleep 1m
     endwhile
+    sleep 5m    " Wait for out_cb. (not sure this is enough.)
   endif
   return [l:opt.errcode, l:opt.out]
 endfunction
@@ -93,7 +94,7 @@ function! s:get_plugin_revision(name) abort
   let l:pluginfo = g:minpac#pluglist[a:name]
   let l:dir = l:pluginfo.dir
   let l:res = s:system([g:minpac#opt.git, '-C', l:dir, 'rev-parse', 'HEAD'])
-  if l:res[0] == 0
+  if l:res[0] == 0 && len(l:res[1]) > 0
     return l:res[1][0]
   else
     " Error
