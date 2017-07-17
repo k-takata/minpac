@@ -65,27 +65,20 @@ function! s:system_out_cb(id, message, event) dict abort
   let self.out += a:message
 endfunction
 
-function! s:system_exit_cb(id, errcode, event) dict abort
-  let self.errcode = a:errcode
-  let self.exited = 1
-endfunction
-
 " Replacement for system().
 " This doesn't open an extra window on MS-Windows.
 function! s:system(cmds) abort
   let l:opt = {
         \ 'on_stdout': function('s:system_out_cb'),
-        \ 'on_exit': function('s:system_exit_cb'),
-        \ 'out': [], 'errcode': -1, 'exited': 0
+        \ 'out': []
         \ }
   let l:job = minpac#job#start(s:quote_cmds(a:cmds), l:opt)
   if l:job > 0
     " It worked!
-    while !l:opt.exited
-      sleep 1m
-    endwhile
+    let l:ret = minpac#job#wait([l:job])[0]
+    sleep 5m    " Wait for out_cb. (not sure this is enough.)
   endif
-  return [l:opt.errcode, l:opt.out]
+  return [l:ret, l:opt.out]
 endfunction
 
 " Get the revision of the specified plugin.
@@ -93,7 +86,7 @@ function! s:get_plugin_revision(name) abort
   let l:pluginfo = g:minpac#pluglist[a:name]
   let l:dir = l:pluginfo.dir
   let l:res = s:system([g:minpac#opt.git, '-C', l:dir, 'rev-parse', 'HEAD'])
-  if l:res[0] == 0
+  if l:res[0] == 0 && len(l:res[1]) > 0
     return l:res[1][0]
   else
     " Error
