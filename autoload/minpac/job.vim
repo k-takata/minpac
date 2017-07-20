@@ -179,9 +179,9 @@ function! s:job_wait_single(jobid, timeout, start) abort
         try
             while l:timeout < 0 || reltimefloat(reltime(a:start)) < l:timeout
                 let l:info = job_info(l:jobinfo.job)
-                if l:info.status ==# "dead"
+                if l:info.status ==# 'dead'
                     return l:info.exitval
-                elseif l:info.status ==# "fail"
+                elseif l:info.status ==# 'fail'
                     return -3
                 endif
                 sleep 1m
