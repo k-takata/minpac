@@ -165,6 +165,47 @@ function! s:job_send(jobid, data) abort
     endif
 endfunction
 
+function! s:job_wait_single(jobid, timeout, start) abort
+    if !has_key(s:jobs, a:jobid)
+        return -3
+    endif
+
+    let l:jobinfo = s:jobs[a:jobid]
+    if l:jobinfo.type == s:job_type_nvimjob
+        let l:timeout = a:timeout - reltimefloat(reltime(a:start)) * 1000
+        return jobwait([a:jobid], float2nr(l:timeout))[0]
+    elseif l:jobinfo.type == s:job_type_vimjob
+        let l:timeout = a:timeout / 1000.0
+        try
+            while l:timeout < 0 || reltimefloat(reltime(a:start)) < l:timeout
+                let l:info = job_info(l:jobinfo.job)
+                if l:info.status ==# 'dead'
+                    return l:info.exitval
+                elseif l:info.status ==# 'fail'
+                    return -3
+                endif
+                sleep 1m
+            endwhile
+        catch /^Vim:Interrupt$/
+            return -2
+        endtry
+    endif
+    return -1
+endfunction
+
+function! s:job_wait(jobids, timeout) abort
+    let l:start = reltime()
+    let l:exitcode = 0
+    let l:ret = []
+    for l:jobid in a:jobids
+        if l:exitcode != -2  " Not interrupted.
+            let l:exitcode = s:job_wait_single(l:jobid, a:timeout, l:start)
+        endif
+        let l:ret += [l:exitcode]
+    endfor
+    return l:ret
+endfunction
+
 " public apis {{{
 function! async#job#start(cmd, opts) abort
     return s:job_start(a:cmd, a:opts)
@@ -176,5 +217,10 @@ endfunction
 
 function! async#job#send(jobid, data) abort
     call s:job_send(a:jobid, a:data)
+endfunction
+
+function! async#job#wait(jobids, ...) abort
+    let l:timeout = get(a:000, 0, -1)
+    call s:job_wait(a:jobids, l:timeout)
 endfunction
 " }}}
