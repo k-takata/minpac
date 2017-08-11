@@ -101,7 +101,8 @@ function! s:decrement_job_count() abort
     " `minpac#update()` is finished.
     call s:invoke_hook('finish-update', [s:updated_plugins, s:installed_plugins], s:finish_update_hook)
 
-    if has('nvim') && (s:updated_plugins > 0 || s:installed_plugins > 0)
+    if has('nvim') && exists(':UpdateRemotePlugins') == 2
+          \ && (s:updated_plugins > 0 || s:installed_plugins > 0)
       UpdateRemotePlugins
     endif
 
@@ -406,7 +407,7 @@ function! minpac#impl#clean(args) abort
         let err = 1
       endif
     endfor
-    if has('nvim')
+    if has('nvim') && exists(':UpdateRemotePlugins') == 2
       UpdateRemotePlugins
     endif
     if err == 0
