@@ -101,6 +101,11 @@ function! s:decrement_job_count() abort
     " `minpac#update()` is finished.
     call s:invoke_hook('finish-update', [s:updated_plugins, s:installed_plugins], s:finish_update_hook)
 
+    if has('nvim') && exists(':UpdateRemotePlugins') == 2
+          \ && (s:updated_plugins > 0 || s:installed_plugins > 0)
+      UpdateRemotePlugins
+    endif
+
     " Show the status.
     if s:error_plugins != 0
       echohl WarningMsg
@@ -108,7 +113,7 @@ function! s:decrement_job_count() abort
       echohl None
     else
       let l:mes = 'All plugins are up to date.'
-      if s:updated_plugins != 0 || s:installed_plugins != 0
+      if s:updated_plugins > 0 || s:installed_plugins > 0
         let l:mes .= ' (Updated: ' . s:updated_plugins . ', Newly installed: ' . s:installed_plugins . ')'
       endif
       echom l:mes
@@ -402,6 +407,9 @@ function! minpac#impl#clean(args) abort
         let err = 1
       endif
     endfor
+    if has('nvim') && exists(':UpdateRemotePlugins') == 2
+      UpdateRemotePlugins
+    endif
     if err == 0
       echo 'Successfully cleaned.'
     endif
