@@ -207,6 +207,7 @@ See `:help packages` for detail.
 Register a plugin.
 
 `{url}` is a URL of a plugin. It can be a short form (`'<github-account>/<repository>'`) or a valid git URL.
+Note: Unlike Vundle, a short form without `<github-account>/` is not supported. (Because vim-scripts.org is not maintained now.)
 
 `{config}` is a Dictionary of options for configuring the plugin.
 
