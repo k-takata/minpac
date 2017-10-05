@@ -77,7 +77,7 @@ function! minpac#add(plugname, ...) abort
     let l:opt.name = substitute(l:opt.name, '\C\.git$', '', '')
   endif
   if l:opt.name == ''
-    echoerr 'Cannot specify the plugin name.'
+    echoerr 'Cannot extract the plugin name. (' . a:plugname . ')'
     return
   endif
 
