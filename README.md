@@ -40,17 +40,24 @@ Plugins installed under `pack/*/start/` are automatically added to the `'runtime
 
 ```cmd
 cd /d %USERPROFILE%
-mkdir vimfiles\pack\minpac\opt
-cd vimfiles\pack\minpac\opt
-git clone https://github.com/k-takata/minpac.git
+git clone https://github.com/k-takata/minpac.git^
+ vimfiles\pack\minpac\opt\minpac
 ```
 
 ### Linux, macOS
 
+Vim:
+
 ```sh
-mkdir -p ~/.vim/pack/minpac/opt
-cd ~/.vim/pack/minpac/opt
-git clone https://github.com/k-takata/minpac.git
+git clone https://github.com/k-takata/minpac.git \
+    ~/.vim/pack/minpac/opt/minpac
+```
+
+Neovim (use `$XDG_CONFIG_HOME` in place of `~/.config` if set on your system):
+
+```sh
+git clone https://github.com/k-takata/minpac.git \
+    ~/.config/nvim/pack/minpac/opt/minpac
 ```
 
 ### Sample .vimrc
