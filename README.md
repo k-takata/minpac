@@ -40,8 +40,8 @@ Plugins installed under `pack/*/start/` are automatically added to the `'runtime
 
 ```cmd
 cd /d %USERPROFILE%
-git clone https://github.com/k-takata/minpac.git^
- vimfiles\pack\minpac\opt\minpac
+git clone https://github.com/k-takata/minpac.git ^
+    vimfiles\pack\minpac\opt\minpac
 ```
 
 ### Linux, macOS
