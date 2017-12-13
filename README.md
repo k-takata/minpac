@@ -382,6 +382,7 @@ There are some other plugin managers built on top of the Vim 8's packages featur
 * [infect](https://github.com/csexton/infect): written in Ruby
 * [vim-pck](https://github.com/nicodebo/vim-pck): written in Python
 * [vim8-pack](https://github.com/mkarpoff/vim8-pack): written in Bash
+* [volt](https://github.com/vim-volt/volt): written in Go
 
 
 Credit
