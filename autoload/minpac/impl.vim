@@ -284,6 +284,7 @@ function! s:update_single_plugin(name, force) abort
       call s:echo_verbose(3, 'Cloning ' . a:name)
 
       let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
+      let l:cmd += ['--recurse-submodules']
       if l:pluginfo.depth > 0
         let l:cmd += ['--depth=' . l:pluginfo.depth]
       endif
