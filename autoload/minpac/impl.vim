@@ -309,6 +309,7 @@ function! s:update_single_plugin(name, force) abort
     call s:echo_verbose(3, 'Updating ' . a:name)
     let l:pluginfo.revision = s:get_plugin_revision(a:name)
     let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
+    let l:cmd += ['--recurse-submodules']
   endif
   return s:start_job(l:cmd, a:name, 0)
 endfunction
