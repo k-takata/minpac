@@ -196,7 +196,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
 
         if has('nvim') && isdirectory(l:dir . '/rplugin')
           " Required for :UpdateRemotePlugins.
-          let &rtp += l:dir
+          exec 'set rtp+=' . l:dir
         endif
 
         call s:invoke_hook('post-update', [self.name], l:pluginfo.do)
