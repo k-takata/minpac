@@ -194,6 +194,11 @@ function! s:job_exit_cb(id, errcode, event) dict abort
 
         call s:generate_helptags(l:dir, 1)
 
+        if has('nvim') && isdirectory(l:dir . '/rplugin')
+          " Required for :UpdateRemotePlugins.
+          let &rtp += l:dir
+        endif
+
         call s:invoke_hook('post-update', [self.name], l:pluginfo.do)
       else
         " Even the plugin is not updated, generate helptags if it is not found.
