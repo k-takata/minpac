@@ -427,4 +427,87 @@ function! minpac#impl#clean(args) abort
   endif
 endfunction
 
+function! s:syntax()
+  syntax clear
+  syn match minpacDash /^-/
+  syn match minpacName /\(^- \)\@<=.*/ contains=minpacStatus
+  syn match minpacStatus /\(-.*\)\@<=-\s.*$/ contained
+  syn match minpacStar /^\s\*/ contained
+  syn match minpacCommit /^\s\*\s[0-9a-f]\{7,9} .*/ contains=minpacRelDate,minpacSha,minpacStar
+  syn match minpacSha /\(\s\*\s\)\@<=[0-9a-f]\{4,}/ contained
+  syn match minpacRelDate /([^)]*)$/ contained
+
+  hi def link minpacDash    Special
+  hi def link minpacStar    Boolean
+  hi def link minpacName    Function
+  hi def link minpacSha     Identifier
+  hi def link minpacRelDate Comment
+  hi def link minpacStatus  Constant
+endfunction
+
+function! minpac#impl#status()
+  let l:result = []
+  let l:update_ran = exists('s:installed_plugins')
+  for l:name in keys(g:minpac#pluglist)
+    let l:pluginfo = g:minpac#pluglist[l:name]
+    let l:dir = l:pluginfo.dir
+    let l:plugin = { 'name': l:name, 'lines': [], 'status': '' }
+
+    if !isdirectory(l:dir)
+      let l:plugin.status = 'Not installed'
+    else
+      let l:commits = systemlist([g:minpac#opt.git, '-C', l:dir, 'log',
+            \ '--color=never', '--pretty=format:%h %s (%cr)', 'HEAD...HEAD@{1}'
+            \ ])
+
+      " Show installed status only when the plugin is installed for the first time
+      if has_key(l:pluginfo, 'installed') && l:pluginfo.installed ==? 0
+        let l:plugin.status = 'Installed'
+      elseif !l:update_ran
+        let l:plugin.status = 'OK'
+      endif
+
+      " Fetching log on non-updated plugin returns fatal error, so make sure
+      " to handle that case properly
+      if len(l:commits) > 0 && l:commits[0] !~? 'fatal'
+        let l:plugin.lines = l:commits
+      endif
+
+      if get(l:pluginfo, 'revision') !=? '' && l:pluginfo.revision !=# s:get_plugin_revision(l:name)
+        let l:plugin.status = 'Updated'
+      endif
+    endif
+
+    call add(l:result, l:plugin)
+  endfor
+
+  " Show items with most lines (commits) first.
+  call sort(l:result, { first, second -> len(second.lines) - len(first.lines) })
+
+  let l:content = []
+
+  if l:update_ran
+    call add(l:content, s:updated_plugins. ' updated. '.s:installed_plugins. ' installed.')
+  endif
+
+  for l:item in l:result
+    if l:item.status ==? ''
+      continue
+    endif
+
+    call add(l:content, '- '.l:item.name.' - '.l:item.status)
+    for l:line in l:item.lines
+      call add(l:content, ' * '.l:line)
+    endfor
+  endfor
+
+  let l:content = join(l:content, "\<NL>")
+  silent exe 'vertical topleft new'
+  setf minpac
+  silent exe 'put! =l:content'
+  call s:syntax()
+  setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nomodifiable nospell
+  silent exe 'norm!gg'
+endfunction
+
 " vim: set ts=8 sw=2 et:

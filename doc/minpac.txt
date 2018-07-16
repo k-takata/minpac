@@ -191,6 +191,9 @@ functions.  E.g.: >
 
 	" To uninstall unused plugins:
 	call minpac#clean()
+
+	" To see plugins status:
+	call minpac#status()
 <
 
 ------------------------------------------------------------------------------
@@ -343,6 +346,12 @@ minpac#getpackages([{packname}[, {packtype}[, {plugname}[, {nameonly}]]]])
 	" List package names.
 	echo minpac#getpackages("", "NAME", "", 1)
 <
+minpac#status()			              *minpac#status()*
+	Print status of plugins in vertical split.
+        When ran after `minpac#update()`, shows only installed and updated
+        plugins. Otherwise, shows the status of the plugin and commits of last
+        update (if any)
+
 ------------------------------------------------------------------------------
 HOOKS						*minpac-hooks*
 
