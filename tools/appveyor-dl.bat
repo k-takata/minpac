@@ -15,7 +15,7 @@ if ERRORLEVEL 1 (
 )
 if "%DL%"=="yes" (
 	echo Download the latest Vim.
-	py tools\dl-kaoriya-vim.py --arch win64 --filename vim.zip --force
+	py tools\dl-kaoriya-vim.py --arch win64 --filename vim.zip --force --noprogress
 	if not ERRORLEVEL 1 (
 		move /y vim.zip downloads > nul
 		copy /y release-info.txt downloads > nul
@@ -29,3 +29,4 @@ if "%DL%"=="yes" (
 	echo Use cached version of Vim.
 )
 7z x downloads\vim.zip > nul
+move vim??-kaoriya-win64 vim-kaoriya-win64 > nul
