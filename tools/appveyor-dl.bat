@@ -29,3 +29,4 @@ if "%DL%"=="yes" (
 	echo Use cached version of Vim.
 )
 7z x downloads\vim.zip > nul
+move vim??-kaoriya-win64 vim-kaoriya-win64 > nul
