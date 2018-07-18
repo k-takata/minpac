@@ -456,9 +456,11 @@ function! minpac#impl#status()
     if !isdirectory(l:dir)
       let l:plugin.status = 'Not installed'
     else
-      let l:commits = systemlist([g:minpac#opt.git, '-C', l:dir, 'log',
+      let l:commits = s:system([g:minpac#opt.git, '-C', l:dir, 'log',
             \ '--color=never', '--pretty=format:%h %s (%cr)', 'HEAD...HEAD@{1}'
             \ ])
+
+      let l:commits = filter(l:commits[1], {-> v:val !=? '' })
 
       " Show installed status only when the plugin is installed for the first time
       if has_key(l:pluginfo, 'installed') && l:pluginfo.installed ==? 0
