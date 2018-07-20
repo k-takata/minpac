@@ -166,7 +166,7 @@ Load minpac on demand
 	" Define user commands for updating/cleaning the plugins.
 	" Each of them loads minpac, reloads .vimrc to register the
 	" information of plugins, then performs the task.
-	command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
+	command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update() | call minpac#status()
 	command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
 <
   Note that your .vimrc must be reloadable to use this.  E.g.:

@@ -460,23 +460,14 @@ function! minpac#impl#status()
             \ '--color=never', '--pretty=format:%h %s (%cr)', 'HEAD...HEAD@{1}'
             \ ])
 
-      let l:commits = filter(l:commits[1], {-> v:val !=? '' })
+      let l:plugin.lines = filter(l:commits[1], {-> v:val !=? '' })
 
-      " Show installed status only when the plugin is installed for the first time
-      if has_key(l:pluginfo, 'installed') && l:pluginfo.installed ==? 0
-        let l:plugin.status = 'Installed'
-      elseif !l:update_ran
+      if !l:update_ran
         let l:plugin.status = 'OK'
-      endif
-
-      " Fetching log on non-updated plugin returns fatal error, so make sure
-      " to handle that case properly
-      if len(l:commits) > 0 && l:commits[0] !~? 'fatal'
-        let l:plugin.lines = l:commits
-      endif
-
-      if get(l:pluginfo, 'revision') !=? '' && l:pluginfo.revision !=# s:get_plugin_revision(l:name)
+      elseif len(l:plugin.lines) > 0
         let l:plugin.status = 'Updated'
+      elseif has_key(l:pluginfo, 'installed') && l:pluginfo.installed ==? 0
+        let l:plugin.status = 'Installed'
       endif
     endif
 

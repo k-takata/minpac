@@ -153,7 +153,7 @@ endif
 " Define user commands for updating/cleaning the plugins.
 " Each of them loads minpac, reloads .vimrc to register the
 " information of plugins, then performs the task.
-command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
+command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update() | call minpac#status()
 command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
 command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
 ```
@@ -181,7 +181,7 @@ call minpac#update()
 " To uninstall unused plugins:
 call minpac#clean()
 
-" To see plugins s tatus:
+" To see plugins status:
 call minpac#status()
 ```
 
