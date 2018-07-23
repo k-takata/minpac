@@ -67,7 +67,7 @@ endfunction
 
 " Replacement for system().
 " This doesn't open an extra window on MS-Windows.
-function! s:system(cmds) abort
+function! minpac#impl#system(cmds) abort
   let l:opt = {
         \ 'on_stdout': function('s:system_out_cb'),
         \ 'out': []
@@ -82,10 +82,10 @@ function! s:system(cmds) abort
 endfunction
 
 " Get the revision of the specified plugin.
-function! s:get_plugin_revision(name) abort
+function! minpac#impl#get_plugin_revision(name) abort
   let l:pluginfo = g:minpac#pluglist[a:name]
   let l:dir = l:pluginfo.dir
-  let l:res = s:system([g:minpac#opt.git, '-C', l:dir, 'rev-parse', 'HEAD'])
+  let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'rev-parse', 'HEAD'])
   if l:res[0] == 0 && len(l:res[1]) > 0
     return l:res[1][0]
   else
@@ -177,7 +177,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
       " Check if it is actually updated (or installed).
       let l:updated = 1
       if l:pluginfo.revision != ''
-        if l:pluginfo.revision ==# s:get_plugin_revision(self.name)
+        if l:pluginfo.revision ==# minpac#impl#get_plugin_revision(self.name)
           let l:updated = 0
         endif
       endif
@@ -301,7 +301,7 @@ function! s:update_single_plugin(name, force) abort
     endif
 
     call s:echo_verbose(3, 'Updating ' . a:name)
-    let l:pluginfo.revision = s:get_plugin_revision(a:name)
+    let l:pluginfo.revision = minpac#impl#get_plugin_revision(a:name)
     let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
   endif
   return s:start_job(l:cmd, a:name, 0)
@@ -427,80 +427,13 @@ function! minpac#impl#clean(args) abort
   endif
 endfunction
 
-function! s:syntax()
-  syntax clear
-  syn match minpacDash /^-/
-  syn match minpacName /\(^- \)\@<=.*/ contains=minpacStatus
-  syn match minpacStatus /\(-.*\)\@<=-\s.*$/ contained
-  syn match minpacStar /^\s\*/ contained
-  syn match minpacCommit /^\s\*\s[0-9a-f]\{7,9} .*/ contains=minpacRelDate,minpacSha,minpacStar
-  syn match minpacSha /\(\s\*\s\)\@<=[0-9a-f]\{4,}/ contained
-  syn match minpacRelDate /([^)]*)$/ contained
-
-  hi def link minpacDash    Special
-  hi def link minpacStar    Boolean
-  hi def link minpacName    Function
-  hi def link minpacSha     Identifier
-  hi def link minpacRelDate Comment
-  hi def link minpacStatus  Constant
-endfunction
-
-function! minpac#impl#status()
-  let l:result = []
+function! minpac#impl#update_information() abort
   let l:update_ran = exists('s:installed_plugins')
-  for l:name in keys(g:minpac#pluglist)
-    let l:pluginfo = g:minpac#pluglist[l:name]
-    let l:dir = l:pluginfo.dir
-    let l:plugin = { 'name': l:name, 'lines': [], 'status': '' }
-
-    if !isdirectory(l:dir)
-      let l:plugin.status = 'Not installed'
-    else
-      let l:commits = s:system([g:minpac#opt.git, '-C', l:dir, 'log',
-            \ '--color=never', '--pretty=format:%h %s (%cr)', 'HEAD...HEAD@{1}'
-            \ ])
-
-      let l:plugin.lines = filter(l:commits[1], {-> v:val !=? '' })
-
-      if !l:update_ran
-        let l:plugin.status = 'OK'
-      elseif len(l:plugin.lines) > 0
-        let l:plugin.status = 'Updated'
-      elseif has_key(l:pluginfo, 'installed') && l:pluginfo.installed ==? 0
-        let l:plugin.status = 'Installed'
-      endif
-    endif
-
-    call add(l:result, l:plugin)
-  endfor
-
-  " Show items with most lines (commits) first.
-  call sort(l:result, { first, second -> len(second.lines) - len(first.lines) })
-
-  let l:content = []
-
-  if l:update_ran
-    call add(l:content, s:updated_plugins. ' updated. '.s:installed_plugins. ' installed.')
-  endif
-
-  for l:item in l:result
-    if l:item.status ==? ''
-      continue
-    endif
-
-    call add(l:content, '- '.l:item.name.' - '.l:item.status)
-    for l:line in l:item.lines
-      call add(l:content, ' * '.l:line)
-    endfor
-  endfor
-
-  let l:content = join(l:content, "\<NL>")
-  silent exe 'vertical topleft new'
-  setf minpac
-  silent exe 'put! =l:content'
-  call s:syntax()
-  setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nomodifiable nospell
-  silent exe 'norm!gg'
+  return {
+        \ 'update_ran': l:update_ran,
+        \ 'installed': l:update_ran ? s:installed_plugins : 0,
+        \ 'updated': l:update_ran ? s:updated_plugins : 0,
+        \ }
 endfunction
 
 " vim: set ts=8 sw=2 et:

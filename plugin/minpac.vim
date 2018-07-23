@@ -111,7 +111,7 @@ endfunction
 
 function! minpac#status()
   call s:ensure_initialization()
-  return minpac#impl#status()
+  return minpac#status#get()
 endfunction
 
 
