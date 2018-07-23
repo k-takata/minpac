@@ -1,7 +1,9 @@
 let s:results = []
 
 function! minpac#status#get() abort
-  let l:update_info = minpac#impl#update_information()
+  let l:is_update_ran = minpac#impl#is_update_ran()
+  let l:update_count = 0
+  let l:install_count = 0
   let l:result = []
   for l:name in keys(g:minpac#pluglist)
     let l:pluginfo = g:minpac#pluglist[l:name]
@@ -17,11 +19,13 @@ function! minpac#status#get() abort
 
       let l:plugin.lines = filter(l:commits[1], {-> v:val !=? '' })
 
-      if !l:update_info.update_ran
+      if !l:is_update_ran
         let l:plugin.status = 'OK'
       elseif get(l:pluginfo, 'revision') !=? '' && l:pluginfo.revision !=# minpac#impl#get_plugin_revision(l:name)
+        let l:update_count += 1
         let l:plugin.status = 'Updated'
       elseif has_key(l:pluginfo, 'installed') && l:pluginfo.installed ==? 0
+        let l:install_count += 1
         let l:plugin.status = 'Installed'
       endif
     endif
@@ -35,8 +39,8 @@ function! minpac#status#get() abort
 
   let l:content = []
 
-  if l:update_info.update_ran
-    call add(l:content, l:update_info.updated. ' updated. '.l:update_info.installed. ' installed.')
+  if l:is_update_ran
+    call add(l:content, l:update_count.' updated. '.l:install_count.' installed.')
   endif
 
   for l:item in l:result

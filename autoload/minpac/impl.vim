@@ -427,13 +427,8 @@ function! minpac#impl#clean(args) abort
   endif
 endfunction
 
-function! minpac#impl#update_information() abort
-  let l:update_ran = exists('s:installed_plugins')
-  return {
-        \ 'update_ran': l:update_ran,
-        \ 'installed': l:update_ran ? s:installed_plugins : 0,
-        \ 'updated': l:update_ran ? s:updated_plugins : 0,
-        \ }
+function! minpac#impl#is_update_ran() abort
+  return exists('s:installed_plugins')
 endfunction
 
 " vim: set ts=8 sw=2 et:
