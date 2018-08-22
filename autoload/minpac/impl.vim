@@ -27,7 +27,7 @@ function! minpac#impl#getpackages(args) abort
     let l:pat = 'pack/' . l:packname . '/' . l:packtype . '/' . l:plugname
   endif
 
-  let l:ret = filter(globpath(&packpath, l:pat, 0 , 1), {-> isdirectory(v:val)})
+  let l:ret = filter(globpath(&packpath, l:pat, 0, 1), {-> isdirectory(v:val)})
   if l:nameonly
     call map(l:ret, {-> substitute(v:val, '^.*[/\\]', '', '')})
   endif
