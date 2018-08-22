@@ -67,7 +67,7 @@ endfunction
 
 " Replacement for system().
 " This doesn't open an extra window on MS-Windows.
-function! s:system(cmds) abort
+function! minpac#impl#system(cmds) abort
   let l:opt = {
         \ 'on_stdout': function('s:system_out_cb'),
         \ 'out': []
@@ -82,10 +82,10 @@ function! s:system(cmds) abort
 endfunction
 
 " Get the revision of the specified plugin.
-function! s:get_plugin_revision(name) abort
+function! minpac#impl#get_plugin_revision(name) abort
   let l:pluginfo = g:minpac#pluglist[a:name]
   let l:dir = l:pluginfo.dir
-  let l:res = s:system([g:minpac#opt.git, '-C', l:dir, 'rev-parse', 'HEAD'])
+  let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'rev-parse', 'HEAD'])
   if l:res[0] == 0 && len(l:res[1]) > 0
     return l:res[1][0]
   else
@@ -177,7 +177,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
       " Check if it is actually updated (or installed).
       let l:updated = 1
       if l:pluginfo.revision != ''
-        if l:pluginfo.revision ==# s:get_plugin_revision(self.name)
+        if l:pluginfo.revision ==# minpac#impl#get_plugin_revision(self.name)
           let l:updated = 0
         endif
       endif
@@ -316,7 +316,7 @@ function! s:update_single_plugin(name, force) abort
     endif
 
     call s:echo_verbose(3, 'Updating ' . a:name)
-    let l:pluginfo.revision = s:get_plugin_revision(a:name)
+    let l:pluginfo.revision = minpac#impl#get_plugin_revision(a:name)
     let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
   endif
   return s:start_job(l:cmd, a:name, 0)
@@ -440,6 +440,10 @@ function! minpac#impl#clean(args) abort
   else
     echo "\n" . 'Not cleaned.'
   endif
+endfunction
+
+function! minpac#impl#is_update_ran() abort
+  return exists('s:installed_plugins')
 endfunction
 
 " vim: set ts=8 sw=2 et:

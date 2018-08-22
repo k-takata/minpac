@@ -109,6 +109,11 @@ function! minpac#clean(...)
   return minpac#impl#clean(a:000)
 endfunction
 
+function! minpac#status()
+  call s:ensure_initialization()
+  return minpac#status#get()
+endfunction
+
 
 " Get information of specified plugin. Mainly for debugging.
 function! minpac#getpluginfo(name)

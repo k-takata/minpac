@@ -17,6 +17,7 @@ USAGE				|minpac-usage|
   COMMANDS			|minpac-commands|
   FUNCTIONS			|minpac-functions|
   HOOKS				|minpac-hooks|
+  MAPPINGS			|minpac-mappings|
 
 
 ==============================================================================
@@ -166,7 +167,7 @@ Load minpac on demand
 	" Define user commands for updating/cleaning the plugins.
 	" Each of them loads minpac, reloads .vimrc to register the
 	" information of plugins, then performs the task.
-	command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
+	command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update() | call minpac#status()
 	command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
 <
   Note that your .vimrc must be reloadable to use this.  E.g.:
@@ -191,6 +192,9 @@ functions.  E.g.: >
 
 	" To uninstall unused plugins:
 	call minpac#clean()
+
+	" To see plugins status:
+	call minpac#status()
 <
 
 ------------------------------------------------------------------------------
@@ -350,6 +354,12 @@ minpac#getpackages([{packname}[, {packtype}[, {plugname}[, {nameonly}]]]])
 	" List package names.
 	echo minpac#getpackages("", "NAME", "", 1)
 <
+minpac#status()			              *minpac#status()*
+	Print status of plugins in vertical split.
+        When ran after `minpac#update()`, shows only installed and updated
+        plugins. Otherwise, shows the status of the plugin and commits of last
+        update (if any)
+
 ------------------------------------------------------------------------------
 HOOKS						*minpac-hooks*
 
@@ -425,5 +435,22 @@ E.g.: >
 	" Quit Vim immediately after all updates are finished.
 	call minpac#update('', {'do': 'quit'})
 <
+------------------------------------------------------------------------------
+MAPPINGS						*minpac-mappings*
+
+List of mappings available only in status window.
+
+                                                *minpac-<CR>*
+<CR>                    Preview the commit under the cursor.
+
+                                                *minpac-CTRL-j*
+<C-j>                   Jump to next package in list.
+
+                                                *minpac-CTRL-k*
+<C-k>                   Jump to previous package in list.
+
+                                                *minpac-q*
+q                       Exit the status window.
+                        (Also works for commit preview window)
 ==============================================================================
  vim:tw=78:ts=8:ft=help:norl:
