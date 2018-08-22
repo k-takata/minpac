@@ -384,6 +384,18 @@ E.g.:
 call minpac#update('', {'do': 'quit'})
 ```
 
+### Mappings
+
+List of mappings available only in status window.
+
+| mapping | description |
+|---------|-------------|
+|`<CR>`   | Preview the commit under the cursor. |
+|`<C-j>`  | Jump to next package in list. |
+|`<C-k>`  | Jump to previous package in list. |
+|`q`      | Exit the status window.<br/>(Also works for commit preview window) |
+
+
 Similar projects
 ----------------
 
