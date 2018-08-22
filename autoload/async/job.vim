@@ -1,6 +1,28 @@
 " Author: Prabir Shrestha <mail at prabir dot me>
-" License: The MIT License
 " Website: https://github.com/prabirshrestha/async.vim
+" License: The MIT License {{{
+"   The MIT License (MIT)
+"
+"   Copyright (c) 2016 Prabir Shrestha
+"
+"   Permission is hereby granted, free of charge, to any person obtaining a copy
+"   of this software and associated documentation files (the "Software"), to deal
+"   in the Software without restriction, including without limitation the rights
+"   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+"   copies of the Software, and to permit persons to whom the Software is
+"   furnished to do so, subject to the following conditions:
+"
+"   The above copyright notice and this permission notice shall be included in all
+"   copies or substantial portions of the Software.
+"
+"   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+"   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+"   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+"   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+"   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+"   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+"   SOFTWARE.
+" }}}
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -133,7 +155,8 @@ function! s:job_start(cmd, opts) abort
             \ 'type': s:job_type_vimjob,
             \ 'opts': a:opts,
             \ 'job': l:job,
-            \ 'channel': job_getchannel(l:job)
+            \ 'channel': job_getchannel(l:job),
+            \ 'buffer': ''
         \ }
     else
         return s:job_error_unsupported_job_type
@@ -161,7 +184,23 @@ function! s:job_send(jobid, data) abort
     if l:jobinfo.type == s:job_type_nvimjob
         call jobsend(a:jobid, a:data)
     elseif l:jobinfo.type == s:job_type_vimjob
-        call ch_sendraw(l:jobinfo.channel, a:data)
+        let l:jobinfo.buffer .= a:data
+        call s:flush_vim_sendraw(a:jobid, v:null)
+    endif
+endfunction
+
+function! s:flush_vim_sendraw(jobid, timer) abort
+    " https://github.com/vim/vim/issues/2548
+    " https://github.com/natebosch/vim-lsc/issues/67#issuecomment-357469091
+    let l:jobinfo = s:jobs[a:jobid]
+    if len(l:jobinfo.buffer) <= 1024
+        call ch_sendraw(l:jobinfo.channel, l:jobinfo.buffer)
+        let l:jobinfo.buffer = ''
+    else
+        let l:to_send = l:jobinfo.buffer[:1023]
+        let l:jobinfo.buffer = l:jobinfo.buffer[1024:]
+        call ch_sendraw(l:jobinfo.channel, l:to_send)
+        call timer_start(0, function('s:flush_vim_sendraw', [a:jobid]))
     endif
 endfunction
 
