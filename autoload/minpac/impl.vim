@@ -251,6 +251,7 @@ function! s:start_job(cmds, name, seq) abort
     endwhile
   endif
 
+  call s:echo_verbose(4, 'start_job: cmds=' . string(a:cmds))
   let l:job = minpac#job#start(s:quote_cmds(a:cmds), {
         \ 'on_stderr': function('s:job_err_cb'),
         \ 'on_exit': function('s:job_exit_cb'),

@@ -209,7 +209,13 @@ minpac#init([{config}])				*minpac#init()*
 		depth		Default clone depth.  Default: 1
 		jobs		Maximum job numbers.  If <= 0, unlimited.
 				Default: 8
-		verbose		Verbosity level (0 to 3).  Default: 1
+		verbose		Verbosity level (0 to 4).
+				0: Show only important messages.
+				1: Show the result of each plugin.
+				2: Show error messages from external commands.
+				3: Show start/end messages for each plugin.
+				4: Show debug messages.
+				Default: 1
 
 	All plugins will be installed under the following directories:
 
