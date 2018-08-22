@@ -281,19 +281,34 @@ function! s:update_single_plugin(name, force) abort
   let l:dir = l:pluginfo.dir
   let l:url = l:pluginfo.url
   if !isdirectory(l:dir)
-    let l:pluginfo.installed = 0
-    let l:pluginfo.revision = ''
-    call s:echo_verbose(3, 'Cloning ' . a:name)
-
-    let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
-    if l:pluginfo.depth > 0
-      let l:cmd += ['--depth=' . l:pluginfo.depth]
+    if g:minpac#pluglist[a:name].type == 'start'
+      let l:dirtmp = substitute(l:dir, '/start/', '/opt/', '')
+    else
+      let l:dirtmp = substitute(l:dir, '/opt/', '/start/', '')
     endif
-    if l:pluginfo.branch != ''
-      let l:cmd += ['--branch=' . l:pluginfo.branch]
+
+    if !isdirectory(l:dirtmp)
+      let l:pluginfo.installed = 0
+      let l:pluginfo.revision = ''
+      call s:echo_verbose(3, 'Cloning ' . a:name)
+
+      let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
+      let l:cmd += ['--recurse-submodules']
+      if l:pluginfo.depth > 0
+        let l:cmd += ['--depth=' . l:pluginfo.depth]
+      endif
+      if l:pluginfo.branch != ''
+        let l:cmd += ['--branch=' . l:pluginfo.branch]
+      endif
+    else
+      call rename(l:dirtmp, l:dir)
+      let l:pluginfo.installed = 1
     endif
   else
     let l:pluginfo.installed = 1
+  endif
+
+  if l:pluginfo.installed == 1
     if l:pluginfo.frozen && !a:force
       call s:echom_verbose(3, 'Skipped: ' . a:name)
       call s:decrement_job_count()
@@ -303,6 +318,7 @@ function! s:update_single_plugin(name, force) abort
     call s:echo_verbose(3, 'Updating ' . a:name)
     let l:pluginfo.revision = s:get_plugin_revision(a:name)
     let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
+    let l:cmd += ['--recurse-submodules']
   endif
   return s:start_job(l:cmd, a:name, 0)
 endfunction
