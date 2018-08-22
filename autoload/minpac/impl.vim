@@ -1,7 +1,7 @@
 " ---------------------------------------------------------------------
 " minpac: A minimal package manager for Vim 8 (and Neovim)
 "
-" Maintainer:	Ken Takata
+" Maintainer:   Ken Takata
 " Last Change:  2017-04-22
 " License:      VIM License
 " URL:          https://github.com/k-takata/minpac

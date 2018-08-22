@@ -1,3 +1,13 @@
+" ---------------------------------------------------------------------
+" minpac: A minimal package manager for Vim 8 (and Neovim)
+"
+" Maintainer:   Ken Takata
+" Contributor:  Kristijan Husak
+" Last Change:  2018-08-23
+" License:      VIM License
+" URL:          https://github.com/k-takata/minpac
+" ---------------------------------------------------------------------
+
 let s:results = []
 
 function! minpac#status#get() abort
@@ -17,7 +27,7 @@ function! minpac#status#get() abort
             \ '--color=never', '--pretty=format:%h %s (%cr)', '--no-show-signature', 'HEAD...HEAD@{1}'
             \ ])
 
-      let l:plugin.lines = filter(l:commits[1], {-> v:val !=? '' })
+      let l:plugin.lines = filter(l:commits[1], {-> v:val !=? ''})
 
       if !l:is_update_ran
         let l:plugin.status = 'OK'
@@ -34,13 +44,13 @@ function! minpac#status#get() abort
   endfor
 
   " Show items with most lines (commits) first.
-  call sort(l:result, { first, second -> len(second.lines) - len(first.lines) })
+  call sort(l:result, {first, second -> len(second.lines) - len(first.lines)})
   let s:results = l:result
 
   let l:content = []
 
   if l:is_update_ran
-    call add(l:content, l:update_count.' updated. '.l:install_count.' installed.')
+    call add(l:content, l:update_count . ' updated. ' . l:install_count . ' installed.')
   endif
 
   for l:item in l:result
@@ -48,9 +58,9 @@ function! minpac#status#get() abort
       continue
     endif
 
-    call add(l:content, '- '.l:item.name.' - '.l:item.status)
+    call add(l:content, '- ' . l:item.name . ' - ' . l:item.status)
     for l:line in l:item.lines
-      call add(l:content, ' * '.l:line)
+      call add(l:content, ' * ' . l:line)
     endfor
   endfor
 
@@ -126,7 +136,7 @@ endfunction
 function! s:find_name_by_sha(sha) abort
   for l:result in s:results
     for l:commit in l:result.lines
-      if l:commit =~? '^'.a:sha
+      if l:commit =~? '^' . a:sha
         return l:result.name
       endif
     endfor
