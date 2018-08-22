@@ -215,7 +215,7 @@ minpac#init([{config}])				*minpac#init()*
 				2: Show error messages from external commands.
 				3: Show start/end messages for each plugin.
 				4: Show debug messages.
-				Default: 1
+				Default: 2
 
 	All plugins will be installed under the following directories:
 

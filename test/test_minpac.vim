@@ -20,7 +20,7 @@ func Test_minpac_init()
   call assert_equal('git', g:minpac#opt.git)
   call assert_equal(1, g:minpac#opt.depth)
   call assert_equal(8, g:minpac#opt.jobs)
-  call assert_equal(1, g:minpac#opt.verbose)
+  call assert_equal(2, g:minpac#opt.verbose)
   call assert_equal({}, minpac#getpluglist())
 
   let g:minpac#pluglist.foo = 'bar'
