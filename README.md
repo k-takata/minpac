@@ -248,6 +248,7 @@ Initialize minpac.
 | `'depth'` | Default clone depth. Default: 1 |
 | `'jobs'`  | Maximum job numbers. If <= 0, unlimited. Default: 8 |
 | `'verbose'` | Verbosity level (0 to 4).<br/>0: Show only important messages.<br/>1: Show the result of each plugin.<br/>2: Show error messages from external commands.<br/>3: Show start/end messages for each plugin.<br/>4: Show debug messages.<br/>Default: 2 |
+| `'status_open'` | Default setting for the open option of `minpac#status()`. Default: `'vertical'` |
 
 All plugins will be installed under the following directories:
 
@@ -369,7 +370,7 @@ Otherwise, shows the status of the plugin and commits of last update (if any).
 
 | option   | description |
 |----------|-------------|
-| `'open'` | Specify how to open the status window.<br/>`'vertical'`: Open in vertical split.<br/>`'horizontal'`: Open in horizontal split.<br/>`'tab'`: Open in a new tab.<br/>Default: `'vertical'`  |
+| `'open'` | Specify how to open the status window.<br/>`'vertical'`: Open in vertical split.<br/>`'horizontal'`: Open in horizontal split.<br/>`'tab'`: Open in a new tab.<br/>Default: `'vertical'` or specified value by `minpac#init()`.  |
 
 ### Hooks
 

@@ -269,6 +269,9 @@ minpac#init([{config}])				*minpac#init()*
 				3: Show start/end messages for each plugin.
 				4: Show debug messages.
 				Default: 2
+		status_open	Default setting for the open option of
+				|minpac#status()|.
+				Default: "vertical"
 
 	All plugins will be installed under the following directories:
 
@@ -418,7 +421,8 @@ minpac#status([{config}])			*minpac#status()*
 				"vertical": Open in vertical split.
 				"horizontal": Open in horizontal split.
 				"tab": Open in a new tab.
-				Default: "vertical"
+				Default: "vertical" or specified value by
+				|minpac#init()|.
 
 ------------------------------------------------------------------------------
 HOOKS						*minpac-hooks*

@@ -21,18 +21,20 @@ func Test_minpac_init()
   call assert_equal(1, g:minpac#opt.depth)
   call assert_equal(8, g:minpac#opt.jobs)
   call assert_equal(2, g:minpac#opt.verbose)
+  call assert_equal('vertical', g:minpac#opt.status_open)
   call assert_equal({}, minpac#getpluglist())
 
   let g:minpac#pluglist.foo = 'bar'
 
   " Change settings
-  call minpac#init({'package_name': 'm', 'git': 'foo', 'depth': 10, 'jobs': 2, 'verbose': 1})
+  call minpac#init({'package_name': 'm', 'git': 'foo', 'depth': 10, 'jobs': 2, 'verbose': 1, 'status_open': 'horizontal'})
   call assert_true(isdirectory('pack/m/start'))
   call assert_true(isdirectory('pack/m/opt'))
   call assert_equal('foo', g:minpac#opt.git)
   call assert_equal(10, g:minpac#opt.depth)
   call assert_equal(2, g:minpac#opt.jobs)
   call assert_equal(1, g:minpac#opt.verbose)
+  call assert_equal('horizontal', g:minpac#opt.status_open)
   call assert_equal({}, minpac#getpluglist())
 
   call delete('pack', 'rf')
