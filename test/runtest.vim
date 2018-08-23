@@ -101,6 +101,14 @@ func RunTheTest(test)
     call test_override('ALL', 0)
   endif
 
+  " Some tests wipe out buffers.  To be consistent, always wipe out all
+  " buffers.
+  %bwipe!
+
+  " The test may change the current directory. Save and restore the
+  " directory after executing the test.
+  let save_cwd = getcwd()
+
   if exists("*SetUp")
     try
       call SetUp()
@@ -111,14 +119,24 @@ func RunTheTest(test)
 
   call add(s:messages, 'Executing ' . a:test)
   let s:done += 1
-  try
+
+  if a:test =~ 'Test_nocatch_'
+    " Function handles errors itself.  This avoids skipping commands after the
+    " error.
     exe 'call ' . a:test
-  catch /^\cskipped/
-    call add(s:messages, '    Skipped')
-    call add(s:skipped, 'SKIPPED ' . a:test . ': ' . substitute(v:exception, '^\S*\s\+', '',  ''))
-  catch
-    call add(v:errors, 'Caught exception in ' . a:test . ': ' . v:exception . ' @ ' . v:throwpoint)
-  endtry
+  else
+    try
+      let s:test = a:test
+      au VimLeavePre * call EarlyExit(s:test)
+      exe 'call ' . a:test
+      au! VimLeavePre
+    catch /^\cskipped/
+      call add(s:messages, '    Skipped')
+      call add(s:skipped, 'SKIPPED ' . a:test . ': ' . substitute(v:exception, '^\S*\s\+', '',  ''))
+    catch
+      call add(v:errors, 'Caught exception in ' . a:test . ': ' . v:exception . ' @ ' . v:throwpoint)
+    endtry
+  endif
 
   if exists("*TearDown")
     try
@@ -128,7 +146,14 @@ func RunTheTest(test)
     endtry
   endif
 
-  " Close any extra windows and make the current one not modified.
+  " Clear any autocommands
+  au!
+
+  " Close any extra tab pages and windows and make the current one not modified.
+  while tabpagenr('$') > 1
+    quit!
+  endwhile
+
   while 1
     let wincount = winnr('$')
     if wincount == 1
@@ -141,7 +166,8 @@ func RunTheTest(test)
       break
     endif
   endwhile
-  set nomodified
+
+  exe 'cd ' . save_cwd
 endfunc
 
 func AfterTheTest()
@@ -153,12 +179,24 @@ func AfterTheTest()
   endif
 endfunc
 
+func EarlyExit(test)
+  " It's OK for the test we use to test the quit detection.
+  if a:test != 'Test_zz_quit_detected()'
+    call add(v:errors, 'Test caused Vim to exit: ' . a:test)
+  endif
+
+  call FinishTesting()
+endfunc
+
 " This function can be called by a test if it wants to abort testing.
 func FinishTesting()
   call AfterTheTest()
 
   " Don't write viminfo on exit.
   set viminfo=
+
+  " Clean up files created by setup.vim
+  call delete('XfakeHOME', 'rf')
 
   if s:fail == 0
     " Success, create the .res file so that make knows it's done.
@@ -175,7 +213,11 @@ func FinishTesting()
     write
   endif
 
-  let message = 'Executed ' . s:done . (s:done > 1 ? ' tests' : ' test')
+  if s:done == 0
+    let message = 'NO tests executed'
+  else
+    let message = 'Executed ' . s:done . (s:done > 1 ? ' tests' : ' test')
+  endif
   echo message
   call add(s:messages, message)
   if s:fail > 0
@@ -235,6 +277,9 @@ endif
 
 " Execute the tests in alphabetical order.
 for s:test in sort(s:tests)
+  " Silence, please!
+  silent! set belloff=all
+
   call RunTheTest(s:test)
 
   if len(v:errors) > 0 && index(s:flaky, s:test) >= 0
@@ -242,6 +287,10 @@ for s:test in sort(s:tests)
     call extend(s:messages, v:errors)
     call add(s:messages, 'Flaky test failed, running it again')
     let first_run = v:errors
+
+    " Flakiness is often caused by the system being very busy.  Sleep a couple
+    " of seconds to have a higher chance of succeeding the second time.
+    sleep 2
 
     let v:errors = []
     call RunTheTest(s:test)
