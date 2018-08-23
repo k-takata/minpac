@@ -65,7 +65,7 @@ function! minpac#status#get() abort
   endfor
 
   let l:content = join(l:content, "\<NL>")
-  silent exe 'vertical topleft new'
+  silent vertical topleft new
   setf minpac
   silent exe 'put! =l:content|norm!gg'
   call s:syntax()
