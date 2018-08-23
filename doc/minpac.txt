@@ -139,6 +139,7 @@ Load minpac on demand
   other plugin managers, it is needed only when updating, installing or
   cleaning the plugins.  This is because minpac itself doesn't handle the
   runtime path.
+
   You can define a user command to load minpac, reload .vimrc to register the
   information of plugins, then call |minpac#update()|, |minpac#clean()| or
   |minpac#status()|. >
@@ -179,6 +180,52 @@ Load minpac on demand
   * `:command!` should be used to define a user command.
   * `:augroup!` should be used properly to avoid the same autogroups are
     defined twice.
+
+  Another way is defining a function to load minpac and register the
+  information of plugins. >
+
+	function! PackInit() abort
+	  packadd minpac
+
+	  call minpac#init()
+	  call minpac#add('k-takata/minpac', {'type': 'opt'})
+
+	  " Additional plugins here.
+	  call minpac#add('vim-jp/syntax-vim-ex')
+	  ...
+	endfunction
+
+	" Plugin settings here.
+	...
+
+	" Define user commands for updating/cleaning the plugins.
+	" Each of them calls PackInit() to load minpac and register
+	" the information of plugins, then performs the task.
+	command! PackUpdate call PackInit() | call minpac#update() | call minpac#status()
+	command! PackClean  call PackInit() | call minpac#clean()
+	command! PackStatus call PackInit() | call minpac#status()
+<
+  This doesn't reload .vimrc, so the .vimrc doesn't need to be reloadable.
+  However, if you make it reloadable, you can apply the changes to the .vimrc
+  immediately by executing `:so $MYVIMRC | PackUpdate` .
+
+
+  Sometimes, you may want to open a shell at the directory where a plugin is
+  installed.  The following example defines a command to open a terminal
+  window at the directory of a specified plugin. >
+
+	function! PackList(...)
+	  call PackInit()
+	  return join(sort(keys(minpac#getpluglist())), "\n")
+	endfunction
+
+	command! -nargs=1 -complete=custom,PackList
+	      \ PackOpenDir call PackInit() | call term_start(&shell,
+	      \    {'cwd': minpac#getpluginfo(<q-args>).dir,
+	      \     'term_finish': 'close'})
+<
+  If you execute `:PackOpenDir minpac`, it will open a terminal window at
+  `~/.vim/pack/minpac/opt/minpac` (or the directory where minpac is installed).
 
 
 ==============================================================================
