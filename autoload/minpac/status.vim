@@ -120,7 +120,7 @@ function s:openSha() abort
   endif
 
   let l:pluginfo = g:minpac#pluglist[l:name]
-  exe 'pedit' l:sha
+  silent exe 'pedit' l:sha
   wincmd p
   setlocal previewwindow filetype=git buftype=nofile nobuflisted modifiable
   let l:sha_content = minpac#impl#system([g:minpac#opt.git, '-C', l:pluginfo.dir, 'show',
