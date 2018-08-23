@@ -99,7 +99,7 @@ You can write a .vimrc which can be also used even if minpac is not installed.
 
 ```vim
 " Try to load minpac.
-silent! packadd minpac
+packadd minpac
 
 if !exists('*minpac#init')
   " minpac is not available.

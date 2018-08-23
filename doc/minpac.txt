@@ -111,7 +111,7 @@ Advanced sample
   installed.
 >
 	" Try to load minpac.
-	silent! packadd minpac
+	packadd minpac
 
 	if !exists('*minpac#init')
 	  " minpac is not available.
