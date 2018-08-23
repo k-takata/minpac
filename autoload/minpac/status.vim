@@ -77,8 +77,8 @@ function! minpac#status#get(opt) abort
     tabnew
   endif
   setf minpac
-  call append(0, l:content)
-  1
+  call append(1, l:content)
+  1delete _
   call s:syntax()
   call s:mappings()
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nomodifiable nospell
@@ -138,8 +138,8 @@ function s:openSha() abort
             \ '--no-color', '--pretty=medium', l:sha
             \ ])
 
-  call append(0, l:sha_content[1])
-  1
+  call append(1, l:sha_content[1])
+  1delete _
   setlocal nomodifiable
   nnoremap <silent><buffer> q :q<CR>
 endfunction
