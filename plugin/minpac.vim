@@ -109,9 +109,11 @@ function! minpac#clean(...)
   return minpac#impl#clean(a:000)
 endfunction
 
-function! minpac#status()
+function! minpac#status(...)
   call s:ensure_initialization()
-  return minpac#status#get()
+  let l:opt = extend(copy(get(a:000, 0, {})),
+        \ {'open': 'vertical'}, 'keep')
+  return minpac#status#get(l:opt)
 endfunction
 
 

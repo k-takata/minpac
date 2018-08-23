@@ -10,7 +10,7 @@
 
 let s:results = []
 
-function! minpac#status#get() abort
+function! minpac#status#get(opt) abort
   let l:is_update_ran = minpac#impl#is_update_ran()
   let l:update_count = 0
   let l:install_count = 0
@@ -64,7 +64,13 @@ function! minpac#status#get() abort
     endfor
   endfor
 
-  silent vertical topleft new
+  if a:opt.open ==# 'vertical'
+    vertical topleft new
+  elseif a:opt.open ==# 'horizontal'
+    topleft new
+  elseif a:opt.open ==# 'tab'
+    tabnew
+  endif
   setf minpac
   call append(0, l:content)
   1

@@ -357,13 +357,19 @@ echo minpac#getpackages("minpac", "", "", 1)
 echo minpac#getpackages("", "NAME", "", 1)
 ```
 
-#### minpac#status()
+#### minpac#status([{config}])
 
-Print status of plugins in vertical split.
+Print status of plugins.
 
 When ran after `minpac#update()`, shows only installed and updated plugins.
 
 Otherwise, shows the status of the plugin and commits of last update (if any).
+
+`{config}` is a Dictionary of options for configuring the function.
+
+| option   | description |
+|----------|-------------|
+| `'open'` | Specify how to open the status window.<br/>`'vertical'`: Open in vertical split.<br/>`'horizontal'`: Open in horizontal split.<br/>`'tab'`: Open in a new tab.<br/>Default: `'vertical'`  |
 
 ### Hooks
 

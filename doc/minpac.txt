@@ -293,22 +293,22 @@ minpac#add({url}[, {config}])			*minpac#add()*
 
 	{config} is a Dictionary of options for configuring the plugin.
 
-		 Option		Description  ~
-		 name		Unique name of the plugin. *minpac-plugin_name*
+		Option		Description  ~
+		name		Unique name of the plugin. *minpac-plugin_name*
 				Also used as a local directory name.
 				Default: derived from the repository name.
-		 type		Type of the plugin.  "start" or "opt".
+		type		Type of the plugin.  "start" or "opt".
 				Default: "start"
-		 frozen		If 1, the plugin will not be updated
+		frozen		If 1, the plugin will not be updated
 				automatically.  Default: 0
-		 depth		If >= 1, it is used as a depth to be cloned.
+		depth		If >= 1, it is used as a depth to be cloned.
 				Only effective when install the plugin newly.
 				Default: 1 or specified value by
 				|minpac#init()|.
-		 branch		Used as a branch name to be cloned.
+		branch		Used as a branch name to be cloned.
 				Only effective when install the plugin newly.
 				Default: empty
-		 do		Post-update hook.
+		do		Post-update hook.
 				See |minpac-post-update-hooks|.
 				Default: empty
 
@@ -328,8 +328,8 @@ minpac#update([{name}[, {config}]])			*minpac#update()*
 
 	{config} is a Dictionary of options for configuring the function.
 
-		 Option		Description  ~
-		 do		Finish-update hook.
+		Option		Description  ~
+		do		Finish-update hook.
 				See |minpac-finish-update-hooks|.
 				Default: empty
 
@@ -405,11 +405,20 @@ minpac#getpackages([{packname}[, {packtype}[, {plugname}[, {nameonly}]]]])
 	" List package names.
 	echo minpac#getpackages("", "NAME", "", 1)
 <
-minpac#status()			              *minpac#status()*
-	Print status of plugins in vertical split.
-        When ran after |minpac#update()|, shows only installed and updated
-        plugins. Otherwise, shows the status of the plugin and commits of last
-        update (if any)
+minpac#status([{config}])			*minpac#status()*
+	Print status of plugins.
+	When ran after |minpac#update()|, shows only installed and updated
+	plugins. Otherwise, shows the status of the plugin and commits of last
+	update (if any).
+
+	{config} is a Dictionary of options for configuring the function.
+
+		Option		Description  ~
+		open		Specify how to open the status window.
+				"vertical": Open in vertical split.
+				"horizontal": Open in horizontal split.
+				"tab": Open in a new tab.
+				Default: "vertical"
 
 ------------------------------------------------------------------------------
 HOOKS						*minpac-hooks*
