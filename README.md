@@ -273,8 +273,8 @@ Note: Unlike Vundle, a short form without `<github-account>/` is not supported. 
 | `'name'`   | Unique name of the plugin (`plugin_name`). Also used as a local directory name. Default: derived from the repository name. |
 | `'type'`   | Type of the plugin. `'start'` or `'opt'`. Default: `'start'` |
 | `'frozen'` | If 1, the plugin will not be updated automatically. Default: 0 |
-| `'depth'`  | If >= 1, it is used as a depth to be cloned. Default: 1 or specified value by `minpac#init()`. |
-| `'branch'` | Used as a branch name to be cloned. Default: empty |
+| `'depth'`  | If >= 1, it is used as a depth to be cloned. Only effective when install the plugin newly. Default: 1 or specified value by `minpac#init()`. |
+| `'branch'` | Used as a branch name to be cloned. Only effective when install the plugin newly. Default: empty |
 | `'do'`     | Post-update hook. See [Post-update hooks](#post-update-hooks). Default: empty |
 
 #### minpac#update([{name}[, {config}]])
