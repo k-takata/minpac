@@ -236,6 +236,7 @@ endfunction
 function! s:job_err_cb(id, message, event) dict abort
   echohl WarningMsg
   for l:line in a:message
+    let l:line = substitute(l:line, "\t", '        ', 'g')
     call s:echom_verbose(2, self.name . ': ' . l:line)
   endfor
   echohl None
