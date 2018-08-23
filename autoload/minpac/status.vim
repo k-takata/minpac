@@ -51,6 +51,7 @@ function! minpac#status#get(opt) abort
 
   if l:is_update_ran
     call add(l:content, l:update_count . ' updated. ' . l:install_count . ' installed.')
+    call add(l:content, '')
   endif
 
   for l:item in l:result
