@@ -64,10 +64,10 @@ function! minpac#status#get() abort
     endfor
   endfor
 
-  let l:content = join(l:content, "\<NL>")
   silent vertical topleft new
   setf minpac
-  silent exe 'put! =l:content|norm!gg'
+  call append(0, l:content)
+  1
   call s:syntax()
   call s:mappings()
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nomodifiable nospell
@@ -126,9 +126,9 @@ function s:openSha() abort
   let l:sha_content = minpac#impl#system([g:minpac#opt.git, '-C', l:pluginfo.dir, 'show',
             \ '--no-color', '--pretty=medium', l:sha
             \ ])
-  let l:sha_content = join(l:sha_content[1], "\<NL>")
 
-  silent exe 'put! =l:sha_content|norm!gg'
+  call append(0, l:sha_content[1])
+  1
   setlocal nomodifiable
   nnoremap <silent> <buffer> q :q<cr>
 endfunction
