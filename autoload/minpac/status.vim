@@ -18,7 +18,7 @@ function! minpac#status#get() abort
   for l:name in keys(g:minpac#pluglist)
     let l:pluginfo = g:minpac#pluglist[l:name]
     let l:dir = l:pluginfo.dir
-    let l:plugin = { 'name': l:name, 'lines': [], 'status': '' }
+    let l:plugin = {'name': l:name, 'lines': [], 'status': ''}
 
     if !isdirectory(l:dir)
       let l:plugin.status = 'Not installed'
@@ -93,10 +93,10 @@ function! s:syntax() abort
 endfunction
 
 function! s:mappings() abort
-  nnoremap <silent><buffer><CR> :call <SID>openSha()<CR>
-  nnoremap <silent><buffer>q :q<CR>
-  nnoremap <silent><buffer><C-j> :call <SID>nextPackage()<CR>
-  nnoremap <silent><buffer><C-k> :call <SID>prevPackage()<CR>
+  nnoremap <silent><buffer> <CR> :call <SID>openSha()<CR>
+  nnoremap <silent><buffer> q :q<CR>
+  nnoremap <silent><buffer> <C-j> :call <SID>nextPackage()<CR>
+  nnoremap <silent><buffer> <C-k> :call <SID>prevPackage()<CR>
 endfunction
 
 function! s:nextPackage()
@@ -130,7 +130,7 @@ function s:openSha() abort
   call append(0, l:sha_content[1])
   1
   setlocal nomodifiable
-  nnoremap <silent> <buffer> q :q<cr>
+  nnoremap <silent><buffer> q :q<CR>
 endfunction
 
 function! s:find_name_by_sha(sha) abort
