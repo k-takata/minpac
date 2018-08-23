@@ -125,7 +125,7 @@ endif
 #### Load minpac on demand
 
 Very interestingly, minpac doesn't need to be loaded every time. Unlike other plugin managers, it is needed only when updating, installing or cleaning the plugins. This is because minpac itself doesn't handle the runtime path.
-You can define a user command to load minpac, reload .vimrc to register the information of plugins, then call `minpac#update()` or `minpac#clean()`.
+You can define a user command to load minpac, reload .vimrc to register the information of plugins, then call `minpac#update()`, `minpac#clean()` or `minpac#status()`.
 
 ```vim
 " For a paranoia.
@@ -411,7 +411,8 @@ There are some other plugin managers built on top of the Vim 8's packages featur
 Credit
 ------
 
-Prabir Shrestha (as the author of [async.vim](https://github.com/prabirshrestha/async.vim))
+Prabir Shrestha (as the author of [async.vim](https://github.com/prabirshrestha/async.vim))  
+Kristijan Husak (status window)  
 
 
 License
