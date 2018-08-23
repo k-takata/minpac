@@ -62,7 +62,11 @@ function! minpac#status#get(opt) abort
     for l:line in l:item.lines
       call add(l:content, ' * ' . l:line)
     endfor
+    call add(l:content, '')
   endfor
+  if l:content[-1] ==? ''
+    call remove(l:content, -1)
+  endif
 
   if a:opt.open ==# 'vertical'
     vertical topleft new
