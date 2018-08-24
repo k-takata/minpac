@@ -65,7 +65,7 @@ function! minpac#status#get(opt) abort
     endfor
     call add(l:content, '')
   endfor
-  if l:content[-1] ==# ''
+  if len(l:content) > 0 && l:content[-1] ==# ''
     call remove(l:content, -1)
   endif
 
