@@ -72,7 +72,9 @@ function! minpac#impl#system(cmds) abort
         \ 'on_stdout': function('s:system_out_cb'),
         \ 'out': []
         \ }
-  let l:job = minpac#job#start(s:quote_cmds(a:cmds), l:opt)
+  let l:quote_cmds = s:quote_cmds(a:cmds)
+  call s:echom_verbose(4, 'system: cmds=' . string(l:quote_cmds))
+  let l:job = minpac#job#start(l:quote_cmds, l:opt)
   if l:job > 0
     " It worked!
     let l:ret = minpac#job#wait([l:job])[0]
@@ -252,8 +254,9 @@ function! s:start_job(cmds, name, seq) abort
     endwhile
   endif
 
-  call s:echo_verbose(4, 'start_job: cmds=' . string(a:cmds))
-  let l:job = minpac#job#start(s:quote_cmds(a:cmds), {
+  let l:quote_cmds = s:quote_cmds(a:cmds)
+  call s:echom_verbose(4, 'start_job: cmds=' . string(l:quote_cmds))
+  let l:job = minpac#job#start(l:quote_cmds, {
         \ 'on_stderr': function('s:job_err_cb'),
         \ 'on_exit': function('s:job_exit_cb'),
         \ 'name': a:name, 'seq': a:seq
