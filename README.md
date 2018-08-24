@@ -195,7 +195,7 @@ This doesn't reload .vimrc, so the .vimrc doesn't need to be reloadable.
 However, if you make it reloadable, you can apply the changes to the .vimrc immediately by executing `:so $MYVIMRC | PackUpdate`.
 
 
-Sometimes, you may want to open a shell at the directory where a plugin is installed.  The following example defines a command to open a terminal window at the directory of a specified plugin.
+Sometimes, you may want to open a shell at the directory where a plugin is installed.  The following example defines a command to open a terminal window at the directory of a specified plugin.  (Requires Vim 8.0.902 or later.)
 
 ```vim
 function! PackList(...)

@@ -212,7 +212,8 @@ Load minpac on demand
 
   Sometimes, you may want to open a shell at the directory where a plugin is
   installed.  The following example defines a command to open a terminal
-  window at the directory of a specified plugin. >
+  window at the directory of a specified plugin.  (Requires Vim 8.0.902 or
+  later.) >
 
 	function! PackList(...)
 	  call PackInit()
