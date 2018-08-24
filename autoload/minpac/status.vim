@@ -27,14 +27,14 @@ function! minpac#status#get(opt) abort
             \ '--color=never', '--pretty=format:%h %s (%cr)', '--no-show-signature', 'HEAD...HEAD@{1}'
             \ ])
 
-      let l:plugin.lines = filter(l:commits[1], {-> v:val !=? ''})
+      let l:plugin.lines = filter(l:commits[1], {-> v:val !=# ''})
 
       if !l:is_update_ran
         let l:plugin.status = 'OK'
-      elseif get(l:pluginfo, 'revision') !=? '' && l:pluginfo.revision !=# minpac#impl#get_plugin_revision(l:name)
+      elseif get(l:pluginfo, 'revision') !=# '' && l:pluginfo.revision !=# minpac#impl#get_plugin_revision(l:name)
         let l:update_count += 1
         let l:plugin.status = 'Updated'
-      elseif has_key(l:pluginfo, 'installed') && l:pluginfo.installed ==? 0
+      elseif has_key(l:pluginfo, 'installed') && l:pluginfo.installed == 0
         let l:install_count += 1
         let l:plugin.status = 'Installed'
       endif
@@ -55,7 +55,7 @@ function! minpac#status#get(opt) abort
   endif
 
   for l:item in l:result
-    if l:item.status ==? ''
+    if l:item.status ==# ''
       continue
     endif
 
@@ -65,7 +65,7 @@ function! minpac#status#get(opt) abort
     endfor
     call add(l:content, '')
   endfor
-  if l:content[-1] ==? ''
+  if l:content[-1] ==# ''
     call remove(l:content, -1)
   endif
 
@@ -110,15 +110,15 @@ function! s:mappings() abort
   nnoremap <silent><buffer> <C-k> :call <SID>prevPackage()<CR>
 endfunction
 
-function! s:nextPackage()
+function! s:nextPackage() abort
   return search('^-\s.*$')
 endfunction
 
-function! s:prevPackage()
+function! s:prevPackage() abort
   return search('^-\s.*$', 'b')
 endfunction
 
-function s:openSha() abort
+function! s:openSha() abort
   let l:sha = matchstr(getline('.'), '^\s\*\s\zs[0-9a-f]\{7,9}')
   if empty(l:sha)
     return

@@ -17,9 +17,9 @@ function! minpac#impl#getpackages(args) abort
   let l:plugname = get(a:args, 2, '')
   let l:nameonly = get(a:args, 3, 0)
 
-  if l:packname == '' | let l:packname = '*' | endif
-  if l:packtype == '' | let l:packtype = '*' | endif
-  if l:plugname == '' | let l:plugname = '*' | endif
+  if l:packname ==# '' | let l:packname = '*' | endif
+  if l:packtype ==# '' | let l:packtype = '*' | endif
+  if l:plugname ==# '' | let l:plugname = '*' | endif
 
   if l:packtype ==# 'NONE'
     let l:pat = 'pack/' . l:packname
@@ -49,14 +49,14 @@ endfunction
 
 
 if has('win32')
-  function! s:quote_cmds(cmds)
+  function! s:quote_cmds(cmds) abort
     " If space is found, surround the argument with "".
     " Assuming double quotations are not used elsewhere.
     return join(map(a:cmds,
           \ {-> (v:val =~# ' ') ? '"' . v:val . '"' : v:val}), ' ')
   endfunction
 else
-  function! s:quote_cmds(cmds)
+  function! s:quote_cmds(cmds) abort
     return a:cmds
   endfunction
 endif
@@ -128,7 +128,7 @@ function! s:decrement_job_count() abort
 endfunction
 
 function! s:invoke_hook(hooktype, args, hook) abort
-  if a:hook == ''
+  if a:hook ==# ''
     return
   endif
 
@@ -176,7 +176,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     if isdirectory(l:dir)
       " Check if it is actually updated (or installed).
       let l:updated = 1
-      if l:pluginfo.revision != ''
+      if l:pluginfo.revision !=# ''
         if l:pluginfo.revision ==# minpac#impl#get_plugin_revision(self.name)
           let l:updated = 0
         endif
@@ -283,7 +283,7 @@ function! s:update_single_plugin(name, force) abort
   let l:dir = l:pluginfo.dir
   let l:url = l:pluginfo.url
   if !isdirectory(l:dir)
-    if g:minpac#pluglist[a:name].type == 'start'
+    if g:minpac#pluglist[a:name].type ==# 'start'
       let l:dirtmp = substitute(l:dir, '/start/', '/opt/', '')
     else
       let l:dirtmp = substitute(l:dir, '/opt/', '/start/', '')
@@ -298,7 +298,7 @@ function! s:update_single_plugin(name, force) abort
       if l:pluginfo.depth > 0
         let l:cmd += ['--depth=' . l:pluginfo.depth]
       endif
-      if l:pluginfo.branch != ''
+      if l:pluginfo.branch !=# ''
         let l:cmd += ['--branch=' . l:pluginfo.branch]
       endif
     else
@@ -329,7 +329,7 @@ function! minpac#impl#update(args) abort
         \ {'do': ''}, 'keep')
 
   let l:force = 0
-  if len(a:args) == 0 || (type(a:args[0]) == v:t_string && a:args[0] == '')
+  if len(a:args) == 0 || (type(a:args[0]) == v:t_string && a:args[0] ==# '')
     let l:names = keys(g:minpac#pluglist)
   elseif type(a:args[0]) == v:t_string
     let l:names = [a:args[0]]
@@ -370,7 +370,7 @@ function! s:match_plugin(dir, packname, plugnames) abort
   let l:plugname = substitute(l:plugname, '\.', '\\.', 'g')
   let l:plugname = substitute(l:plugname, '\*', '.*', 'g')
   let l:plugname = substitute(l:plugname, '?', '.', 'g')
-  if l:plugname =~ '/'
+  if l:plugname =~# '/'
     let l:pat = '/pack/' . a:packname . '/' . l:plugname . '$'
   else
     let l:pat = '/pack/' . a:packname . '/\%(start\|opt\)/' . l:plugname . '$'

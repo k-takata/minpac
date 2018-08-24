@@ -37,7 +37,7 @@ function! minpac#init(...) abort
   let g:minpac#pluglist = {}
 
   let l:packdir = l:opt.dir
-  if l:packdir == ''
+  if l:packdir ==# ''
     " If 'dir' is not specified, the first directory of 'packpath' is used.
     let l:packdir = split(&packpath, ',')[0]
   endif
@@ -72,11 +72,11 @@ function! minpac#add(plugname, ...) abort
   endif
 
   " Name of the plugin
-  if l:opt.name == ''
+  if l:opt.name ==# ''
     let l:opt.name = matchstr(l:opt.url, '[/\\]\zs[^/\\]\+$')
     let l:opt.name = substitute(l:opt.name, '\C\.git$', '', '')
   endif
-  if l:opt.name == ''
+  if l:opt.name ==# ''
     echoerr 'Cannot extract the plugin name. (' . a:plugname . ')'
     return
   endif
