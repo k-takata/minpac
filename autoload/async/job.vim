@@ -260,6 +260,6 @@ endfunction
 
 function! async#job#wait(jobids, ...) abort
     let l:timeout = get(a:000, 0, -1)
-    call s:job_wait(a:jobids, l:timeout)
+    return s:job_wait(a:jobids, l:timeout)
 endfunction
 " }}}
