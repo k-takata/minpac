@@ -24,10 +24,13 @@ function! minpac#status#get(opt) abort
       let l:plugin.status = 'Not installed'
     else
       let l:commits = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'log',
-            \ '--color=never', '--pretty=format:%h %s (%cr)', '--no-show-signature', 'HEAD...HEAD@{1}'
+            \ '--color=never', '--pretty=format:%h <<<<%D>>>> %s (%cr)', '--no-show-signature', 'HEAD...HEAD@{1}'
             \ ])
 
       let l:plugin.lines = filter(l:commits[1], {-> v:val !=# ''})
+      call map(l:plugin.lines,
+            \ {-> substitute(v:val, '^[0-9a-f]\{4,} \zs\(<<<<\(.*\)>>>>\) ',
+            \   {m -> m[2] =~# '^tag: ' ? '(' . m[2] . ') ' : ''}, '')})
 
       if !l:is_update_ran
         let l:plugin.status = 'OK'
@@ -92,13 +95,15 @@ function! s:syntax() abort
   syn match minpacStatus /\(-.*\)\@<=-\s.*$/ contained
   syn match minpacStar /^\s\*/ contained
   syn match minpacCommit /^\s\*\s[0-9a-f]\{7,9} .*/ contains=minpacRelDate,minpacSha,minpacStar
-  syn match minpacSha /\(\s\*\s\)\@<=[0-9a-f]\{4,}/ contained
+  syn match minpacSha /\(\s\*\s\)\@<=[0-9a-f]\{4,}/ contained nextgroup=minpacTag
+  syn match minpacTag / (tag: [^)]*)/ contained
   syn match minpacRelDate /([^)]*)$/ contained
 
   hi def link minpacDash    Special
   hi def link minpacStar    Boolean
   hi def link minpacName    Function
   hi def link minpacSha     Identifier
+  hi def link minpacTag     PreProc
   hi def link minpacRelDate Comment
   hi def link minpacStatus  Constant
 endfunction
