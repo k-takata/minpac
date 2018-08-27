@@ -237,7 +237,12 @@ endfunction
 
 function! s:job_err_cb(id, message, event) dict abort
   echohl WarningMsg
-  for l:line in a:message
+  let l:mes = copy(a:message)
+  if len(l:mes) > 0 && l:mes[-1] ==# ''
+    " Remove the last empty line. It is redundant.
+    call remove(l:mes, -1)
+  endif
+  for l:line in l:mes
     let l:line = substitute(l:line, "\t", '        ', 'g')
     call s:echom_verbose(2, self.name . ': ' . l:line)
   endfor
