@@ -29,8 +29,8 @@ function! minpac#status#get(opt) abort
 
       let l:plugin.lines = filter(l:commits[1], {-> v:val !=# ''})
       call map(l:plugin.lines,
-            \ {-> substitute(v:val, '^[0-9a-f]\{4,} \zs\(<<<<\(.*\)>>>>\) ',
-            \   {m -> m[2] =~# '^tag: ' ? '(' . m[2] . ') ' : ''}, '')})
+            \ {-> substitute(v:val, '^[0-9a-f]\{4,} \zs<<<<\(.*\)>>>> ',
+            \   {m -> m[1] =~# '^tag: ' ? '(' . m[1] . ') ' : ''}, '')})
 
       if !l:is_update_ran
         let l:plugin.status = 'OK'
