@@ -35,6 +35,7 @@ function! minpac#init(...) abort
 
   let g:minpac#opt = l:opt
   let g:minpac#pluglist = {}
+  let g:minpac#plugstat = {}
 
   let l:packdir = l:opt.dir
   if l:packdir ==# ''

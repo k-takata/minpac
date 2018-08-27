@@ -231,6 +231,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     call s:echom_verbose(1, 'Error while updating "' . self.name . '".  Error code: ' . a:errcode)
     echohl None
   endif
+  let g:minpac#plugstat[self.name].errcode = a:errcode
 
   call s:decrement_job_count()
 endfunction
@@ -244,6 +245,7 @@ function! s:job_err_cb(id, message, event) dict abort
   endif
   for l:line in l:mes
     let l:line = substitute(l:line, "\t", '        ', 'g')
+    call add(g:minpac#plugstat[self.name].lines, l:line)
     call s:echom_verbose(2, self.name . ': ' . l:line)
   endfor
   echohl None
@@ -281,6 +283,7 @@ endfunction
 
 " Update a single plugin.
 function! s:update_single_plugin(name, force) abort
+  let g:minpac#plugstat[a:name] = {'errcode': 0, 'lines': []}
   if !has_key(g:minpac#pluglist, a:name)
     echoerr 'Plugin not registered: ' . a:name
     call s:decrement_job_count()
@@ -359,6 +362,7 @@ function! minpac#impl#update(args) abort
   let s:updated_plugins = 0
   let s:installed_plugins = 0
   let s:finish_update_hook = l:opt.do
+  let g:minpac#plugstat = {}
 
   " Disable the pager temporarily to avoid jobs being interrupted.
   if !exists('s:save_more')

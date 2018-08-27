@@ -14,6 +14,7 @@ function! minpac#status#get(opt) abort
   let l:is_update_ran = minpac#impl#is_update_ran()
   let l:update_count = 0
   let l:install_count = 0
+  let l:error_count = 0
   let l:result = []
   for l:name in keys(g:minpac#pluglist)
     let l:pluginfo = g:minpac#pluglist[l:name]
@@ -40,6 +41,9 @@ function! minpac#status#get(opt) abort
       elseif has_key(l:pluginfo, 'installed') && l:pluginfo.installed == 0
         let l:install_count += 1
         let l:plugin.status = 'Installed'
+      elseif has_key(g:minpac#plugstat, l:name) && g:minpac#plugstat[l:name].errcode != 0
+        let l:error_count += 1
+        let l:plugin.status = 'Error (' . g:minpac#plugstat[l:name].errcode . ')'
       endif
     endif
 
@@ -53,7 +57,7 @@ function! minpac#status#get(opt) abort
   let l:content = []
 
   if l:is_update_ran
-    call add(l:content, l:update_count . ' updated. ' . l:install_count . ' installed.')
+    call add(l:content, l:update_count . ' updated. ' . l:install_count . ' installed. ' . l:error_count . ' failed.')
     call add(l:content, '')
   endif
 
@@ -63,9 +67,15 @@ function! minpac#status#get(opt) abort
     endif
 
     call add(l:content, '- ' . l:item.name . ' - ' . l:item.status)
-    for l:line in l:item.lines
-      call add(l:content, ' * ' . l:line)
-    endfor
+    if l:item.status =~# '^Error'
+      for l:line in g:minpac#plugstat[l:item.name].lines
+        call add(l:content, ' msg: ' . l:line)
+      endfor
+    else
+      for l:line in l:item.lines
+        call add(l:content, ' * ' . l:line)
+      endfor
+    endif
     call add(l:content, '')
   endfor
   if len(l:content) > 0 && l:content[-1] ==# ''
@@ -98,6 +108,7 @@ function! s:syntax() abort
   syn match minpacSha /\(\s\*\s\)\@<=[0-9a-f]\{4,}/ contained nextgroup=minpacTag
   syn match minpacTag / (tag: [^)]*)/ contained
   syn match minpacRelDate /([^)]*)$/ contained
+  syn match minpacWarning /^ msg: .*/
 
   hi def link minpacDash    Special
   hi def link minpacStar    Boolean
@@ -106,6 +117,7 @@ function! s:syntax() abort
   hi def link minpacTag     PreProc
   hi def link minpacRelDate Comment
   hi def link minpacStatus  Constant
+  hi def link minpacWarning WarningMsg
 endfunction
 
 function! s:mappings() abort
