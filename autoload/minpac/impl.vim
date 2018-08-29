@@ -178,14 +178,24 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     if isdirectory(l:dir)
       " Check if it is actually updated (or installed).
       let l:updated = 1
-      if l:pluginfo.revision !=# ''
+      if l:pluginfo.revision !=# '' && l:pluginfo.commit ==# ''
         if l:pluginfo.revision ==# minpac#impl#get_plugin_revision(self.name)
           let l:updated = 0
         endif
       endif
 
       if l:updated
-        if self.seq == 0 && filereadable(l:dir . '/.gitmodules')
+        if self.seq == 0 && l:pluginfo.commit !=# ''
+          " Check out the specified commit.
+          let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'checkout',
+                \ l:pluginfo.commit]
+          call s:echom_verbose(3, 'Checking out the commit: ' . self.name
+                \ . ': ' . l:pluginfo.commit)
+          call s:start_job(l:cmd, self.name, self.seq + 1)
+          return
+        endif
+        if (self.seq == 0 || (self.seq == 1 && l:pluginfo.commit !=# ''))
+              \ && filereadable(l:dir . '/.gitmodules')
           " Update git submodule.
           let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
                 \ 'update', '--init', '--recursive']
@@ -281,6 +291,11 @@ function! s:start_job(cmds, name, seq) abort
   return 0
 endfunction
 
+function! s:is_same_commit(a, b) abort
+  let l:min = min([len(a:a), len(a:b)]) - 1
+  return a:a[0 : l:min] ==# a:b[0 : l:min]
+endfunction
+
 " Update a single plugin.
 function! s:update_single_plugin(name, force) abort
   let g:minpac#plugstat[a:name] = {'errcode': 0, 'lines': []}
@@ -306,7 +321,7 @@ function! s:update_single_plugin(name, force) abort
       call s:echo_verbose(3, 'Cloning ' . a:name)
 
       let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
-      if l:pluginfo.depth > 0
+      if l:pluginfo.depth > 0 && l:pluginfo.commit ==# ''
         let l:cmd += ['--depth=' . l:pluginfo.depth]
       endif
       if l:pluginfo.branch !=# ''
@@ -329,7 +344,16 @@ function! s:update_single_plugin(name, force) abort
 
     call s:echo_verbose(3, 'Updating ' . a:name)
     let l:pluginfo.revision = minpac#impl#get_plugin_revision(a:name)
-    let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
+    if l:pluginfo.commit !=# ''
+      if s:is_same_commit(l:pluginfo.revision, l:pluginfo.commit)
+        call s:echom_verbose(3, 'Already up-to-date: ' . a:name)
+        call s:decrement_job_count()
+        return 0
+      endif
+      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'fetch', '--depth', '999999']
+    else
+      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
+    endif
   endif
   return s:start_job(l:cmd, a:name, 0)
 endfunction

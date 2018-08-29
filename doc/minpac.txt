@@ -312,6 +312,9 @@ minpac#add({url}[, {config}])			*minpac#add()*
 		branch		Used as a branch name to be cloned.
 				Only effective when install the plugin newly.
 				Default: empty
+		commit		Commit ID to be checked out.  If this is
+				specified, "depth" will be ignored.
+				Default: empty
 		do		Post-update hook.
 				See |minpac-post-update-hooks|.
 				Default: empty
