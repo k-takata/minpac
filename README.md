@@ -460,6 +460,7 @@ There are some other plugin managers built on top of the Vim 8's packages featur
 * [vim-pck](https://github.com/nicodebo/vim-pck): written in Python
 * [vim8-pack](https://github.com/mkarpoff/vim8-pack): written in Bash
 * [volt](https://github.com/vim-volt/volt): written in Go
+* [autopac](https://github.com/meldavis/autopac): modified version of minpac
 
 
 Credit
