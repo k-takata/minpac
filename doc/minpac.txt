@@ -504,7 +504,7 @@ E.g.: >
 	call minpac#update('', {'do': 'quit'})
 <
 ------------------------------------------------------------------------------
-MAPPINGS						*minpac-mappings*
+MAPPINGS					*minpac-mappings*
 
 List of mappings available only in status window.
 
