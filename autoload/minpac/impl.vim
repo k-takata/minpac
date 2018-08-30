@@ -201,6 +201,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
 
   let l:err = 1
   let l:pluginfo = g:minpac#pluglist[self.name]
+  let l:pluginfo.stat.errcode = a:errcode
   if a:errcode == 0
     let l:dir = l:pluginfo.dir
     " Check if the plugin directory is available.
@@ -218,7 +219,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
           " Check out the specified revison.
           let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'checkout',
                 \ l:pluginfo.rev, '--']
-          call s:echom_verbose(3, 'Checking out the rev: ' . self.name
+          call s:echom_verbose(3, 'Checking out the revison: ' . self.name
                 \ . ': ' . l:pluginfo.rev)
           call s:start_job(l:cmd, self.name, self.seq + 1)
           return
@@ -270,7 +271,6 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     call s:echom_verbose(1, 'Error while updating "' . self.name . '".  Error code: ' . a:errcode)
     echohl None
   endif
-  let l:pluginfo.stat.errcode = a:errcode
 
   call s:decrement_job_count()
 endfunction
@@ -403,7 +403,6 @@ function! s:update_single_plugin(name, force) abort
       return 0
     endif
 
-    call s:echo_verbose(3, 'Updating ' . a:name)
     let l:ret = s:check_plugin_status(a:name)
     if l:ret == 0
       " No need to update.
@@ -412,9 +411,11 @@ function! s:update_single_plugin(name, force) abort
       return 0
     elseif l:ret == 1
       " Same branch. Update by pull.
+      call s:echo_verbose(3, 'Pulling ' . a:name)
       let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
     elseif l:ret == 2
       " Different branch. Update by fetch & checkout.
+      call s:echo_verbose(3, 'Fetching ' . a:name)
       let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'fetch', '--depth', '999999']
     endif
   endif
