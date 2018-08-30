@@ -35,7 +35,6 @@ function! minpac#init(...) abort
 
   let g:minpac#opt = l:opt
   let g:minpac#pluglist = {}
-  let g:minpac#plugstat = {}
 
   let l:packdir = l:opt.dir
   if l:packdir ==# ''
@@ -91,6 +90,9 @@ function! minpac#add(plugname, ...) abort
     echoerr "Wrong type (must be 'start' or 'opt'): " . l:opt.type
     return
   endif
+
+  " Initialize the status
+  let l:opt.stat = {'errcode': 0, 'lines': [], 'prev_rev': '', 'installed': -1}
 
   " Add to pluglist
   let g:minpac#pluglist[l:opt.name] = l:opt

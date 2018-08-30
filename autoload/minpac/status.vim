@@ -35,15 +35,15 @@ function! minpac#status#get(opt) abort
 
       if !l:is_update_ran
         let l:plugin.status = 'OK'
-      elseif get(l:pluginfo, 'prev_rev') !=# '' && l:pluginfo.prev_rev !=# minpac#impl#get_plugin_revision(l:name)
+      elseif l:pluginfo.stat.prev_rev !=# '' && l:pluginfo.stat.prev_rev !=# minpac#impl#get_plugin_revision(l:name)
         let l:update_count += 1
         let l:plugin.status = 'Updated'
-      elseif has_key(l:pluginfo, 'installed') && l:pluginfo.installed == 0
+      elseif l:pluginfo.stat.installed == 0
         let l:install_count += 1
         let l:plugin.status = 'Installed'
-      elseif has_key(g:minpac#plugstat, l:name) && g:minpac#plugstat[l:name].errcode != 0
+      elseif l:pluginfo.stat.errcode != 0
         let l:error_count += 1
-        let l:plugin.status = 'Error (' . g:minpac#plugstat[l:name].errcode . ')'
+        let l:plugin.status = 'Error (' . l:pluginfo.stat.errcode . ')'
       endif
     endif
 
@@ -68,7 +68,7 @@ function! minpac#status#get(opt) abort
 
     call add(l:content, '- ' . l:item.name . ' - ' . l:item.status)
     if l:item.status =~# '^Error'
-      for l:line in g:minpac#plugstat[l:item.name].lines
+      for l:line in g:minpac#pluglist[l:item.name].stat.lines
         call add(l:content, ' msg: ' . l:line)
       endfor
     else

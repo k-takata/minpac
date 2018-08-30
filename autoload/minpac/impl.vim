@@ -200,15 +200,15 @@ function! s:job_exit_cb(id, errcode, event) dict abort
   call filter(s:joblist, {-> v:val != a:id})
 
   let l:err = 1
+  let l:pluginfo = g:minpac#pluglist[self.name]
   if a:errcode == 0
-    let l:pluginfo = g:minpac#pluglist[self.name]
     let l:dir = l:pluginfo.dir
     " Check if the plugin directory is available.
     if isdirectory(l:dir)
       " Check if it is actually updated (or installed).
       let l:updated = 1
-      if l:pluginfo.prev_rev !=# '' && l:pluginfo.rev ==# ''
-        if l:pluginfo.prev_rev ==# minpac#impl#get_plugin_revision(self.name)
+      if l:pluginfo.stat.prev_rev !=# '' && l:pluginfo.rev ==# ''
+        if l:pluginfo.stat.prev_rev ==# minpac#impl#get_plugin_revision(self.name)
           let l:updated = 0
         endif
       endif
@@ -250,7 +250,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
         call s:generate_helptags(l:dir, 0)
       endif
 
-      if l:pluginfo.installed
+      if l:pluginfo.stat.installed
         if l:updated
           let s:updated_plugins += 1
           call s:echom_verbose(1, 'Updated: ' . self.name)
@@ -270,7 +270,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     call s:echom_verbose(1, 'Error while updating "' . self.name . '".  Error code: ' . a:errcode)
     echohl None
   endif
-  let g:minpac#plugstat[self.name].errcode = a:errcode
+  let l:pluginfo.stat.errcode = a:errcode
 
   call s:decrement_job_count()
 endfunction
@@ -284,7 +284,7 @@ function! s:job_err_cb(id, message, event) dict abort
   endif
   for l:line in l:mes
     let l:line = substitute(l:line, "\t", '        ', 'g')
-    call add(g:minpac#plugstat[self.name].lines, l:line)
+    call add(g:minpac#pluglist[self.name].stat.lines, l:line)
     call s:echom_verbose(2, self.name . ': ' . l:line)
   endfor
   echohl None
@@ -331,7 +331,7 @@ endfunction
 "         2: Need to update by fetch & checkout.
 function! s:check_plugin_status(name) abort
   let l:pluginfo = g:minpac#pluglist[a:name]
-  let l:pluginfo.prev_rev = minpac#impl#get_plugin_revision(a:name)
+  let l:pluginfo.stat.prev_rev = minpac#impl#get_plugin_revision(a:name)
 
   if l:pluginfo.rev ==# ''
     " Need to update by pull.
@@ -345,7 +345,7 @@ function! s:check_plugin_status(name) abort
     " Same tag. No need to update.
     return 0
   endif
-  if s:is_same_commit(l:pluginfo.prev_rev, l:pluginfo.rev)
+  if s:is_same_commit(l:pluginfo.stat.prev_rev, l:pluginfo.rev)
     " Same commit ID. No need to update.
     return 0
   endif
@@ -356,7 +356,6 @@ endfunction
 
 " Update a single plugin.
 function! s:update_single_plugin(name, force) abort
-  let g:minpac#plugstat[a:name] = {'errcode': 0, 'lines': []}
   if !has_key(g:minpac#pluglist, a:name)
     echoerr 'Plugin not registered: ' . a:name
     call s:decrement_job_count()
@@ -366,6 +365,10 @@ function! s:update_single_plugin(name, force) abort
   let l:pluginfo = g:minpac#pluglist[a:name]
   let l:dir = l:pluginfo.dir
   let l:url = l:pluginfo.url
+  let l:pluginfo.stat.errcode = 0
+  let l:pluginfo.stat.lines = []
+  let l:pluginfo.stat.prev_rev = ''
+
   if !isdirectory(l:dir)
     if g:minpac#pluglist[a:name].type ==# 'start'
       let l:dirtmp = substitute(l:dir, '/start/', '/opt/', '')
@@ -374,8 +377,7 @@ function! s:update_single_plugin(name, force) abort
     endif
 
     if !isdirectory(l:dirtmp)
-      let l:pluginfo.installed = 0
-      let l:pluginfo.prev_rev = ''
+      let l:pluginfo.stat.installed = 0
       call s:echo_verbose(3, 'Cloning ' . a:name)
 
       let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
@@ -388,13 +390,13 @@ function! s:update_single_plugin(name, force) abort
     else
       " The type was changed (start <-> opt).
       call rename(l:dirtmp, l:dir)
-      let l:pluginfo.installed = 1
+      let l:pluginfo.stat.installed = 1
     endif
   else
-    let l:pluginfo.installed = 1
+    let l:pluginfo.stat.installed = 1
   endif
 
-  if l:pluginfo.installed == 1
+  if l:pluginfo.stat.installed == 1
     if l:pluginfo.frozen && !a:force
       call s:echom_verbose(3, 'Skipped: ' . a:name)
       call s:decrement_job_count()
@@ -447,7 +449,6 @@ function! minpac#impl#update(args) abort
   let s:updated_plugins = 0
   let s:installed_plugins = 0
   let s:finish_update_hook = l:opt.do
-  let g:minpac#plugstat = {}
 
   " Disable the pager temporarily to avoid jobs being interrupted.
   if !exists('s:save_more')
