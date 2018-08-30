@@ -177,6 +177,7 @@ function! PackInit() abort
 
   " Additional plugins here.
   call minpac#add('vim-jp/syntax-vim-ex')
+  call minpac#add('tyru/open-browser.vim')
   ...
 endfunction
 
@@ -210,6 +211,16 @@ command! -nargs=1 -complete=custom,PackList
 ```
 
 If you execute `:PackOpenDir minpac`, it will open a terminal window at `~/.vim/pack/minpac/opt/minpac` (or the directory where minpac is installed).
+
+To define a command to open the repository of a plugin in a web browser:
+
+```vim
+command! -nargs=1 -complete=custom,PackList
+      \ PackOpenUrl call PackInit() | call openbrowser#open(
+      \    minpac#getpluginfo(<q-args>).url)
+```
+
+This uses [open-browser.vim](https://github.com/tyru/open-browser.vim).
 
 
 Usage

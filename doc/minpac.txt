@@ -192,6 +192,7 @@ Load minpac on demand
 
 	  " Additional plugins here.
 	  call minpac#add('vim-jp/syntax-vim-ex')
+	  call minpac#add('tyru/open-browser.vim')
 	  ...
 	endfunction
 
@@ -227,6 +228,14 @@ Load minpac on demand
 <
   If you execute `:PackOpenDir minpac`, it will open a terminal window at
   `~/.vim/pack/minpac/opt/minpac` (or the directory where minpac is installed).
+
+  To define a command to open the repository of a plugin in a web browser:
+>
+	command! -nargs=1 -complete=custom,PackList
+	      \ PackOpenUrl call PackInit() | call openbrowser#open(
+	      \    minpac#getpluginfo(<q-args>).url)
+<
+  This uses open-browser.vim (https://github.com/tyru/open-browser.vim).
 
 
 ==============================================================================
