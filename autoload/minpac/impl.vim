@@ -207,8 +207,8 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     if isdirectory(l:dir)
       " Check if it is actually updated (or installed).
       let l:updated = 1
-      if l:pluginfo.revision !=# '' && l:pluginfo.rev ==# ''
-        if l:pluginfo.revision ==# minpac#impl#get_plugin_revision(self.name)
+      if l:pluginfo.prev_rev !=# '' && l:pluginfo.rev ==# ''
+        if l:pluginfo.prev_rev ==# minpac#impl#get_plugin_revision(self.name)
           let l:updated = 0
         endif
       endif
@@ -331,7 +331,7 @@ endfunction
 "         2: Need to update by fetch & checkout.
 function! s:check_plugin_status(name) abort
   let l:pluginfo = g:minpac#pluglist[a:name]
-  let l:pluginfo.revision = minpac#impl#get_plugin_revision(a:name)
+  let l:pluginfo.prev_rev = minpac#impl#get_plugin_revision(a:name)
 
   if l:pluginfo.rev ==# ''
     " Need to update by pull.
@@ -345,7 +345,7 @@ function! s:check_plugin_status(name) abort
     " Same tag. No need to update.
     return 0
   endif
-  if s:is_same_commit(l:pluginfo.revision, l:pluginfo.rev)
+  if s:is_same_commit(l:pluginfo.prev_rev, l:pluginfo.rev)
     " Same commit ID. No need to update.
     return 0
   endif
@@ -375,7 +375,7 @@ function! s:update_single_plugin(name, force) abort
 
     if !isdirectory(l:dirtmp)
       let l:pluginfo.installed = 0
-      let l:pluginfo.revision = ''
+      let l:pluginfo.prev_rev = ''
       call s:echo_verbose(3, 'Cloning ' . a:name)
 
       let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]

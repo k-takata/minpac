@@ -35,7 +35,7 @@ function! minpac#status#get(opt) abort
 
       if !l:is_update_ran
         let l:plugin.status = 'OK'
-      elseif get(l:pluginfo, 'revision') !=# '' && l:pluginfo.revision !=# minpac#impl#get_plugin_revision(l:name)
+      elseif get(l:pluginfo, 'prev_rev') !=# '' && l:pluginfo.prev_rev !=# minpac#impl#get_plugin_revision(l:name)
         let l:update_count += 1
         let l:plugin.status = 'Updated'
       elseif has_key(l:pluginfo, 'installed') && l:pluginfo.installed == 0
