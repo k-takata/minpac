@@ -325,12 +325,16 @@ A dictionary with following items will be returned:
 
 | item       | description |
 |------------|-------------|
+| `'name'`   | Name of the plugin.  |
 | `'url'`    | URL of the plugin repository.  |
 | `'dir'`    | Local directory of the plugin. |
 | `'frozen'` | If 1, the plugin is frozen. |
 | `'type'`   | Type of the plugin. |
-| `'branch'` | Branch name to be cloned. |
 | `'depth'`  | Depth to be cloned. |
+| `'branch'` | Branch name to be cloned. |
+| `'rev'`    | Revision to be checked out. |
+| `'do'`     | Post-update hook. |
+| `'stat'`   | Status of last update. |
 
 #### minpac#getpackages([{packname}[, {packtype}[, {plugname}[, {nameonly}]]]])
 
