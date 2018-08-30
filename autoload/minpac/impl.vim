@@ -371,9 +371,9 @@ function! s:update_single_plugin(name, force) abort
 
   if !isdirectory(l:dir)
     if g:minpac#pluglist[a:name].type ==# 'start'
-      let l:dirtmp = substitute(l:dir, '/start/', '/opt/', '')
+      let l:dirtmp = substitute(l:dir, '/start/\ze[^/]\+$', '/opt/', '')
     else
-      let l:dirtmp = substitute(l:dir, '/opt/', '/start/', '')
+      let l:dirtmp = substitute(l:dir, '/opt/\ze[^/]\+$', '/start/', '')
     endif
 
     if !isdirectory(l:dirtmp)
