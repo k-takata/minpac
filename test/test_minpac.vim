@@ -56,9 +56,10 @@ func Test_minpac_add()
   call assert_equal('', p.branch)
   call assert_equal(1, p.depth)
   call assert_equal('', p.do)
+  call assert_equal('', p.rev)
 
   " With configuration
-  call minpac#add('k-takata/minpac', {'type': 'opt', 'frozen': 1, 'branch': 'master', 'depth': 10})
+  call minpac#add('k-takata/minpac', {'type': 'opt', 'frozen': 1, 'branch': 'master', 'depth': 10, 'rev': 'abcdef'})
   let p = minpac#getpluginfo('minpac')
   call assert_equal('https://github.com/k-takata/minpac.git', p.url)
   call assert_match('/pack/minpac/opt/minpac$', p.dir)
@@ -67,6 +68,7 @@ func Test_minpac_add()
   call assert_equal('master', p.branch)
   call assert_equal(10, p.depth)
   call assert_equal('', p.do)
+  call assert_equal('abcdef', p.rev)
 
   " SSH URL
   call minpac#add('git@github.com:k-takata/minpac.git', {'name': 'm'})

@@ -276,8 +276,13 @@ Note: Unlike Vundle, a short form without `<github-account>/` is not supported. 
 | `'frozen'` | If 1, the plugin will not be updated automatically. Default: 0 |
 | `'depth'`  | If >= 1, it is used as a depth to be cloned. Only effective when install the plugin newly. Default: 1 or specified value by `minpac#init()`. |
 | `'branch'` | Used as a branch name to be cloned. Only effective when install the plugin newly. Default: empty |
-| `'commit'` | Commit ID to be checked out. If this is specified, `'depth'` will be ignored. Default: empty |
+| `'rev'`    | Commit ID, branch name or tag name to be checked out. If this is specified, `'depth'` will be ignored. Default: empty |
 | `'do'`     | Post-update hook. See [Post-update hooks](#post-update-hooks). Default: empty |
+
+The `'branch'` and `'rev'` options are slightly different.  
+The `'branch'` option is used only when the plugin is newly installed. It clones the plugin by `git clone <URL> --depth=<DEPTH> -b <BRANCH>`. This is faster, but you cannot change the branch later.  
+The `'rev'` option is used both for installing and updating the plugin. It installs the plugin by `git clone <URL> && git checkout <REV>` and updates the plugin by `git fetch && git checkout <REV>`. This is slower because it clones the whole repository, but you can change the rev (commit ID, branch or tag) later.
+
 
 #### minpac#update([{name}[, {config}]])
 

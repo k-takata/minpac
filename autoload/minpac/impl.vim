@@ -89,6 +89,35 @@ function! minpac#impl#get_plugin_revision(name) abort
   let l:dir = l:pluginfo.dir
   let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'rev-parse', 'HEAD'])
   if l:res[0] == 0 && len(l:res[1]) > 0
+    call s:echom_verbose(4, 'revision: ' . l:res[1][0])
+    return l:res[1][0]
+  else
+    " Error
+    return ''
+  endif
+endfunction
+
+" Get the exact tag name of the specified plugin.
+function! s:get_plugin_tag(name) abort
+  let l:pluginfo = g:minpac#pluglist[a:name]
+  let l:dir = l:pluginfo.dir
+  let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'describe', '--tags', '--exact-match'])
+  if l:res[0] == 0 && len(l:res[1]) > 0
+    call s:echom_verbose(4, 'tag: ' . l:res[1][0])
+    return l:res[1][0]
+  else
+    " Error
+    return ''
+  endif
+endfunction
+
+" Get the branch name of the specified plugin.
+function! s:get_plugin_branch(name) abort
+  let l:pluginfo = g:minpac#pluglist[a:name]
+  let l:dir = l:pluginfo.dir
+  let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'sybolic-ref', '--short', 'HEAD'])
+  if l:res[0] == 0 && len(l:res[1]) > 0
+    call s:echom_verbose(4, 'branch: ' . l:res[1][0])
     return l:res[1][0]
   else
     " Error
@@ -178,23 +207,23 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     if isdirectory(l:dir)
       " Check if it is actually updated (or installed).
       let l:updated = 1
-      if l:pluginfo.revision !=# '' && l:pluginfo.commit ==# ''
+      if l:pluginfo.revision !=# '' && l:pluginfo.rev ==# ''
         if l:pluginfo.revision ==# minpac#impl#get_plugin_revision(self.name)
           let l:updated = 0
         endif
       endif
 
       if l:updated
-        if self.seq == 0 && l:pluginfo.commit !=# ''
-          " Check out the specified commit.
+        if self.seq == 0 && l:pluginfo.rev !=# ''
+          " Check out the specified revison.
           let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'checkout',
-                \ l:pluginfo.commit]
-          call s:echom_verbose(3, 'Checking out the commit: ' . self.name
-                \ . ': ' . l:pluginfo.commit)
+                \ l:pluginfo.rev, '--']
+          call s:echom_verbose(3, 'Checking out the rev: ' . self.name
+                \ . ': ' . l:pluginfo.rev)
           call s:start_job(l:cmd, self.name, self.seq + 1)
           return
         endif
-        if (self.seq == 0 || (self.seq == 1 && l:pluginfo.commit !=# ''))
+        if (self.seq == 0 || (self.seq == 1 && l:pluginfo.rev !=# ''))
               \ && filereadable(l:dir . '/.gitmodules')
           " Update git submodule.
           let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
@@ -296,6 +325,35 @@ function! s:is_same_commit(a, b) abort
   return a:a[0 : l:min] ==# a:b[0 : l:min]
 endfunction
 
+" Check the status of the plugin.
+" return: 0: No need to update.
+"         1: Need to update by pull.
+"         2: Need to update by fetch & checkout.
+function! s:check_plugin_status(name) abort
+  let l:pluginfo = g:minpac#pluglist[a:name]
+  let l:pluginfo.revision = minpac#impl#get_plugin_revision(a:name)
+
+  if l:pluginfo.rev ==# ''
+    " Need to update by pull.
+    return 1
+  endif
+  if s:get_plugin_branch(a:name) == l:pluginfo.rev
+    " Same branch. Need to update by pull.
+    return 1
+  endif
+  if s:get_plugin_tag(a:name) == l:pluginfo.rev
+    " Same tag. No need to update.
+    return 0
+  endif
+  if s:is_same_commit(l:pluginfo.revision, l:pluginfo.rev)
+    " Same commit ID. No need to update.
+    return 0
+  endif
+
+  " Need to update by fetch & checkout.
+  return 2
+endfunction
+
 " Update a single plugin.
 function! s:update_single_plugin(name, force) abort
   let g:minpac#plugstat[a:name] = {'errcode': 0, 'lines': []}
@@ -321,13 +379,14 @@ function! s:update_single_plugin(name, force) abort
       call s:echo_verbose(3, 'Cloning ' . a:name)
 
       let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
-      if l:pluginfo.depth > 0 && l:pluginfo.commit ==# ''
+      if l:pluginfo.depth > 0 && l:pluginfo.rev ==# ''
         let l:cmd += ['--depth=' . l:pluginfo.depth]
       endif
       if l:pluginfo.branch !=# ''
         let l:cmd += ['--branch=' . l:pluginfo.branch]
       endif
     else
+      " The type was changed (start <-> opt).
       call rename(l:dirtmp, l:dir)
       let l:pluginfo.installed = 1
     endif
@@ -343,16 +402,18 @@ function! s:update_single_plugin(name, force) abort
     endif
 
     call s:echo_verbose(3, 'Updating ' . a:name)
-    let l:pluginfo.revision = minpac#impl#get_plugin_revision(a:name)
-    if l:pluginfo.commit !=# ''
-      if s:is_same_commit(l:pluginfo.revision, l:pluginfo.commit)
-        call s:echom_verbose(3, 'Already up-to-date: ' . a:name)
-        call s:decrement_job_count()
-        return 0
-      endif
-      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'fetch', '--depth', '999999']
-    else
+    let l:ret = s:check_plugin_status(a:name)
+    if l:ret == 0
+      " No need to update.
+      call s:echom_verbose(3, 'Already up-to-date: ' . a:name)
+      call s:decrement_job_count()
+      return 0
+    elseif l:ret == 1
+      " Same branch. Update by pull.
       let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
+    elseif l:ret == 2
+      " Different branch. Update by fetch & checkout.
+      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'fetch', '--depth', '999999']
     endif
   endif
   return s:start_job(l:cmd, a:name, 0)
