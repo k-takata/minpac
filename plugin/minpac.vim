@@ -127,7 +127,7 @@ function! minpac#getpluginfo(name)
 endfunction
 
 
-" Get a list of plugin information. Only for internal use.
+" Get a list of plugin information. Mainly for debugging.
 function! minpac#getpluglist()
   return g:minpac#pluglist
 endfunction

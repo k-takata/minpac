@@ -347,6 +347,10 @@ A dictionary with following items will be returned:
 | `'do'`     | Post-update hook. |
 | `'stat'`   | Status of last update. |
 
+#### minpac#getpluglist()
+
+Get a list of plugin information. Mainly for debugging.
+
 #### minpac#getpackages([{packname}[, {packtype}[, {plugname}[, {nameonly}]]]])
 
 Get a list of plugins under the package directories.

@@ -401,6 +401,11 @@ minpac#getpluginfo({name})			*minpac#getpluginfo()*
 		do		Post-update hook.
 		stat		Status of last update.
 
+
+minpac#getpluglist()				*minpac#getpluglist()*
+	Get a list of plugin information. Mainly for debugging.
+
+
 						*minpac#getpackages()*
 minpac#getpackages([{packname}[, {packtype}[, {plugname}[, {nameonly}]]]])
 	Get a list of plugins under the package directories.
