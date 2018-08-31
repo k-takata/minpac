@@ -422,11 +422,11 @@ function! s:update_single_plugin(name, force) abort
       return 0
     elseif l:ret == 1
       " Same branch. Update by pull.
-      call s:echo_verbose(3, 'Pulling ' . a:name)
+      call s:echo_verbose(3, 'Updating (pull): ' . a:name)
       let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
     elseif l:ret == 2
       " Different branch. Update by fetch & checkout.
-      call s:echo_verbose(3, 'Fetching ' . a:name)
+      call s:echo_verbose(3, 'Updating (fetch): ' . a:name)
       let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'fetch', '--depth', '999999']
     endif
   endif
