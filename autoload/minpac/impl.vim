@@ -199,7 +199,7 @@ endfunction
 function! s:generate_helptags(dir) abort
   let l:docdir = a:dir . '/doc'
   if s:is_helptags_old(l:docdir)
-    silent! execute 'helptags' l:docdir
+    silent! execute 'helptags' fnameescape(l:docdir)
   endif
 endfunction
 
