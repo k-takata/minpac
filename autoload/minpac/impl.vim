@@ -61,17 +61,12 @@ else
   endfunction
 endif
 
-function! s:system_out_cb(id, message, event) dict abort
-  let self.out += a:message
-endfunction
-
 " Replacement for system().
 " This doesn't open an extra window on MS-Windows.
 function! minpac#impl#system(cmds) abort
-  let l:opt = {
-        \ 'on_stdout': function('s:system_out_cb'),
-        \ 'out': []
-        \ }
+  let l:opt = {'out': []}
+  let l:opt.on_stdout = {id, mes, ev -> extend(l:opt.out, mes)}
+
   let l:quote_cmds = s:quote_cmds(a:cmds)
   call s:echom_verbose(4, 'system: cmds=' . string(l:quote_cmds))
   let l:job = minpac#job#start(l:quote_cmds, l:opt)
