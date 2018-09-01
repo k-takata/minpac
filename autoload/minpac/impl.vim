@@ -77,46 +77,33 @@ function! minpac#impl#system(cmds) abort
   return [l:ret, l:out]
 endfunction
 
-" Get the revision of the specified plugin.
-function! minpac#impl#get_plugin_revision(name) abort
+" Execute git command on the specified plugin directory.
+function! s:exec_plugin_cmd(name, cmd, mes) abort
   let l:pluginfo = g:minpac#pluglist[a:name]
   let l:dir = l:pluginfo.dir
-  let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'rev-parse', 'HEAD'])
+  let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir] + a:cmd)
   if l:res[0] == 0 && len(l:res[1]) > 0
-    call s:echom_verbose(4, 'revision: ' . l:res[1][0])
+    call s:echom_verbose(4, a:mes . ': ' . l:res[1][0])
     return l:res[1][0]
   else
     " Error
     return ''
   endif
+endfunction
+
+" Get the revision of the specified plugin.
+function! minpac#impl#get_plugin_revision(name) abort
+  return s:exec_plugin_cmd(a:name, ['rev-parse', 'HEAD'], 'revision')
 endfunction
 
 " Get the exact tag name of the specified plugin.
 function! s:get_plugin_tag(name) abort
-  let l:pluginfo = g:minpac#pluglist[a:name]
-  let l:dir = l:pluginfo.dir
-  let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'describe', '--tags', '--exact-match'])
-  if l:res[0] == 0 && len(l:res[1]) > 0
-    call s:echom_verbose(4, 'tag: ' . l:res[1][0])
-    return l:res[1][0]
-  else
-    " Error
-    return ''
-  endif
+  return s:exec_plugin_cmd(a:name, ['describe', '--tags', '--exact-match'], 'tag')
 endfunction
 
 " Get the branch name of the specified plugin.
 function! s:get_plugin_branch(name) abort
-  let l:pluginfo = g:minpac#pluglist[a:name]
-  let l:dir = l:pluginfo.dir
-  let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'sybolic-ref', '--short', 'HEAD'])
-  if l:res[0] == 0 && len(l:res[1]) > 0
-    call s:echom_verbose(4, 'branch: ' . l:res[1][0])
-    return l:res[1][0]
-  else
-    " Error
-    return ''
-  endif
+  return s:exec_plugin_cmd(a:name, ['sybolic-ref', '--short', 'HEAD'], 'branch')
 endfunction
 
 
