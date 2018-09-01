@@ -20,19 +20,21 @@ func Test_minpac_init()
   call assert_equal('git', g:minpac#opt.git)
   call assert_equal(1, g:minpac#opt.depth)
   call assert_equal(8, g:minpac#opt.jobs)
-  call assert_equal(1, g:minpac#opt.verbose)
+  call assert_equal(2, g:minpac#opt.verbose)
+  call assert_equal('vertical', g:minpac#opt.status_open)
   call assert_equal({}, minpac#getpluglist())
 
   let g:minpac#pluglist.foo = 'bar'
 
   " Change settings
-  call minpac#init({'package_name': 'm', 'git': 'foo', 'depth': 10, 'jobs': 2, 'verbose': 1})
+  call minpac#init({'package_name': 'm', 'git': 'foo', 'depth': 10, 'jobs': 2, 'verbose': 1, 'status_open': 'horizontal'})
   call assert_true(isdirectory('pack/m/start'))
   call assert_true(isdirectory('pack/m/opt'))
   call assert_equal('foo', g:minpac#opt.git)
   call assert_equal(10, g:minpac#opt.depth)
   call assert_equal(2, g:minpac#opt.jobs)
   call assert_equal(1, g:minpac#opt.verbose)
+  call assert_equal('horizontal', g:minpac#opt.status_open)
   call assert_equal({}, minpac#getpluglist())
 
   call delete('pack', 'rf')
@@ -54,9 +56,10 @@ func Test_minpac_add()
   call assert_equal('', p.branch)
   call assert_equal(1, p.depth)
   call assert_equal('', p.do)
+  call assert_equal('', p.rev)
 
   " With configuration
-  call minpac#add('k-takata/minpac', {'type': 'opt', 'frozen': 1, 'branch': 'master', 'depth': 10})
+  call minpac#add('k-takata/minpac', {'type': 'opt', 'frozen': 1, 'branch': 'master', 'depth': 10, 'rev': 'abcdef'})
   let p = minpac#getpluginfo('minpac')
   call assert_equal('https://github.com/k-takata/minpac.git', p.url)
   call assert_match('/pack/minpac/opt/minpac$', p.dir)
@@ -65,6 +68,7 @@ func Test_minpac_add()
   call assert_equal('master', p.branch)
   call assert_equal(10, p.depth)
   call assert_equal('', p.do)
+  call assert_equal('abcdef', p.rev)
 
   " SSH URL
   call minpac#add('git@github.com:k-takata/minpac.git', {'name': 'm'})

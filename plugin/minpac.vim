@@ -1,8 +1,8 @@
 " ---------------------------------------------------------------------
 " minpac: A minimal package manager for Vim 8 (and Neovim)
 "
-" Maintainer:	Ken Takata
-" Last Change:  2017-04-22
+" Maintainer:   Ken Takata
+" Last Change:  2018-08-23
 " License:      VIM License
 " URL:          https://github.com/k-takata/minpac
 " ---------------------------------------------------------------------
@@ -15,7 +15,7 @@ let g:loaded_minpac = 1
 
 " Get a list of package/plugin directories.
 function! minpac#getpackages(...)
-  return minpac#impl#getpackages(a:000)
+  return call("minpac#impl#getpackages", a:000)
 endfunction
 
 
@@ -31,13 +31,13 @@ endfunction
 " Initialize minpac.
 function! minpac#init(...) abort
   let l:opt = extend(copy(get(a:000, 0, {})),
-        \ {'dir': '', 'package_name': 'minpac', 'git': 'git', 'depth': 1, 'jobs': 8, 'verbose': 1}, 'keep')
+        \ {'dir': '', 'package_name': 'minpac', 'git': 'git', 'depth': 1, 'jobs': 8, 'verbose': 2, 'status_open': 'vertical'}, 'keep')
 
   let g:minpac#opt = l:opt
   let g:minpac#pluglist = {}
 
   let l:packdir = l:opt.dir
-  if l:packdir == ''
+  if l:packdir ==# ''
     " If 'dir' is not specified, the first directory of 'packpath' is used.
     let l:packdir = split(&packpath, ',')[0]
   endif
@@ -62,7 +62,7 @@ function! minpac#add(plugname, ...) abort
   call s:ensure_initialization()
   let l:opt = extend(copy(get(a:000, 0, {})),
         \ {'name': '', 'type': 'start', 'depth': g:minpac#opt.depth,
-        \  'frozen': 0, 'branch': '', 'do': ''}, 'keep')
+        \  'frozen': 0, 'branch': '', 'rev': '', 'do': ''}, 'keep')
 
   " URL
   if a:plugname =~? '^[-._0-9a-z]\+\/[-._0-9a-z]\+$'
@@ -72,11 +72,11 @@ function! minpac#add(plugname, ...) abort
   endif
 
   " Name of the plugin
-  if l:opt.name == ''
+  if l:opt.name ==# ''
     let l:opt.name = matchstr(l:opt.url, '[/\\]\zs[^/\\]\+$')
     let l:opt.name = substitute(l:opt.name, '\C\.git$', '', '')
   endif
-  if l:opt.name == ''
+  if l:opt.name ==# ''
     echoerr 'Cannot extract the plugin name. (' . a:plugname . ')'
     return
   endif
@@ -91,6 +91,9 @@ function! minpac#add(plugname, ...) abort
     return
   endif
 
+  " Initialize the status
+  let l:opt.stat = {'errcode': 0, 'lines': [], 'prev_rev': '', 'installed': -1}
+
   " Add to pluglist
   let g:minpac#pluglist[l:opt.name] = l:opt
 endfunction
@@ -99,14 +102,21 @@ endfunction
 " Update all or specified plugin(s).
 function! minpac#update(...)
   call s:ensure_initialization()
-  return minpac#impl#update(a:000)
+  return call("minpac#impl#update", a:000)
 endfunction
 
 
 " Remove plugins that are not registered.
 function! minpac#clean(...)
   call s:ensure_initialization()
-  return minpac#impl#clean(a:000)
+  return call("minpac#impl#clean", a:000)
+endfunction
+
+function! minpac#status(...)
+  call s:ensure_initialization()
+  let l:opt = extend(copy(get(a:000, 0, {})),
+        \ {'open': g:minpac#opt.status_open}, 'keep')
+  return minpac#status#get(l:opt)
 endfunction
 
 
@@ -117,7 +127,7 @@ function! minpac#getpluginfo(name)
 endfunction
 
 
-" Get a list of plugin information. Only for internal use.
+" Get a list of plugin information. Mainly for debugging.
 function! minpac#getpluglist()
   return g:minpac#pluglist
 endfunction
