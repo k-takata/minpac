@@ -1,6 +1,6 @@
 *minpac.txt*	A minimal package manager for Vim 8 (and Neovim)
 
-Version:	1.0
+Version:	2.0
 Author:		Ken Takata
 License:	The Vim License
 URL:		https://github.com/k-takata/minpac
