@@ -203,6 +203,14 @@ function! s:generate_helptags(dir) abort
   endif
 endfunction
 
+function! s:add_rtp(dir)
+  if empty(&rtp)
+    let &rtp = a:dir
+  else
+    let &rtp .= ',' . a:dir
+  endif
+endfunction
+
 function! s:job_exit_cb(id, errcode, event) dict abort
   call filter(s:joblist, {-> v:val != a:id})
 
@@ -245,11 +253,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
 
         if has('nvim') && isdirectory(l:dir . '/rplugin')
           " Required for :UpdateRemotePlugins.
-          if empty(&rtp)
-            let &rtp = l:dir
-          else
-            let &rtp .= ',' . l:dir
-          endif
+          call s:add_rtp(l:dir)
         endif
 
         call s:invoke_hook('post-update', [self.name], l:pluginfo.do)
