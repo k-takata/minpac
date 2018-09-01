@@ -15,7 +15,7 @@ let g:loaded_minpac = 1
 
 " Get a list of package/plugin directories.
 function! minpac#getpackages(...)
-  return minpac#impl#getpackages(a:000)
+  return call("minpac#impl#getpackages", a:000)
 endfunction
 
 
@@ -102,14 +102,14 @@ endfunction
 " Update all or specified plugin(s).
 function! minpac#update(...)
   call s:ensure_initialization()
-  return minpac#impl#update(a:000)
+  return call("minpac#impl#update", a:000)
 endfunction
 
 
 " Remove plugins that are not registered.
 function! minpac#clean(...)
   call s:ensure_initialization()
-  return minpac#impl#clean(a:000)
+  return call("minpac#impl#clean", a:000)
 endfunction
 
 function! minpac#status(...)

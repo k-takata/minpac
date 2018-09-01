@@ -11,11 +11,11 @@ let s:joblist = []
 let s:remain_jobs = 0
 
 " Get a list of package/plugin directories.
-function! minpac#impl#getpackages(args) abort
-  let l:packname = get(a:args, 0, '')
-  let l:packtype = get(a:args, 1, '')
-  let l:plugname = get(a:args, 2, '')
-  let l:nameonly = get(a:args, 3, 0)
+function! minpac#impl#getpackages(...) abort
+  let l:packname = get(a:000, 0, '')
+  let l:packtype = get(a:000, 1, '')
+  let l:plugname = get(a:000, 2, '')
+  let l:nameonly = get(a:000, 3, 0)
 
   if l:packname ==# '' | let l:packname = '*' | endif
   if l:packtype ==# '' | let l:packtype = '*' | endif
@@ -415,18 +415,18 @@ function! s:update_single_plugin(name, force) abort
 endfunction
 
 " Update all or specified plugin(s).
-function! minpac#impl#update(args) abort
-  let l:opt = extend(copy(get(a:args, 1, {})),
+function! minpac#impl#update(...) abort
+  let l:opt = extend(copy(get(a:000, 1, {})),
         \ {'do': ''}, 'keep')
 
   let l:force = 0
-  if len(a:args) == 0 || (type(a:args[0]) == v:t_string && a:args[0] ==# '')
+  if a:0 == 0 || (type(a:1) == v:t_string && a:1 ==# '')
     let l:names = keys(g:minpac#pluglist)
-  elseif type(a:args[0]) == v:t_string
-    let l:names = [a:args[0]]
+  elseif type(a:1) == v:t_string
+    let l:names = [a:1]
     let l:force = 1
-  elseif type(a:args[0]) == v:t_list
-    let l:names = a:args[0]
+  elseif type(a:1) == v:t_list
+    let l:names = a:1
     let l:force = 1
   else
     echoerr 'Wrong parameter type. Must be a String or a List of Strings.'
@@ -477,15 +477,15 @@ function! s:match_plugin(dir, packname, plugnames) abort
 endfunction
 
 " Remove plugins that are not registered.
-function! minpac#impl#clean(args) abort
+function! minpac#impl#clean(...) abort
   let l:plugin_dirs = minpac#getpackages(g:minpac#opt.package_name)
 
-  if len(a:args) > 0
+  if a:0 > 0
     " Going to remove only specified plugins.
-    if type(a:args[0]) == v:t_string
-      let l:names = [a:args[0]]
-    elseif type(a:args[0]) == v:t_list
-      let l:names = a:args[0]
+    if type(a:1) == v:t_string
+      let l:names = [a:1]
+    elseif type(a:1) == v:t_list
+      let l:names = a:1
     else
       echoerr 'Wrong parameter type. Must be a String or a List of Strings.'
       return
