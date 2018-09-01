@@ -189,18 +189,17 @@ function! s:invoke_hook(hooktype, args, hook) abort
 endfunction
 
 function! s:is_helptags_old(dir) abort
-  let l:txts = glob(a:dir . '/doc/*.{txt,[a-z][a-z]x}', 1, 1)
-  let l:tags = glob(a:dir . '/doc/tags{,-[a-z][a-z]}', 1, 1)
+  let l:txts = glob(a:dir . '/*.{txt,[a-z][a-z]x}', 1, 1)
+  let l:tags = glob(a:dir . '/tags{,-[a-z][a-z]}', 1, 1)
   let l:txt_newest = max(map(l:txts, {-> getftime(v:val)}))
   let l:tag_oldest = min(map(l:tags, {-> getftime(v:val)}))
   return l:txt_newest > l:tag_oldest
 endfunction
 
 function! s:generate_helptags(dir) abort
-  if isdirectory(a:dir . '/doc')
-    if s:is_helptags_old(a:dir)
-      silent! execute 'helptags' a:dir . '/doc'
-    endif
+  let l:docdir = a:dir . '/doc'
+  if s:is_helptags_old(l:docdir)
+    silent! execute 'helptags' l:docdir
   endif
 endfunction
 
