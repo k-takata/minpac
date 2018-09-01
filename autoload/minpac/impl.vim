@@ -196,9 +196,9 @@ function! s:is_helptags_old(dir) abort
   return l:txt_newest > l:tag_oldest
 endfunction
 
-function! s:generate_helptags(dir, force) abort
+function! s:generate_helptags(dir) abort
   if isdirectory(a:dir . '/doc')
-    if a:force || s:is_helptags_old(a:dir)
+    if s:is_helptags_old(a:dir)
       silent! execute 'helptags' a:dir . '/doc'
     endif
   endif
@@ -242,7 +242,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
           return
         endif
 
-        call s:generate_helptags(l:dir, 1)
+        call s:generate_helptags(l:dir)
 
         if has('nvim') && isdirectory(l:dir . '/rplugin')
           " Required for :UpdateRemotePlugins.
@@ -256,7 +256,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
         call s:invoke_hook('post-update', [self.name], l:pluginfo.do)
       else
         " Even the plugin is not updated, generate helptags if it is not found.
-        call s:generate_helptags(l:dir, 0)
+        call s:generate_helptags(l:dir)
       endif
 
       if l:pluginfo.stat.installed
