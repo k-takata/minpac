@@ -184,7 +184,7 @@ function! s:generate_helptags(dir) abort
   endif
 endfunction
 
-function! s:add_rtp(dir)
+function! s:add_rtp(dir) abort
   if empty(&rtp)
     let &rtp = a:dir
   else
