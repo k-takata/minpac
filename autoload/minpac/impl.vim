@@ -64,18 +64,17 @@ endif
 " Replacement for system().
 " This doesn't open an extra window on MS-Windows.
 function! minpac#impl#system(cmds) abort
-  let l:opt = {'out': []}
-  let l:opt.on_stdout = {id, mes, ev -> extend(l:opt.out, mes)}
-
+  let l:out = []
   let l:quote_cmds = s:quote_cmds(a:cmds)
   call s:echom_verbose(4, 'system: cmds=' . string(l:quote_cmds))
-  let l:job = minpac#job#start(l:quote_cmds, l:opt)
+  let l:job = minpac#job#start(l:quote_cmds,
+        \ {'on_stdout': {id, mes, ev -> extend(l:out, mes)}})
   if l:job > 0
     " It worked!
     let l:ret = minpac#job#wait([l:job])[0]
     sleep 5m    " Wait for out_cb. (not sure this is enough.)
   endif
-  return [l:ret, l:opt.out]
+  return [l:ret, l:out]
 endfunction
 
 " Get the revision of the specified plugin.
