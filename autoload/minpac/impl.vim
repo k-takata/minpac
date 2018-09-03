@@ -389,7 +389,7 @@ function! s:update_single_plugin(name, force) abort
       endif
       call s:echo_verbose(3, 'Cloning ' . a:name)
 
-      let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
+      let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir, '--no-single-branch']
       if l:pluginfo.depth > 0 && l:pluginfo.rev ==# ''
         let l:cmd += ['--depth=' . l:pluginfo.depth]
       endif
