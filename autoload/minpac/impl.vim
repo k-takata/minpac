@@ -204,30 +204,41 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     if isdirectory(l:dir)
       " Check if it is actually updated (or installed).
       let l:updated = 1
-      if l:pluginfo.stat.prev_rev !=# '' && l:pluginfo.rev ==# ''
+      if l:pluginfo.stat.prev_rev !=# '' && l:pluginfo.stat.upd_method != 2
         if l:pluginfo.stat.prev_rev ==# minpac#impl#get_plugin_revision(self.name)
           let l:updated = 0
         endif
       endif
 
       if l:updated
-        if self.seq == 0 && l:pluginfo.rev !=# ''
-          " Check out the specified revison.
-          let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'checkout',
-                \ l:pluginfo.rev, '--']
-          call s:echom_verbose(3, 'Checking out the revison: ' . self.name
-                \ . ': ' . l:pluginfo.rev)
-          call s:start_job(l:cmd, self.name, self.seq + 1)
-          return
+        if l:pluginfo.stat.upd_method == 2
+          if self.seq == 0
+            " Check out the specified revison.
+            let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'checkout',
+                  \ l:pluginfo.rev, '--']
+            call s:echom_verbose(3, 'Checking out the revison: ' . self.name
+                  \ . ': ' . l:pluginfo.rev)
+            call s:start_job(l:cmd, self.name, self.seq + 1)
+            return
+          elseif self.seq == 1
+                \ && s:get_plugin_branch(self.name) == l:pluginfo.rev
+            let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'merge', '--quiet',
+                  \ '--ff-only', '@{u}']
+            call s:echom_verbose(3, 'Update to the upstream: ' . self.name)
+            call s:start_job(l:cmd, self.name, self.seq + 1)
+            return
+          endif
         endif
-        if (self.seq == 0 || (self.seq == 1 && l:pluginfo.rev !=# ''))
-              \ && filereadable(l:dir . '/.gitmodules')
-          " Update git submodule.
-          let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
-                \ 'update', '--init', '--recursive']
-          call s:echom_verbose(3, 'Updating submodules: ' . self.name)
-          call s:start_job(l:cmd, self.name, self.seq + 1)
-          return
+        if l:pluginfo.stat.submod == 0
+          let l:pluginfo.stat.submod = 1
+          if filereadable(l:dir . '/.gitmodules')
+            " Update git submodule.
+            let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
+                  \ 'update', '--init', '--recursive']
+            call s:echom_verbose(3, 'Updating submodules: ' . self.name)
+            call s:start_job(l:cmd, self.name, self.seq + 1)
+            return
+          endif
         endif
 
         call s:generate_helptags(l:dir)
@@ -360,6 +371,7 @@ function! s:update_single_plugin(name, force) abort
   let l:pluginfo.stat.errcode = 0
   let l:pluginfo.stat.lines = []
   let l:pluginfo.stat.prev_rev = ''
+  let l:pluginfo.stat.submod = 0
 
   if !isdirectory(l:dir)
     if g:minpac#pluglist[a:name].type ==# 'start'
@@ -370,6 +382,11 @@ function! s:update_single_plugin(name, force) abort
 
     if !isdirectory(l:dirtmp)
       let l:pluginfo.stat.installed = 0
+      if l:pluginfo.rev ==# ''
+        let l:pluginfo.stat.upd_method = 1
+      else
+        let l:pluginfo.stat.upd_method = 2
+      endif
       call s:echo_verbose(3, 'Cloning ' . a:name)
 
       let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir]
@@ -396,6 +413,7 @@ function! s:update_single_plugin(name, force) abort
     endif
 
     let l:ret = s:check_plugin_status(a:name)
+    let l:pluginfo.stat.upd_method = l:ret
     if l:ret == 0
       " No need to update.
       call s:echom_verbose(3, 'Already up-to-date: ' . a:name)
