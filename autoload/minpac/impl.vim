@@ -103,7 +103,7 @@ endfunction
 
 " Get the branch name of the specified plugin.
 function! s:get_plugin_branch(name) abort
-  return s:exec_plugin_cmd(a:name, ['sybolic-ref', '--short', 'HEAD'], 'branch')
+  return s:exec_plugin_cmd(a:name, ['symbolic-ref', '--short', 'HEAD'], 'branch')
 endfunction
 
 
