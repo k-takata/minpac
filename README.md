@@ -291,8 +291,9 @@ Note: Unlike Vundle, a short form without `<github-account>/` is not supported. 
 | `'do'`     | Post-update hook. See [Post-update hooks](#post-update-hooks). Default: empty |
 
 The `'branch'` and `'rev'` options are slightly different.  
-The `'branch'` option is used only when the plugin is newly installed. It clones the plugin by `git clone <URL> --depth=<DEPTH> -b <BRANCH>`. This is faster, but you cannot change the branch later.  
+The `'branch'` option is used only when the plugin is newly installed. It clones the plugin by `git clone <URL> --depth=<DEPTH> -b <BRANCH>`. This is faster at the installation, but it can be slow if you want to change the branch (by the `'rev'` option) later. This cannot specify a commit ID.
 The `'rev'` option is used both for installing and updating the plugin. It installs the plugin by `git clone <URL> && git checkout <REV>` and updates the plugin by `git fetch && git checkout <REV>`. This is slower because it clones the whole repository, but you can change the rev (commit ID, branch or tag) later.
+So, if you want to change the branch frequently or want to specify a commit ID, you should use the `'rev'` option. Otherwise you can use the `'branch'` option.
 
 
 #### minpac#update([{name}[, {config}]])
