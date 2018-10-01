@@ -480,6 +480,7 @@ Similar projects
 
 There are some other plugin managers built on top of the Vim 8's packages feature.
 
+* [vim-packager](https://github.com/kristijanhusak/vim-packager): written in Vim script
 * [pack](https://github.com/maralla/pack): written in Rust
 * [infect](https://github.com/csexton/infect): written in Ruby
 * [vim-pck](https://github.com/nicodebo/vim-pck): written in Python
