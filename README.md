@@ -289,6 +289,7 @@ Note: Unlike Vundle, a short form without `<github-account>/` is not supported. 
 | `'branch'` | Used as a branch name to be cloned. Only effective when install the plugin newly. Default: empty |
 | `'rev'`    | Commit ID, branch name or tag name to be checked out. If this is specified, `'depth'` will be ignored. Default: empty |
 | `'do'`     | Post-update hook. See [Post-update hooks](#post-update-hooks). Default: empty |
+| `'submodule'`| Install plugin as a *git submodule* |
 
 The `'branch'` and `'rev'` options are slightly different.  
 The `'branch'` option is used only when the plugin is newly installed. It clones the plugin by `git clone <URL> --depth=<DEPTH> -b <BRANCH>`. This is faster at the installation, but it can be slow if you want to change the branch (by the `'rev'` option) later. This cannot specify a commit ID.

@@ -328,6 +328,7 @@ minpac#add({url}[, {config}])			*minpac#add()*
 		do		Post-update hook.
 				See |minpac-post-update-hooks|.
 				Default: empty
+		submodule	Install as a git submodule. Default: 0
 
 	The "branch" and "rev" options are slightly different.
 	The "branch" option is used only when the plugin is newly installed.

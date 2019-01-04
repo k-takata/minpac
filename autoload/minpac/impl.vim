@@ -388,8 +388,11 @@ function! s:update_single_plugin(name, force) abort
         let l:pluginfo.stat.upd_method = 2
       endif
       call s:echo_verbose(3, 'Cloning ' . a:name)
-
-      let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir, '--no-single-branch']
+      if l:pluginfo.submodule 
+        let l:cmd = [g:minpac#opt.git, 'submodule', '--quiet', 'add', l:url, l:dir, '--no-single-branch']
+      else
+        let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir, '--no-single-branch']
+      end
       if l:pluginfo.depth > 0 && l:pluginfo.rev ==# ''
         let l:cmd += ['--depth=' . l:pluginfo.depth]
       endif
@@ -422,7 +425,11 @@ function! s:update_single_plugin(name, force) abort
     elseif l:ret == 1
       " Same branch. Update by pull.
       call s:echo_verbose(3, 'Updating (pull): ' . a:name)
-      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
+      if l:pluginfo.submodule
+        let l:cmd = [g:minpac#opt.git, 'submodule', '--quiet', 'update', '--init', '--recursive', '--remote', l:dir]
+      else
+        let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
+      endif
     elseif l:ret == 2
       " Different branch. Update by fetch & checkout.
       call s:echo_verbose(3, 'Updating (fetch): ' . a:name)
