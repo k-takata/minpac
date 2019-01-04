@@ -426,7 +426,8 @@ function! s:update_single_plugin(name, force) abort
       " Same branch. Update by pull.
       call s:echo_verbose(3, 'Updating (pull): ' . a:name)
       if l:pluginfo.submodule
-        let l:cmd = [g:minpac#opt.git, 'submodule', '--quiet', 'update', '--init', '--recursive', '--remote', l:dir]
+        let l:cmd = [g:minpac#opt.git, '-C', g:minpac#opt.minpac_dir,
+              \ 'submodule', '--quiet', 'update', '--init', '--recursive', '--remote', l:dir]
       else
         let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
       endif
