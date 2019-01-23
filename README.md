@@ -487,6 +487,7 @@ There are some other plugin managers built on top of the Vim 8's packages featur
 * [vim8-pack](https://github.com/mkarpoff/vim8-pack): written in Bash
 * [volt](https://github.com/vim-volt/volt): written in Go
 * [autopac](https://github.com/meldavis/autopac): modified version of minpac
+* [plugpac.vim](https://github.com/bennyyip/plugpac.vim): thin wrapper of minpac, provides vim-plug like experience
 
 
 Credit
