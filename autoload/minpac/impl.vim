@@ -170,8 +170,8 @@ function! s:invoke_hook(hooktype, args, hook) abort
 endfunction
 
 function! s:is_helptags_old(dir) abort
-  let l:txts = glob(a:dir . '/*.{txt,[a-z][a-z]x}', 1, 1)
-  let l:tags = glob(a:dir . '/tags{,-[a-z][a-z]}', 1, 1)
+  let l:txts = glob(a:dir . '/*.txt', 1, 1) + glob(a:dir . '/*.[a-z][a-z]x', 1, 1)
+  let l:tags = glob(a:dir . '/tags', 1, 1) + glob(a:dir . '/tags-[a-z][a-z]', 1, 1)
   let l:txt_newest = max(map(l:txts, {-> getftime(v:val)}))
   let l:tag_oldest = min(map(l:tags, {-> getftime(v:val)}))
   return l:txt_newest > l:tag_oldest
