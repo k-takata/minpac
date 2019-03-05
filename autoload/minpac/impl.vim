@@ -101,6 +101,11 @@ function! s:get_plugin_tag(name) abort
   return s:exec_plugin_cmd(a:name, ['describe', '--tags', '--exact-match'], 'tag')
 endfunction
 
+" Get the latest tag name of the specified plugin. Sorted by version number.
+function! s:get_plugin_latest_tag(name, tag) abort
+  return s:exec_plugin_cmd(a:name, ['tag', '--list', '--sort=-version:refname', a:tag], 'latest tag')
+endfunction
+
 " Get the branch name of the specified plugin.
 function! s:get_plugin_branch(name) abort
   return s:exec_plugin_cmd(a:name, ['symbolic-ref', '--short', 'HEAD'], 'branch')
@@ -212,16 +217,34 @@ function! s:job_exit_cb(id, errcode, event) dict abort
 
       if l:updated
         if l:pluginfo.stat.upd_method == 2
+          let l:rev = l:pluginfo.rev
+          if l:rev ==# ''
+            " If no branch or tag is specified, consider as the master branch.
+            let l:rev = 'master'
+          endif
           if self.seq == 0
-            " Check out the specified revison.
+            " Check out the specified revison (or branch).
+            if l:rev =~# '\*'
+              " If it includes '*', consider as the latest matching tag.
+              let l:rev = s:get_plugin_latest_tag(self.name, l:rev)
+              if l:rev ==# ''
+                let s:error_plugins += 1
+                echohl ErrorMsg
+                call s:echom_verbose(1, 'Error while updating "' . self.name . '".  No tags found.')
+                echohl None
+                call s:decrement_job_count()
+                return
+              endif
+            endif
             let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'checkout',
-                  \ l:pluginfo.rev, '--']
+                  \ l:rev, '--']
             call s:echom_verbose(3, 'Checking out the revison: ' . self.name
-                  \ . ': ' . l:pluginfo.rev)
+                  \ . ': ' . l:rev)
             call s:start_job(l:cmd, self.name, self.seq + 1)
             return
           elseif self.seq == 1
-                \ && s:get_plugin_branch(self.name) == l:pluginfo.rev
+                \ && s:get_plugin_branch(self.name) == l:rev
+            " Checked out the branch. Update to the upstream.
             let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'merge', '--quiet',
                   \ '--ff-only', '@{u}']
             call s:echom_verbose(3, 'Update to the upstream: ' . self.name)
@@ -335,12 +358,19 @@ endfunction
 function! s:check_plugin_status(name) abort
   let l:pluginfo = g:minpac#pluglist[a:name]
   let l:pluginfo.stat.prev_rev = minpac#impl#get_plugin_revision(a:name)
+  let l:branch = s:get_plugin_branch(a:name)
 
   if l:pluginfo.rev ==# ''
-    " Need to update by pull.
-    return 1
+    " No branch or tag is specified.
+    if l:branch ==# ''
+      " Maybe a detached head. Need to update by fetch & checkout.
+      return 2
+    else
+      " Need to update by pull.
+      return 1
+    endif
   endif
-  if s:get_plugin_branch(a:name) == l:pluginfo.rev
+  if l:branch == l:pluginfo.rev
     " Same branch. Need to update by pull.
     return 1
   endif

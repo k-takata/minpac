@@ -344,6 +344,9 @@ minpac#add({url}[, {config}])			*minpac#add()*
 	commit ID, you should use the "rev" option. Otherwise you can use the
 	"branch" option.
 
+	If you include "*" in "rev", minpac tries to checkout the latest tag
+	name which matches the "rev".
+
 
 minpac#update([{name}[, {config}]])			*minpac#update()*
 	Install or update all plugins or the specified plugin.
