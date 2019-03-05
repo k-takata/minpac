@@ -295,6 +295,8 @@ The `'branch'` option is used only when the plugin is newly installed. It clones
 The `'rev'` option is used both for installing and updating the plugin. It installs the plugin by `git clone <URL> && git checkout <REV>` and updates the plugin by `git fetch && git checkout <REV>`. This is slower because it clones the whole repository, but you can change the rev (commit ID, branch or tag) later.
 So, if you want to change the branch frequently or want to specify a commit ID, you should use the `'rev'` option. Otherwise you can use the `'branch'` option.
 
+If you include `*` in `'rev'`, minpac tries to checkout the latest tag name which matches the `'rev'`.
+
 
 #### minpac#update([{name}[, {config}]])
 
