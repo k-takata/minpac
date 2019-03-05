@@ -65,6 +65,7 @@ endif
 " This doesn't open an extra window on MS-Windows.
 function! minpac#impl#system(cmds) abort
   let l:out = []
+  let l:ret = -1
   let l:quote_cmds = s:quote_cmds(a:cmds)
   call s:echom_verbose(4, 'system: cmds=' . string(l:quote_cmds))
   let l:job = minpac#job#start(l:quote_cmds,
