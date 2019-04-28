@@ -153,7 +153,13 @@ function! s:invoke_hook(hooktype, args, hook) abort
   if a:hooktype ==# 'post-update'
     let l:name = a:args[0]
     let l:pluginfo = g:minpac#pluglist[l:name]
-    let l:cdcmd = haslocaldir() ? 'lcd' : 'cd'
+    if haslocaldir() == 1
+      let l:cdcmd = 'lcd'
+    elseif haslocaldir() == 2
+      let l:cdcmd = 'tcd'
+    else
+      let l:cdcmd = 'cd'
+    endif
     let l:pwd = getcwd()
     noautocmd execute l:cdcmd fnameescape(l:pluginfo.dir)
   endif
