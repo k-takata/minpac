@@ -145,6 +145,21 @@ function! s:decrement_job_count() abort
   endif
 endfunction
 
+if exists('*chdir')
+  let s:chdir = function('chdir')
+else
+  function! s:chdir(dir) abort
+    if has('nvim')
+      let l:cdcmd = haslocaldir() ? 'lcd' : (haslocaldir(-1, 0) ? 'tcd' : 'cd')
+    else
+      let l:cdcmd = haslocaldir() ? ((haslocaldir() == 1) ? 'lcd' : 'tcd') : 'cd'
+    endif
+    let l:pwd = getcwd()
+    execute l:cdcmd fnameescape(a:dir)
+    return l:pwd
+  endfunction
+endif
+
 function! s:invoke_hook(hooktype, args, hook) abort
   if a:hook ==# ''
     return
@@ -153,13 +168,7 @@ function! s:invoke_hook(hooktype, args, hook) abort
   if a:hooktype ==# 'post-update'
     let l:name = a:args[0]
     let l:pluginfo = g:minpac#pluglist[l:name]
-    if has('nvim')
-      let l:cdcmd = haslocaldir() ? 'lcd' : (haslocaldir(-1, 0) ? 'tcd' : 'cd')
-    else
-      let l:cdcmd = haslocaldir() ? ((haslocaldir() == 1) ? 'lcd' : 'tcd') : 'cd'
-    endif
-    let l:pwd = getcwd()
-    noautocmd execute l:cdcmd fnameescape(l:pluginfo.dir)
+    noautocmd let l:pwd = s:chdir(l:pluginfo.dir)
   endif
   try
     if type(a:hook) == v:t_func
@@ -174,7 +183,7 @@ function! s:invoke_hook(hooktype, args, hook) abort
     echohl None
   finally
     if a:hooktype ==# 'post-update'
-      noautocmd execute l:cdcmd fnameescape(l:pwd)
+      noautocmd call s:chdir(l:pwd)
     endif
   endtry
 endfunction
