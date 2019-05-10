@@ -50,10 +50,11 @@ endfunction
 
 if has('win32')
   function! s:quote_cmds(cmds) abort
-    " If space is found, surround the argument with "".
+    " If space (or brace) is found, surround the argument with "".
     " Assuming double quotations are not used elsewhere.
+    " (Brace needs to be quoted for msys2/git.)
     return join(map(a:cmds,
-          \ {-> (v:val =~# ' ') ? '"' . v:val . '"' : v:val}), ' ')
+          \ {-> (v:val =~# '[ {]') ? '"' . v:val . '"' : v:val}), ' ')
   endfunction
 else
   function! s:quote_cmds(cmds) abort
