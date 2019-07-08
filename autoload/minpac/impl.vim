@@ -514,6 +514,9 @@ function! minpac#impl#update(...) abort
   for l:name in l:names
     let ret = s:update_single_plugin(l:name, l:force)
   endfor
+  while s:remain_jobs > 0
+    sleep 500m
+  endwhile
 endfunction
 
 
