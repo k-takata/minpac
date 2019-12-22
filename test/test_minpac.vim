@@ -23,7 +23,7 @@ func Test_minpac_init()
   call assert_equal(2, g:minpac#opt.verbose)
   call assert_equal('vertical', g:minpac#opt.status_open)
   call assert_equal('github', g:minpac#opt.site)
-  call assert_equal({'github': 'https://github.com/', 'gitlab': 'https://gitlab.com/', 'bitbucket': 'https://bitbucket.com/'}, g:minpac#opt.sites)
+  call assert_equal({'github': 'https://github.com/', 'gitlab': 'https://gitlab.com/', 'bitbucket': 'https://bitbucket.org/'}, g:minpac#opt.sites)
   call assert_equal({}, minpac#getpluglist())
 
   let g:minpac#pluglist.foo = 'bar'
