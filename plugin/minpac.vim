@@ -44,7 +44,7 @@ function! minpac#init(...) abort
                           \ 'sites': {
                                          \ 'github': 'https://github.com/',
                                          \ 'gitlab': 'https://gitlab.com/',
-                                         \ 'bitbucket': 'https://bitbucket.com/'
+                                         \ 'bitbucket': 'https://bitbucket.org/'
                                      \ }
                       \ },
                       \ 'keep'
