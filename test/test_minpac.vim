@@ -77,7 +77,7 @@ func Test_minpac_add()
   " Different site
   call minpac#add('k-takata/minpac', {'site': 'bitbucket'})
   let p = minpac#getpluginfo('minpac')
-  call assert_equal('https://bitbucket.com/k-takata/minpac.git', p.url)
+  call assert_equal('https://bitbucket.org/k-takata/minpac.git', p.url)
 
   " SSH URL
   call minpac#add('git@github.com:k-takata/minpac.git', {'name': 'm'})
