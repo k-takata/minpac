@@ -124,51 +124,20 @@ endif
 
 #### Load minpac on demand
 
-Very interestingly, minpac doesn't need to be loaded every time. Unlike other plugin managers, it is needed only when updating, installing or cleaning the plugins. This is because minpac itself doesn't handle the runtime path.
+Very interestingly, minpac doesn't need to be loaded every time when you execute Vim. Unlike other plugin managers, it is needed only when updating, installing or cleaning the plugins. This is because minpac itself doesn't handle the runtime path.
 
-You can define a user command to load minpac, reload .vimrc to register the information of plugins, then call `minpac#update()`, `minpac#clean()` or `minpac#status()`.
+You can define user commands to load minpac, register the information of plugins, then call `minpac#update()`, `minpac#clean()` or `minpac#status()`.
 
 ```vim
-" For a paranoia.
-" Normally `:set nocp` is not needed, because it is done automatically
-" when .vimrc is found.
+" Normally this if-block is not needed, because `:set nocp` is done
+" automatically when .vimrc is found. However, this might be useful
+" when you execute `vim -u .vimrc` from the command line.
 if &compatible
   " `:set nocp` has many side effects. Therefore this should be done
   " only when 'compatible' is set.
   set nocompatible
 endif
 
-if exists('*minpac#init')
-  " minpac is loaded.
-  call minpac#init()
-  call minpac#add('k-takata/minpac', {'type': 'opt'})
-
-  " Additional plugins here.
-  call minpac#add('vim-jp/syntax-vim-ex')
-  ...
-endif
-
-" Plugin settings here.
-...
-
-" Define user commands for updating/cleaning the plugins.
-" Each of them loads minpac, reloads .vimrc to register the
-" information of plugins, then performs the task.
-command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update('', {'do': 'call minpac#status()'})
-command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
-command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
-```
-
-Note that your .vimrc must be reloadable to use this. E.g.:
-
-* `:set nocompatible` should not be executed twice to avoid side effects.
-* `:function!` should be used to define a user function.
-* `:command!` should be used to define a user command.
-* `:augroup!` should be used properly to avoid the same autogroups are defined twice.
-
-Another way is defining a function to load minpac and register the information of plugins.
-
-```vim
 function! PackInit() abort
   packadd minpac
 
@@ -187,13 +156,25 @@ endfunction
 " Define user commands for updating/cleaning the plugins.
 " Each of them calls PackInit() to load minpac and register
 " the information of plugins, then performs the task.
-command! PackUpdate call PackInit() | call minpac#update('', {'do': 'call minpac#status()'})
+command! PackUpdate call PackInit() | call minpac#update()
 command! PackClean  call PackInit() | call minpac#clean()
 command! PackStatus call PackInit() | call minpac#status()
 ```
 
-This doesn't reload .vimrc, so the .vimrc doesn't need to be reloadable.
-However, if you make it reloadable, you can apply the changes to the .vimrc immediately by executing `:so $MYVIMRC | PackUpdate`.
+If you make your .vimrc reloadable, you can reflect the setting of the .vimrc immediately after you edit it by executing `:so $MYVIMRC | PackUpdate`. Or you can define the commands like this:
+
+```vim
+command! PackUpdate | source $MYVIMRC | call PackInit() | call minpac#update()
+command! PackClean  | source $MYVIMRC | call PackInit() | call minpac#clean()
+command! PackStatus | source $MYVIMRC | call PackInit() | call minpac#status()
+```
+
+To make your .vimrc reloadable:
+
+* `:set nocompatible` should not be executed twice to avoid side effects.
+* `:function!` should be used to define a user function.
+* `:command!` should be used to define a user command.
+* `:augroup!` should be used properly to avoid the same autogroups are defined twice.
 
 
 Sometimes, you may want to open a shell at the directory where a plugin is installed.  The following example defines a command to open a terminal window at the directory of a specified plugin.  (Requires Vim 8.0.902 or later.)
@@ -259,7 +240,9 @@ Initialize minpac.
 | `'depth'` | Default clone depth. Default: 1 |
 | `'jobs'`  | Maximum job numbers. If <= 0, unlimited. Default: 8 |
 | `'verbose'` | Verbosity level (0 to 4).<br/>0: Show only important messages.<br/>1: Show the result of each plugin.<br/>2: Show error messages from external commands.<br/>3: Show start/end messages for each plugin.<br/>4: Show debug messages.<br/>Default: 2 |
-| `'status_open'` | Default setting for the open option of `minpac#status()`. Default: `'vertical'` |
+| `'progress_open'` | Specify how to show the progress of `minpac#update()`.<br/>`'none'`: Do not open the progress window. (Compatible with minpac v2.0.x or earlier.)<br/>`'horizontal'`: Open the progress window by splitting horizontally.<br/>`'vertical'`: Open the progress window by splitting vertically.<br/>`'tab'`: Open the progress window in a new tab.<br/>Default: `'horizontal'` |
+| `'status_open'` | Default setting for the open option of `minpac#status()`. Default: `'horizontal'` |
+| `'status_auto'` | Specify whether the status window will open automatically after `minpac#update()` is finished.<br/>`v:true`: Open the status window automatically, when one or more plugins are updated, installed or errored.<br/>`v:false`: Do not open the status window automatically. (Compatible with minpac v2.0.x or earlier.)<br/>Default: `v:true` |
 
 All plugins will be installed under the following directories:
 
@@ -398,7 +381,7 @@ Otherwise, shows the status of the plugin and commits of last update (if any).
 
 | option   | description |
 |----------|-------------|
-| `'open'` | Specify how to open the status window.<br/>`'vertical'`: Open in vertical split.<br/>`'horizontal'`: Open in horizontal split.<br/>`'tab'`: Open in a new tab.<br/>Default: `'vertical'` or specified value by `minpac#init()`.  |
+| `'open'` | Specify how to open the status window.<br/>`'vertical'`: Open in vertical split.<br/>`'horizontal'`: Open in horizontal split.<br/>`'tab'`: Open in a new tab.<br/>Default: `'horizontal'` or specified value by `minpac#init()`.  |
 
 ### Hooks
 
