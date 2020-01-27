@@ -95,6 +95,7 @@ function! minpac#status#get(opt) abort
   call s:syntax()
   call s:mappings()
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nomodifiable nospell
+  silent file [minpac status]
 endfunction
 
 

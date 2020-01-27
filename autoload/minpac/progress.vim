@@ -40,6 +40,7 @@ function! minpac#progress#open(msg) abort
   call s:syntax()
   call s:mappings()
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nomodifiable nospell
+  silent file [minpac progress]
 endfunction
 
 function! s:syntax() abort
