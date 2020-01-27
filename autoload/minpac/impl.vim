@@ -151,6 +151,9 @@ function! s:decrement_job_count() abort
       endif
       call s:echom_verbose(1, '', l:mes)
     endif
+    if g:minpac#opt.progress_open !=# 'none'
+      call s:echom_verbose(1, '', '(Type "q" to close this window. Type "s" to open the status window.)')
+    endif
 
     " Open the status window.
     if s:updated_plugins > 0 || s:installed_plugins > 0

@@ -53,6 +53,7 @@ endfunction
 
 function! s:mappings() abort
   nnoremap <silent><buffer> q :q<CR>
+  nnoremap <silent><buffer> s :call minpac#status()<CR>
 endfunction
 
 " vim: set ts=8 sw=2 et:
