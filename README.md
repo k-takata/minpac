@@ -242,7 +242,7 @@ Initialize minpac.
 | `'verbose'` | Verbosity level (0 to 4).<br/>0: Show only important messages.<br/>1: Show the result of each plugin.<br/>2: Show error messages from external commands.<br/>3: Show start/end messages for each plugin.<br/>4: Show debug messages.<br/>Default: 2 |
 | `'progress_open'` | Specify how to show the progress of `minpac#update()`.<br/>`'none'`: Do not open the progress window. (Compatible with minpac v2.0.x or earlier.)<br/>`'horizontal'`: Open the progress window by splitting horizontally.<br/>`'vertical'`: Open the progress window by splitting vertically.<br/>`'tab'`: Open the progress window in a new tab.<br/>Default: `'horizontal'` |
 | `'status_open'` | Default setting for the open option of `minpac#status()`. Default: `'horizontal'` |
-| `'status_auto'` | Specify whether the status window will open automatically after `minpac#update()` is finished.<br/>`v:true`: Open the status window automatically, when one or more plugins are updated, installed or errored.<br/>`v:false`: Do not open the status window automatically. (Compatible with minpac v2.0.x or earlier.)<br/>Default: `v:true` |
+| `'status_auto'` | Specify whether the status window will open automatically after `minpac#update()` is finished.<br/>`v:true`: Open the status window automatically, when one or more plugins are updated or installed.<br/>`v:false`: Do not open the status window automatically.<br/>Default: `v:false` |
 
 All plugins will be installed under the following directories:
 

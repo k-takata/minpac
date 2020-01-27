@@ -276,12 +276,11 @@ minpac#init([{config}])				*minpac#init()*
 				automatically after |minpac#update()| is
 				finished.
 				v:true: Open the status window automatically,
-				  when one or more plugins are updated,
-				  installed or errored.
+				  when one or more plugins are updated or
+				  installed.
 				v:false: Do not open the status window
-				  automatically. (Compatible with minpac
-				  v2.0.x or earlier.)
-				Default: v:true
+				  automatically.
+				Default: v:false
 
 	All plugins will be installed under the following directories:
 

@@ -153,7 +153,7 @@ function! s:decrement_job_count() abort
     endif
 
     " Open the status window.
-    if s:error_plugins > 0 || s:updated_plugins > 0 || s:installed_plugins > 0
+    if s:updated_plugins > 0 || s:installed_plugins > 0
       if g:minpac#opt.status_auto
         call minpac#status()
       endif
