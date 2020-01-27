@@ -154,7 +154,7 @@ endif
 " Define user commands for updating/cleaning the plugins.
 " Each of them loads minpac, reloads .vimrc to register the
 " information of plugins, then performs the task.
-command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update('', {'do': 'call minpac#status()'})
+command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
 command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
 command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
 ```
@@ -187,7 +187,7 @@ endfunction
 " Define user commands for updating/cleaning the plugins.
 " Each of them calls PackInit() to load minpac and register
 " the information of plugins, then performs the task.
-command! PackUpdate call PackInit() | call minpac#update('', {'do': 'call minpac#status()'})
+command! PackUpdate call PackInit() | call minpac#update()
 command! PackClean  call PackInit() | call minpac#clean()
 command! PackStatus call PackInit() | call minpac#status()
 ```
@@ -259,7 +259,9 @@ Initialize minpac.
 | `'depth'` | Default clone depth. Default: 1 |
 | `'jobs'`  | Maximum job numbers. If <= 0, unlimited. Default: 8 |
 | `'verbose'` | Verbosity level (0 to 4).<br/>0: Show only important messages.<br/>1: Show the result of each plugin.<br/>2: Show error messages from external commands.<br/>3: Show start/end messages for each plugin.<br/>4: Show debug messages.<br/>Default: 2 |
-| `'status_open'` | Default setting for the open option of `minpac#status()`. Default: `'vertical'` |
+| `'progress_open'` | Specify how to show the progress of `minpac#update()`.<br/>`'none'`: Do not open the progress window. (Compatible with minpac v2.0.x or earlier.)<br/>`'horizontal'`: Open the progress window by splitting horizontally.<br/>`'vertical'`: Open the progress window by splitting vertically.<br/>`'tab'`: Open the progress window in a new tab.<br/>Default: `'horizontal'` |
+| `'status_open'` | Default setting for the open option of `minpac#status()`. Default: `'horizontal'` |
+| `'status_auto'` | Specify whether the status window will open automatically after `minpac#update()` is finished.<br/>`v:true`: Open the status window automatically, when one or more plugins are updated, installed or errored.<br/>`v:false`: Do not open the status window automatically. (Compatible with minpac v2.0.x or earlier.)<br/>Default: `v:true` |
 
 All plugins will be installed under the following directories:
 
@@ -398,7 +400,7 @@ Otherwise, shows the status of the plugin and commits of last update (if any).
 
 | option   | description |
 |----------|-------------|
-| `'open'` | Specify how to open the status window.<br/>`'vertical'`: Open in vertical split.<br/>`'horizontal'`: Open in horizontal split.<br/>`'tab'`: Open in a new tab.<br/>Default: `'vertical'` or specified value by `minpac#init()`.  |
+| `'open'` | Specify how to open the status window.<br/>`'vertical'`: Open in vertical split.<br/>`'horizontal'`: Open in horizontal split.<br/>`'tab'`: Open in a new tab.<br/>Default: `'horizontal'` or specified value by `minpac#init()`.  |
 
 ### Hooks
 

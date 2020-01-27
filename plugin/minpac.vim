@@ -31,7 +31,7 @@ endfunction
 " Initialize minpac.
 function! minpac#init(...) abort
   let l:opt = extend(copy(get(a:000, 0, {})),
-        \ {'dir': '', 'package_name': 'minpac', 'git': 'git', 'depth': 1, 'jobs': 8, 'verbose': 2, 'status_open': 'vertical'}, 'keep')
+        \ {'dir': '', 'package_name': 'minpac', 'git': 'git', 'depth': 1, 'jobs': 8, 'verbose': 2, 'progress_open': 'horizontal', 'status_open': 'horizontal', 'status_auto': v:true}, 'keep')
 
   let g:minpac#opt = l:opt
   let g:minpac#pluglist = {}

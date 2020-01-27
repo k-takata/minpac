@@ -35,16 +35,32 @@ function! minpac#impl#getpackages(...) abort
 endfunction
 
 
-function! s:echo_verbose(level, msg) abort
+function! s:echox_verbose(level, echocmd, type, msg) abort
   if g:minpac#opt.verbose >= a:level
-    echo a:msg
+    if g:minpac#opt.progress_open ==# 'none'
+      if a:type ==# 'warning'
+        echohl WarningMsg
+      elseif a:type ==# 'error'
+        echohl ErrorMsg
+      endif
+      exec a:echocmd . " '" . a:msg . "'"
+      echohl None
+    else
+      call minpac#progress#add_msg(a:type, a:msg)
+    endif
   endif
 endfunction
 
-function! s:echom_verbose(level, msg) abort
-  if g:minpac#opt.verbose >= a:level
-    echom a:msg
-  endif
+function! s:echo_verbose(level, type, msg) abort
+  call s:echox_verbose(a:level, 'echo', a:type, a:msg)
+endfunction
+
+function! s:echom_verbose(level, type, msg) abort
+  call s:echox_verbose(a:level, 'echom', a:type, a:msg)
+endfunction
+
+function! s:echoerr_verbose(level, msg) abort
+  call s:echox_verbose(a:level, 'echoerr', 'error', a:msg)
 endfunction
 
 
@@ -68,7 +84,7 @@ function! minpac#impl#system(cmds) abort
   let l:out = []
   let l:ret = -1
   let l:quote_cmds = s:quote_cmds(a:cmds)
-  call s:echom_verbose(4, 'system: cmds=' . string(l:quote_cmds))
+  call s:echom_verbose(4, '', 'system: cmds=' . string(l:quote_cmds))
   let l:job = minpac#job#start(l:quote_cmds,
         \ {'on_stdout': {id, mes, ev -> extend(l:out, mes)}})
   if l:job > 0
@@ -85,7 +101,7 @@ function! s:exec_plugin_cmd(name, cmd, mes) abort
   let l:dir = l:pluginfo.dir
   let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir] + a:cmd)
   if l:res[0] == 0 && len(l:res[1]) > 0
-    call s:echom_verbose(4, a:mes . ': ' . l:res[1][0])
+    call s:echom_verbose(4, '', a:mes . ': ' . l:res[1][0])
     return l:res[1][0]
   else
     " Error
@@ -127,15 +143,20 @@ function! s:decrement_job_count() abort
 
     " Show the status.
     if s:error_plugins != 0
-      echohl WarningMsg
-      echom 'Error plugins: ' . s:error_plugins
-      echohl None
+      call s:echom_verbose(1, 'warning', 'Error plugins: ' . s:error_plugins)
     else
       let l:mes = 'All plugins are up to date.'
       if s:updated_plugins > 0 || s:installed_plugins > 0
         let l:mes .= ' (Updated: ' . s:updated_plugins . ', Newly installed: ' . s:installed_plugins . ')'
       endif
-      echom l:mes
+      call s:echom_verbose(1, '', l:mes)
+    endif
+
+    " Open the status window.
+    if s:error_plugins > 0 || s:updated_plugins > 0 || s:installed_plugins > 0
+      if g:minpac#opt.status_auto
+        call minpac#status()
+      endif
     endif
 
     " Restore the pager.
@@ -178,10 +199,8 @@ function! s:invoke_hook(hooktype, args, hook) abort
       execute a:hook
     endif
   catch
-    echohl ErrorMsg
-    echom v:throwpoint
-    echom v:exception
-    echohl None
+    call s:echom_verbose(1, 'error', v:throwpoint)
+    call s:echom_verbose(1, 'error', v:exception)
   finally
     if a:hooktype ==# 'post-update'
       noautocmd call s:chdir(l:pwd)
@@ -244,16 +263,14 @@ function! s:job_exit_cb(id, errcode, event) dict abort
               let l:rev = s:get_plugin_latest_tag(self.name, l:rev)
               if l:rev ==# ''
                 let s:error_plugins += 1
-                echohl ErrorMsg
-                call s:echom_verbose(1, 'Error while updating "' . self.name . '".  No tags found.')
-                echohl None
+                call s:echom_verbose(1, 'error', 'Error while updating "' . self.name . '".  No tags found.')
                 call s:decrement_job_count()
                 return
               endif
             endif
             let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'checkout',
                   \ l:rev, '--']
-            call s:echom_verbose(3, 'Checking out the revison: ' . self.name
+            call s:echom_verbose(3, '', 'Checking out the revison: ' . self.name
                   \ . ': ' . l:rev)
             call s:start_job(l:cmd, self.name, self.seq + 1)
             return
@@ -262,7 +279,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
             " Checked out the branch. Update to the upstream.
             let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'merge', '--quiet',
                   \ '--ff-only', '@{u}']
-            call s:echom_verbose(3, 'Update to the upstream: ' . self.name)
+            call s:echom_verbose(3, '', 'Update to the upstream: ' . self.name)
             call s:start_job(l:cmd, self.name, self.seq + 1)
             return
           endif
@@ -273,7 +290,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
             " Update git submodule.
             let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
                   \ 'update', '--init', '--recursive']
-            call s:echom_verbose(3, 'Updating submodules: ' . self.name)
+            call s:echom_verbose(3, '', 'Updating submodules: ' . self.name)
             call s:start_job(l:cmd, self.name, self.seq + 1)
             return
           endif
@@ -295,29 +312,26 @@ function! s:job_exit_cb(id, errcode, event) dict abort
       if l:pluginfo.stat.installed
         if l:updated
           let s:updated_plugins += 1
-          call s:echom_verbose(1, 'Updated: ' . self.name)
+          call s:echom_verbose(1, '', 'Updated: ' . self.name)
         else
-          call s:echom_verbose(3, 'Already up-to-date: ' . self.name)
+          call s:echom_verbose(3, '', 'Already up-to-date: ' . self.name)
         endif
       else
         let s:installed_plugins += 1
-        call s:echom_verbose(1, 'Installed: ' . self.name)
+        call s:echom_verbose(1, '', 'Installed: ' . self.name)
       endif
       let l:err = 0
     endif
   endif
   if l:err
     let s:error_plugins += 1
-    echohl ErrorMsg
-    call s:echom_verbose(1, 'Error while updating "' . self.name . '".  Error code: ' . a:errcode)
-    echohl None
+    call s:echom_verbose(1, 'error', 'Error while updating "' . self.name . '".  Error code: ' . a:errcode)
   endif
 
   call s:decrement_job_count()
 endfunction
 
 function! s:job_err_cb(id, message, event) dict abort
-  echohl WarningMsg
   let l:mes = copy(a:message)
   if len(l:mes) > 0 && l:mes[-1] ==# ''
     " Remove the last empty line. It is redundant.
@@ -326,9 +340,8 @@ function! s:job_err_cb(id, message, event) dict abort
   for l:line in l:mes
     let l:line = substitute(l:line, "\t", '        ', 'g')
     call add(g:minpac#pluglist[self.name].stat.lines, l:line)
-    call s:echom_verbose(2, self.name . ': ' . l:line)
+    call s:echom_verbose(2, 'warning', self.name . ': ' . l:line)
   endfor
-  echohl None
 endfunction
 
 function! s:start_job(cmds, name, seq) abort
@@ -342,7 +355,7 @@ function! s:start_job(cmds, name, seq) abort
   endif
 
   let l:quote_cmds = s:quote_cmds(a:cmds)
-  call s:echom_verbose(4, 'start_job: cmds=' . string(l:quote_cmds))
+  call s:echom_verbose(4, '', 'start_job: cmds=' . string(l:quote_cmds))
   let l:job = minpac#job#start(l:quote_cmds, {
         \ 'on_stderr': function('s:job_err_cb'),
         \ 'on_exit': function('s:job_exit_cb'),
@@ -351,9 +364,7 @@ function! s:start_job(cmds, name, seq) abort
   if l:job > 0
     " It worked!
   else
-    echohl ErrorMsg
-    echom 'Fail to execute: ' . a:cmds[0]
-    echohl None
+    call s:echom_verbose(1, 'error', 'Fail to execute: ' . a:cmds[0])
     call s:decrement_job_count()
     return 1
   endif
@@ -405,7 +416,7 @@ endfunction
 " Update a single plugin.
 function! s:update_single_plugin(name, force) abort
   if !has_key(g:minpac#pluglist, a:name)
-    echoerr 'Plugin not registered: ' . a:name
+    call s:echoerr_verbose(1, 'Plugin not registered: ' . a:name)
     call s:decrement_job_count()
     return 1
   endif
@@ -432,7 +443,7 @@ function! s:update_single_plugin(name, force) abort
       else
         let l:pluginfo.stat.upd_method = 2
       endif
-      call s:echo_verbose(3, 'Cloning ' . a:name)
+      call s:echo_verbose(3, '', 'Cloning ' . a:name)
 
       let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir, '--no-single-branch']
       if l:pluginfo.depth > 0 && l:pluginfo.rev ==# ''
@@ -452,7 +463,7 @@ function! s:update_single_plugin(name, force) abort
 
   if l:pluginfo.stat.installed == 1
     if l:pluginfo.frozen && !a:force
-      call s:echom_verbose(3, 'Skipped: ' . a:name)
+      call s:echom_verbose(3, '', 'Skipped: ' . a:name)
       call s:decrement_job_count()
       return 0
     endif
@@ -461,16 +472,16 @@ function! s:update_single_plugin(name, force) abort
     let l:pluginfo.stat.upd_method = l:ret
     if l:ret == 0
       " No need to update.
-      call s:echom_verbose(3, 'Already up-to-date: ' . a:name)
+      call s:echom_verbose(3, '', 'Already up-to-date: ' . a:name)
       call s:decrement_job_count()
       return 0
     elseif l:ret == 1
       " Same branch. Update by pull.
-      call s:echo_verbose(3, 'Updating (pull): ' . a:name)
+      call s:echo_verbose(3, '', 'Updating (pull): ' . a:name)
       let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only']
     elseif l:ret == 2
       " Different branch. Update by fetch & checkout.
-      call s:echo_verbose(3, 'Updating (fetch): ' . a:name)
+      call s:echo_verbose(3, '', 'Updating (fetch): ' . a:name)
       let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'fetch', '--depth', '999999']
     endif
   endif
@@ -479,6 +490,9 @@ endfunction
 
 " Update all or specified plugin(s).
 function! minpac#impl#update(...) abort
+  if g:minpac#opt.progress_open !=# 'none'
+    call minpac#progress#open(['## minpac update progress ##', ''])
+  endif
   let l:opt = extend(copy(get(a:000, 1, {})),
         \ {'do': ''}, 'keep')
 
@@ -492,12 +506,12 @@ function! minpac#impl#update(...) abort
     let l:names = a:1
     let l:force = 1
   else
-    echoerr 'Wrong parameter type. Must be a String or a List of Strings.'
+    call s:echoerr_verbose(1, 'Wrong parameter type. Must be a String or a List of Strings.')
     return
   endif
 
   if s:remain_jobs > 0
-    echom 'Previous update has not been finished.'
+    call s:echom_verbose(1, '', 'Previous update has not been finished.')
     return
   endif
   let s:remain_jobs = len(l:names)
@@ -506,11 +520,13 @@ function! minpac#impl#update(...) abort
   let s:installed_plugins = 0
   let s:finish_update_hook = l:opt.do
 
-  " Disable the pager temporarily to avoid jobs being interrupted.
-  if !exists('s:save_more')
-    let s:save_more = &more
+  if g:minpac#opt.progress_open ==# 'none'
+    " Disable the pager temporarily to avoid jobs being interrupted.
+    if !exists('s:save_more')
+      let s:save_more = &more
+    endif
+    set nomore
   endif
-  set nomore
 
   for l:name in l:names
     let ret = s:update_single_plugin(l:name, l:force)
