@@ -327,6 +327,8 @@ minpac#add({url}[, {config}])			*minpac#add()*
 		do		Post-update hook.
 				See |minpac-post-update-hooks|.
 				Default: empty
+		subdir		Subdirectory that contains Vim plugin.
+				Default: empty
 
 	The "branch" and "rev" options are slightly different.
 	The "branch" option is used only when the plugin is newly installed.
@@ -345,6 +347,16 @@ minpac#add({url}[, {config}])			*minpac#add()*
 
 	If you include "*" in "rev", minpac tries to checkout the latest tag
 	name which matches the "rev".
+
+	When "subdir"" is specified, the plugin will be installed as usual
+	(e.g. in `pack/minpac/start/pluginname`), however, another directory
+	is created and a symlink (or a junction on Windows) will be created in
+	it. E.g.: >
+
+		ln -s pack/minpac/start/pluginname/subdir \
+		      pack/minpac-sub/start/pluginname
+
+<	This way, Vim can load the plugin from its subdirectory.
 
 
 minpac#update([{name}[, {config}]])			*minpac#update()*

@@ -234,6 +234,38 @@ function! s:add_rtp(dir) abort
   endif
 endfunction
 
+if has('win32')
+  function! s:create_link(target, link) abort
+    call minpac#impl#system(['cmd.exe', '/c', 'mklink', '/J',
+          \ substitute(a:link, '/', '\', 'g'),
+          \ substitute(a:target, '/', '\', 'g')])
+  endfunction
+else
+  function! s:create_link(target, link) abort
+    call minpac#impl#system(['ln', '-s', a:target, a:link])
+  endfunction
+endif
+
+function! s:handle_subdir(pluginfo) abort
+  if a:pluginfo.type ==# 'start'
+    let l:workdir = g:minpac#opt.minpac_start_dir_sub
+  else
+    let l:workdir = g:minpac#opt.minpac_opt_dir_sub
+  endif
+  if !isdirectory(l:workdir)
+    call mkdir(l:workdir, 'p')
+  endif
+  noautocmd let l:pwd = s:chdir(l:workdir)
+  try
+    if !isdirectory(a:pluginfo.name)
+      call s:create_link(a:pluginfo.dir . '/' . a:pluginfo.subdir,
+            \ a:pluginfo.name)
+    endif
+  finally
+    noautocmd call s:chdir(l:pwd)
+  endtry
+endfunction
+
 function! s:job_exit_cb(id, errcode, event) dict abort
   call filter(s:joblist, {-> v:val != a:id})
 
@@ -300,6 +332,10 @@ function! s:job_exit_cb(id, errcode, event) dict abort
         endif
 
         call s:generate_helptags(l:dir)
+
+        if l:pluginfo.subdir !=# ''
+          call s:handle_subdir(l:pluginfo)
+        endif
 
         if has('nvim') && isdirectory(l:dir . '/rplugin')
           " Required for :UpdateRemotePlugins.
@@ -416,6 +452,36 @@ function! s:check_plugin_status(name) abort
   return 2
 endfunction
 
+" Check whether the type was changed. If it was changed, rename the directory.
+function! s:prepare_plugin_dir(pluginfo) abort
+  let l:dir = a:pluginfo.dir
+  if !isdirectory(l:dir)
+    if a:pluginfo.type ==# 'start'
+      let l:dirtmp = substitute(l:dir, '/start/\ze[^/]\+$', '/opt/', '')
+    else
+      let l:dirtmp = substitute(l:dir, '/opt/\ze[^/]\+$', '/start/', '')
+    endif
+    if isdirectory(l:dirtmp)
+      " The type was changed (start <-> opt).
+      call rename(l:dirtmp, l:dir)
+    endif
+  endif
+
+  if a:pluginfo.subdir !=# ''
+    if a:pluginfo.type ==# 'start'
+      let l:subdir = g:minpac#opt.minpac_start_dir_sub . '/' . a:name
+      let l:otherdir = g:minpac#opt.minpac_opt_dir_sub . '/' . a:name
+    else
+      let l:subdir = g:minpac#opt.minpac_opt_dir_sub . '/' . a:name
+      let l:otherdir = g:minpac#opt.minpac_start_dir_sub . '/' . a:name
+    endif
+    if isdirectory(l:otherdir) && !isdirectory(l:subdir)
+      " The type was changed (start <-> opt).
+      call rename(l:otherdir, l:subdir)
+    endif
+  endif
+endfunction
+
 " Update a single plugin.
 function! s:update_single_plugin(name, force) abort
   if !has_key(g:minpac#pluglist, a:name)
@@ -432,39 +498,9 @@ function! s:update_single_plugin(name, force) abort
   let l:pluginfo.stat.prev_rev = ''
   let l:pluginfo.stat.submod = 0
 
-  if !isdirectory(l:dir)
-    if g:minpac#pluglist[a:name].type ==# 'start'
-      let l:dirtmp = substitute(l:dir, '/start/\ze[^/]\+$', '/opt/', '')
-    else
-      let l:dirtmp = substitute(l:dir, '/opt/\ze[^/]\+$', '/start/', '')
-    endif
-
-    if !isdirectory(l:dirtmp)
-      let l:pluginfo.stat.installed = 0
-      if l:pluginfo.rev ==# ''
-        let l:pluginfo.stat.upd_method = 1
-      else
-        let l:pluginfo.stat.upd_method = 2
-      endif
-      call s:echo_verbose(3, '', 'Cloning ' . a:name)
-
-      let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir, '--no-single-branch']
-      if l:pluginfo.depth > 0 && l:pluginfo.rev ==# ''
-        let l:cmd += ['--depth=' . l:pluginfo.depth]
-      endif
-      if l:pluginfo.branch !=# ''
-        let l:cmd += ['--branch=' . l:pluginfo.branch]
-      endif
-    else
-      " The type was changed (start <-> opt).
-      call rename(l:dirtmp, l:dir)
-      let l:pluginfo.stat.installed = 1
-    endif
-  else
+  call s:prepare_plugin_dir(l:pluginfo)
+  if isdirectory(l:dir)
     let l:pluginfo.stat.installed = 1
-  endif
-
-  if l:pluginfo.stat.installed == 1
     if l:pluginfo.frozen && !a:force
       call s:echom_verbose(3, '', 'Skipped: ' . a:name)
       call s:decrement_job_count()
@@ -486,6 +522,22 @@ function! s:update_single_plugin(name, force) abort
       " Different branch. Update by fetch & checkout.
       call s:echo_verbose(3, '', 'Updating (fetch): ' . a:name)
       let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'fetch', '--depth', '999999']
+    endif
+  else
+    let l:pluginfo.stat.installed = 0
+    if l:pluginfo.rev ==# ''
+      let l:pluginfo.stat.upd_method = 1
+    else
+      let l:pluginfo.stat.upd_method = 2
+    endif
+    call s:echo_verbose(3, '', 'Cloning ' . a:name)
+
+    let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir, '--no-single-branch']
+    if l:pluginfo.depth > 0 && l:pluginfo.rev ==# ''
+      let l:cmd += ['--depth=' . l:pluginfo.depth]
+    endif
+    if l:pluginfo.branch !=# ''
+      let l:cmd += ['--branch=' . l:pluginfo.branch]
     endif
   endif
   return s:start_job(l:cmd, a:name, 0)
@@ -544,9 +596,9 @@ function! s:match_plugin(dir, packname, plugnames) abort
   let l:plugname = substitute(l:plugname, '\*', '.*', 'g')
   let l:plugname = substitute(l:plugname, '?', '.', 'g')
   if l:plugname =~# '/'
-    let l:pat = '/pack/' . a:packname . '/' . l:plugname . '$'
+    let l:pat = '/pack/' . a:packname . '\%(-sub\)\?' . '/' . l:plugname . '$'
   else
-    let l:pat = '/pack/' . a:packname . '/\%(start\|opt\)/' . l:plugname . '$'
+    let l:pat = '/pack/' . a:packname . '\%(-sub\)\?' . '/\%(start\|opt\)/' . l:plugname . '$'
   endif
   if has('win32')
     let l:pat = substitute(l:pat, '/', '[/\\\\]', 'g')
@@ -561,6 +613,7 @@ endfunction
 " Remove plugins that are not registered.
 function! minpac#impl#clean(...) abort
   let l:plugin_dirs = minpac#getpackages(g:minpac#opt.package_name)
+        \ + minpac#getpackages(g:minpac#opt.package_name . '-sub')
 
   if a:0 > 0
     " Going to remove only specified plugins.
