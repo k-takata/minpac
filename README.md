@@ -164,9 +164,9 @@ command! PackStatus call PackInit() | call minpac#status()
 If you make your .vimrc reloadable, you can reflect the setting of the .vimrc immediately after you edit it by executing `:so $MYVIMRC | PackUpdate`. Or you can define the commands like this:
 
 ```vim
-command! PackUpdate | source $MYVIMRC | call PackInit() | call minpac#update()
-command! PackClean  | source $MYVIMRC | call PackInit() | call minpac#clean()
-command! PackStatus | source $MYVIMRC | call PackInit() | call minpac#status()
+command! PackUpdate source $MYVIMRC | call PackInit() | call minpac#update()
+command! PackClean  source $MYVIMRC | call PackInit() | call minpac#clean()
+command! PackStatus source $MYVIMRC | call PackInit() | call minpac#status()
 ```
 
 To make your .vimrc reloadable:
