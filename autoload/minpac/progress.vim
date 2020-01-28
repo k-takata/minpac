@@ -8,6 +8,7 @@
 " ---------------------------------------------------------------------
 
 let s:winid = 0
+let s:bufnr = 0
 
 " Add a message to the minpac progress window
 function! minpac#progress#add_msg(type, msg) abort
@@ -26,6 +27,10 @@ endfunction
 
 " Open the minpac progress window
 function! minpac#progress#open(msg) abort
+  let l:bufname = '[minpac progress]'
+  if s:bufnr != 0
+    exec "silent! bwipe" s:bufnr
+  endif
   if g:minpac#opt.progress_open ==# 'vertical'
     vertical topleft new
   elseif g:minpac#opt.progress_open ==# 'horizontal'
@@ -40,7 +45,8 @@ function! minpac#progress#open(msg) abort
   call s:syntax()
   call s:mappings()
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nomodifiable nospell
-  silent file [minpac progress]
+  exec "silent file" l:bufname
+  let s:bufnr = bufnr()
 endfunction
 
 function! s:syntax() abort

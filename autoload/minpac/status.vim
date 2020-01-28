@@ -9,8 +9,13 @@
 " ---------------------------------------------------------------------
 
 let s:results = []
+let s:bufnr = 0
 
 function! minpac#status#get(opt) abort
+  let l:bufname = '[minpac status]'
+  if s:bufnr != 0
+    exec "silent! bwipe" s:bufnr
+  endif
   let l:is_update_ran = minpac#impl#is_update_ran()
   let l:update_count = 0
   let l:install_count = 0
@@ -95,7 +100,8 @@ function! minpac#status#get(opt) abort
   call s:syntax()
   call s:mappings()
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nomodifiable nospell
-  silent file [minpac status]
+  exec "silent file" l:bufname
+  let s:bufnr = bufnr()
 endfunction
 
 
