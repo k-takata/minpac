@@ -272,6 +272,7 @@ Note: Unlike Vundle, a short form without `<github-account>/` is not supported. 
 | `'branch'` | Used as a branch name to be cloned. Only effective when install the plugin newly. Default: empty |
 | `'rev'`    | Commit ID, branch name or tag name to be checked out. If this is specified, `'depth'` will be ignored. Default: empty |
 | `'do'`     | Post-update hook. See [Post-update hooks](#post-update-hooks). Default: empty |
+| `'subdir'` | Subdirectory that contains Vim plugin. Default: empty |
 
 The `'branch'` and `'rev'` options are slightly different.  
 The `'branch'` option is used only when the plugin is newly installed. It clones the plugin by `git clone <URL> --depth=<DEPTH> -b <BRANCH>`. This is faster at the installation, but it can be slow if you want to change the branch (by the `'rev'` option) later. This cannot specify a commit ID.
@@ -279,6 +280,14 @@ The `'rev'` option is used both for installing and updating the plugin. It insta
 So, if you want to change the branch frequently or want to specify a commit ID, you should use the `'rev'` option. Otherwise you can use the `'branch'` option.
 
 If you include `*` in `'rev'`, minpac tries to checkout the latest tag name which matches the `'rev'`.
+
+When `'subdir'` is specified, the plugin will be installed as usual (e.g. in `pack/minpac/start/pluginname`), however, another directory is created and a symlink (or a junction on Windows) will be created in it. E.g.:
+
+```
+ln -s pack/minpac/start/pluginname/subdir pack/minpac-sub/start/pluginname
+```
+
+This way, Vim can load the plugin from its subdirectory.
 
 
 #### minpac#update([{name}[, {config}]])
