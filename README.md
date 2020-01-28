@@ -450,6 +450,13 @@ call minpac#update('', {'do': 'quit'})
 
 ### Mappings
 
+List of mappings available only in progress window.
+
+| mapping | description |
+|---------|-------------|
+|`s`      | Open the status window. |
+|`q`      | Exit the progress window. |
+
 List of mappings available only in status window.
 
 | mapping | description |

@@ -542,18 +542,27 @@ E.g.: >
 ------------------------------------------------------------------------------
 MAPPINGS					*minpac-mappings*
 
+List of mappings available only in progress window.
+
+                                                *minpac-progress-s*
+s                       Open the status window.
+
+                                                *minpac-progress-q*
+q                       Exit the progress window.
+
+
 List of mappings available only in status window.
 
-                                                *minpac-<CR>*
+                                                *minpac-status-<CR>*
 <CR>                    Preview the commit under the cursor.
 
-                                                *minpac-CTRL-j*
+                                                *minpac-status-CTRL-j*
 <C-j>                   Jump to next package in list.
 
-                                                *minpac-CTRL-k*
+                                                *minpac-status-CTRL-k*
 <C-k>                   Jump to previous package in list.
 
-                                                *minpac-q*
+                                                *minpac-status-q*
 q                       Exit the status window.
                         (Also works for commit preview window)
 
