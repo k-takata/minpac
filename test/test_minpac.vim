@@ -22,12 +22,14 @@ func Test_minpac_init()
   call assert_equal(8, g:minpac#opt.jobs)
   call assert_equal(2, g:minpac#opt.verbose)
   call assert_equal('vertical', g:minpac#opt.status_open)
+  call assert_equal('github', g:minpac#opt.site)
+  call assert_equal({'github': 'https://github.com/', 'gitlab': 'https://gitlab.com/', 'bitbucket': 'https://bitbucket.org/'}, g:minpac#opt.sites)
   call assert_equal({}, minpac#getpluglist())
 
   let g:minpac#pluglist.foo = 'bar'
 
   " Change settings
-  call minpac#init({'package_name': 'm', 'git': 'foo', 'depth': 10, 'jobs': 2, 'verbose': 1, 'status_open': 'horizontal'})
+  call minpac#init({'package_name': 'm', 'git': 'foo', 'depth': 10, 'jobs': 2, 'verbose': 1, 'status_open': 'horizontal', 'site': 'foohub', 'sites': {'foohub': 'https://foohub.com/'}})
   call assert_true(isdirectory('pack/m/start'))
   call assert_true(isdirectory('pack/m/opt'))
   call assert_equal('foo', g:minpac#opt.git)
@@ -35,6 +37,8 @@ func Test_minpac_init()
   call assert_equal(2, g:minpac#opt.jobs)
   call assert_equal(1, g:minpac#opt.verbose)
   call assert_equal('horizontal', g:minpac#opt.status_open)
+  call assert_equal('foohub', g:minpac#opt.site)
+  call assert_equal({'foohub': 'https://foohub.com/'}, g:minpac#opt.sites)
   call assert_equal({}, minpac#getpluglist())
 
   call delete('pack', 'rf')
@@ -69,6 +73,11 @@ func Test_minpac_add()
   call assert_equal(10, p.depth)
   call assert_equal('', p.do)
   call assert_equal('abcdef', p.rev)
+
+  " Different site
+  call minpac#add('k-takata/minpac', {'site': 'bitbucket'})
+  let p = minpac#getpluginfo('minpac')
+  call assert_equal('https://bitbucket.org/k-takata/minpac.git', p.url)
 
   " SSH URL
   call minpac#add('git@github.com:k-takata/minpac.git', {'name': 'm'})

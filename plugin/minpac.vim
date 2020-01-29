@@ -30,8 +30,25 @@ endfunction
 
 " Initialize minpac.
 function! minpac#init(...) abort
-  let l:opt = extend(copy(get(a:000, 0, {})),
-        \ {'dir': '', 'package_name': 'minpac', 'git': 'git', 'depth': 1, 'jobs': 8, 'verbose': 2, 'status_open': 'vertical'}, 'keep')
+  let l:opt = extend(
+                      \ copy(get(a:000, 0, {})),
+                      \ {
+                          \ 'dir': '',
+                          \ 'package_name': 'minpac',
+                          \ 'git': 'git',
+                          \ 'depth': 1,
+                          \ 'jobs': 8,
+                          \ 'verbose': 2,
+                          \ 'status_open': 'vertical',
+                          \ 'site': 'github',
+                          \ 'sites': {
+                                         \ 'github': 'https://github.com/',
+                                         \ 'gitlab': 'https://gitlab.com/',
+                                         \ 'bitbucket': 'https://bitbucket.org/'
+                                     \ }
+                      \ },
+                      \ 'keep'
+                  \ )
 
   let g:minpac#opt = l:opt
   let g:minpac#pluglist = {}
@@ -60,13 +77,25 @@ endfunction
 " Register the specified plugin.
 function! minpac#add(plugname, ...) abort
   call s:ensure_initialization()
-  let l:opt = extend(copy(get(a:000, 0, {})),
-        \ {'name': '', 'type': 'start', 'depth': g:minpac#opt.depth,
-        \  'frozen': 0, 'branch': '', 'rev': '', 'do': ''}, 'keep')
+  let l:opt = extend(
+                      \ copy(get(a:000, 0, {})),
+                      \ {
+                         \ 'name': '',
+                         \ 'type': 'start',
+                         \ 'depth': g:minpac#opt.depth,
+                         \ 'frozen': 0,
+                         \ 'branch': '',
+                         \ 'rev': '',
+                         \ 'do': '',
+                         \ 'site': g:minpac#opt.site
+                      \ },
+                      \ 'keep'
+                  \ )
 
   " URL
   if a:plugname =~? '^[-._0-9a-z]\+\/[-._0-9a-z]\+$'
-    let l:opt.url = 'https://github.com/' . a:plugname . '.git'
+    let l:url = g:minpac#opt.sites[l:opt.site]
+    let l:opt.url = l:url . a:plugname . '.git'
   else
     let l:opt.url = a:plugname
   endif
