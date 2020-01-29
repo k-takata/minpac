@@ -334,6 +334,7 @@ A dictionary with following items will be returned:
 | `'name'`   | Name of the plugin.  |
 | `'url'`    | URL of the plugin repository.  |
 | `'dir'`    | Local directory of the plugin. |
+| `'subdir'` | Subdirectory that contains Vim plugin. |
 | `'frozen'` | If TRUE, the plugin is frozen. |
 | `'type'`   | Type of the plugin. |
 | `'depth'`  | Depth to be cloned. |
