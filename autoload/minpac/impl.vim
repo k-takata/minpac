@@ -467,13 +467,14 @@ function! s:prepare_plugin_dir(pluginfo) abort
     endif
   endif
 
+  let l:name = a:pluginfo.name
   if a:pluginfo.subdir !=# ''
     if a:pluginfo.type ==# 'start'
-      let l:subdir = g:minpac#opt.minpac_start_dir_sub . '/' . a:name
-      let l:otherdir = g:minpac#opt.minpac_opt_dir_sub . '/' . a:name
+      let l:subdir = g:minpac#opt.minpac_start_dir_sub . '/' . l:name
+      let l:otherdir = g:minpac#opt.minpac_opt_dir_sub . '/' . l:name
     else
-      let l:subdir = g:minpac#opt.minpac_opt_dir_sub . '/' . a:name
-      let l:otherdir = g:minpac#opt.minpac_start_dir_sub . '/' . a:name
+      let l:subdir = g:minpac#opt.minpac_opt_dir_sub . '/' . l:name
+      let l:otherdir = g:minpac#opt.minpac_start_dir_sub . '/' . l:name
     endif
     if isdirectory(l:otherdir) && !isdirectory(l:subdir)
       " The type was changed (start <-> opt).
