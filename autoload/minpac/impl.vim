@@ -15,7 +15,7 @@ function! minpac#impl#getpackages(...) abort
   let l:packname = get(a:000, 0, '')
   let l:packtype = get(a:000, 1, '')
   let l:plugname = get(a:000, 2, '')
-  let l:nameonly = get(a:000, 3, 0)
+  let l:nameonly = get(a:000, 3, v:false)
 
   if l:packname ==# '' | let l:packname = '*' | endif
   if l:packtype ==# '' | let l:packtype = '*' | endif

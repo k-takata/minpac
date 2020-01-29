@@ -242,7 +242,7 @@ Initialize minpac.
 | `'verbose'` | Verbosity level (0 to 4).<br/>0: Show only important messages.<br/>1: Show the result of each plugin.<br/>2: Show error messages from external commands.<br/>3: Show start/end messages for each plugin.<br/>4: Show debug messages.<br/>Default: 2 |
 | `'progress_open'` | Specify how to show the progress of `minpac#update()`.<br/>`'none'`: Do not open the progress window. (Compatible with minpac v2.0.x or earlier.)<br/>`'horizontal'`: Open the progress window by splitting horizontally.<br/>`'vertical'`: Open the progress window by splitting vertically.<br/>`'tab'`: Open the progress window in a new tab.<br/>Default: `'horizontal'` |
 | `'status_open'` | Default setting for the open option of `minpac#status()`. Default: `'horizontal'` |
-| `'status_auto'` | Specify whether the status window will open automatically after `minpac#update()` is finished.<br/>`v:true`: Open the status window automatically, when one or more plugins are updated or installed.<br/>`v:false`: Do not open the status window automatically.<br/>Default: `v:false` |
+| `'status_auto'` | Specify whether the status window will open automatically after `minpac#update()` is finished.<br/>TRUE: Open the status window automatically, when one or more plugins are updated or installed.<br/>FALSE: Do not open the status window automatically.<br/>Default: FALSE |
 
 All plugins will be installed under the following directories:
 
@@ -267,7 +267,7 @@ Note: Unlike Vundle, a short form without `<github-account>/` is not supported. 
 |------------|-------------|
 | `'name'`   | Unique name of the plugin (`plugin_name`). Also used as a local directory name. Default: derived from the repository name. |
 | `'type'`   | Type of the plugin. `'start'` or `'opt'`. Default: `'start'` |
-| `'frozen'` | If 1, the plugin will not be updated automatically. Default: 0 |
+| `'frozen'` | If TRUE, the plugin will not be updated automatically. Default: FALSE |
 | `'depth'`  | If >= 1, it is used as a depth to be cloned. Only effective when install the plugin newly. Default: 1 or specified value by `minpac#init()`. |
 | `'branch'` | Used as a branch name to be cloned. Only effective when install the plugin newly. Default: empty |
 | `'rev'`    | Commit ID, branch name or tag name to be checked out. If this is specified, `'depth'` will be ignored. Default: empty |
@@ -334,7 +334,7 @@ A dictionary with following items will be returned:
 | `'name'`   | Name of the plugin.  |
 | `'url'`    | URL of the plugin repository.  |
 | `'dir'`    | Local directory of the plugin. |
-| `'frozen'` | If 1, the plugin is frozen. |
+| `'frozen'` | If TRUE, the plugin is frozen. |
 | `'type'`   | Type of the plugin. |
 | `'depth'`  | Depth to be cloned. |
 | `'branch'` | Branch name to be cloned. |
@@ -359,7 +359,7 @@ If `"NONE"` is specified, package directories are listed instead of plugin direc
 
 `{plugname}` specifies a plugin name. Wildcards can be used. If omitted or an empty string is specified, `"*"` is used.
 
-If `{nameonly}` is 1, plugin (or package) names are listed instead of the direcotries. Default is 0.
+If `{nameonly}` is TRUE, plugin (or package) names are listed instead of the direcotries. Default is FALSE.
 
 E.g.:
 

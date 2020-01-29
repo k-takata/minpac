@@ -71,7 +71,7 @@ function! minpac#add(plugname, ...) abort
   call s:ensure_initialization()
   let l:opt = extend(copy(get(a:000, 0, {})),
         \ {'name': '', 'type': 'start', 'depth': g:minpac#opt.depth,
-        \  'frozen': 0, 'branch': '', 'rev': '', 'do': '', 'subdir': ''},
+        \  'frozen': v:false, 'branch': '', 'rev': '', 'do': '', 'subdir': ''},
         \ 'keep')
 
   " URL
