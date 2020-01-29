@@ -56,10 +56,16 @@ before that. Therefore, minpac should be installed under "opt" directory, and
 should be loaded using `packadd minpac`.
 
 Windows ~
+
+Vim:
  >
-	cd /d %USERPROFILE%
 	git clone https://github.com/k-takata/minpac.git ^
-            vimfiles\pack\minpac\opt\minpac
+            %USERPROFILE%\vimfiles\pack\minpac\opt\minpac
+<
+Neovim:
+ >
+	git clone https://github.com/k-takata/minpac.git ^
+            %LOCALAPPDATA%\nvim\pack\minpac\opt\minpac
 <
 
 Linux, macOS ~

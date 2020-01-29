@@ -38,10 +38,18 @@ Plugins installed under `pack/*/start/` are automatically added to the `'runtime
 
 ### Windows
 
+Vim:
+
 ```cmd
-cd /d %USERPROFILE%
 git clone https://github.com/k-takata/minpac.git ^
-    vimfiles\pack\minpac\opt\minpac
+    %USERPROFILE%\vimfiles\pack\minpac\opt\minpac
+```
+
+Neovim:
+
+```cmd
+git clone https://github.com/k-takata/minpac.git ^
+    %LOCALAPPDATA%\nvim\pack\minpac\opt\minpac
 ```
 
 ### Linux, macOS
