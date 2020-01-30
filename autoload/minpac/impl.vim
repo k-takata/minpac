@@ -236,13 +236,16 @@ endfunction
 
 if has('win32')
   function! s:create_link(target, link) abort
+    if isdirectory(a:target)
+      call delete(a:target)
+    endif
     call minpac#impl#system(['cmd.exe', '/c', 'mklink', '/J',
           \ substitute(a:link, '/', '\', 'g'),
           \ substitute(a:target, '/', '\', 'g')])
   endfunction
 else
   function! s:create_link(target, link) abort
-    call minpac#impl#system(['ln', '-s', a:target, a:link])
+    call minpac#impl#system(['ln', '-sf', a:target, a:link])
   endfunction
 endif
 
@@ -479,6 +482,7 @@ function! s:prepare_plugin_dir(pluginfo) abort
     if isdirectory(l:otherdir) && !isdirectory(l:subdir)
       " The type was changed (start <-> opt).
       call rename(l:otherdir, l:subdir)
+      call s:handle_subdir(a:pluginfo)
     endif
   endif
 endfunction
