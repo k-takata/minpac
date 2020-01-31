@@ -111,6 +111,11 @@ endfunction
 
 " Get the revision of the specified plugin.
 function! minpac#impl#get_plugin_revision(name) abort
+  let l:rev = minpac#git#get_revision(g:minpac#pluglist[a:name].dir)
+  if l:rev != v:null
+    call s:echom_verbose(4, '', 'revision: ' . l:rev)
+    return l:rev
+  endif
   return s:exec_plugin_cmd(a:name, ['rev-parse', 'HEAD'], 'revision')
 endfunction
 
@@ -126,6 +131,11 @@ endfunction
 
 " Get the branch name of the specified plugin.
 function! s:get_plugin_branch(name) abort
+  let l:branch = minpac#git#get_branch(g:minpac#pluglist[a:name].dir)
+  if l:branch != v:null
+    call s:echom_verbose(4, '', 'branch: ' . l:branch)
+    return l:branch
+  endif
   return s:exec_plugin_cmd(a:name, ['symbolic-ref', '--short', 'HEAD'], 'branch')
 endfunction
 
