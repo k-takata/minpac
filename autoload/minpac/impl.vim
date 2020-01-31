@@ -470,8 +470,9 @@ function! s:prepare_plugin_dir(pluginfo) abort
     endif
   endif
 
-  let l:name = a:pluginfo.name
+  " Check subdir.
   if a:pluginfo.subdir !=# ''
+    let l:name = a:pluginfo.name
     if a:pluginfo.type ==# 'start'
       let l:subdir = g:minpac#opt.minpac_start_dir_sub . '/' . l:name
       let l:otherdir = g:minpac#opt.minpac_opt_dir_sub . '/' . l:name
@@ -481,7 +482,7 @@ function! s:prepare_plugin_dir(pluginfo) abort
     endif
     if isdirectory(l:otherdir) && !isdirectory(l:subdir)
       " The type was changed (start <-> opt).
-      call rename(l:otherdir, l:subdir)
+      call delete(l:otherdir)
       call s:handle_subdir(a:pluginfo)
     endif
   endif
