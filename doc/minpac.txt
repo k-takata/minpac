@@ -85,6 +85,15 @@ Sample .vimrc ~
 
 Basic sample
  >
+	" Normally this if-block is not needed, because `:set nocp` is done
+	" automatically when .vimrc is found. However, this might be useful
+	" when you execute `vim -u .vimrc` from the command line.
+	if &compatible
+	  " `:set nocp` has many side effects. Therefore this should be done
+	  " only when 'compatible' is set.
+	  set nocompatible
+	endif
+
 	packadd minpac
 
 	call minpac#init()
@@ -100,6 +109,9 @@ Basic sample
 	" Load the plugins right now. (optional)
 	"packloadall
 <
+  Minpac itself requires 'compatible' to be unset. However, the
+  `if &compatible`-block is optional.
+
 Customizing 'packpath'
 
   If you want to use ".vim" directory instead of "vimfiles" even on Windows,
@@ -149,15 +161,6 @@ Load minpac on demand
   You can define user commands to load minpac, register the information of
   plugins, then call |minpac#update()|, |minpac#clean()| or |minpac#status()|.
 >
-	" Normally this if-block is not needed, because `:set nocp` is done
-	" automatically when .vimrc is found. However, this might be useful
-	" when you execute `vim -u .vimrc` from the command line.
-	if &compatible
-	  " `:set nocp` has many side effects. Therefore this should be done
-	  " only when 'compatible' is set.
-	  set nocompatible
-	endif
-
 	function! PackInit() abort
 	  packadd minpac
 
@@ -241,6 +244,8 @@ functions.  E.g.: >
 	" To see plugins status:
 	call minpac#status()
 <
+Or define commands by yourself as described in the previous section.
+
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*minpac-functions*

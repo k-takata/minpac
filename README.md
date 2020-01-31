@@ -41,15 +41,13 @@ Plugins installed under `pack/*/start/` are automatically added to the `'runtime
 Vim:
 
 ```cmd
-git clone https://github.com/k-takata/minpac.git ^
-    %USERPROFILE%\vimfiles\pack\minpac\opt\minpac
+git clone https://github.com/k-takata/minpac.git %USERPROFILE%\vimfiles\pack\minpac\opt\minpac
 ```
 
 Neovim:
 
 ```cmd
-git clone https://github.com/k-takata/minpac.git ^
-    %LOCALAPPDATA%\nvim\pack\minpac\opt\minpac
+git clone https://github.com/k-takata/minpac.git %LOCALAPPDATA%\nvim\pack\minpac\opt\minpac
 ```
 
 ### Linux, macOS
@@ -57,15 +55,13 @@ git clone https://github.com/k-takata/minpac.git ^
 Vim:
 
 ```sh
-git clone https://github.com/k-takata/minpac.git \
-    ~/.vim/pack/minpac/opt/minpac
+git clone https://github.com/k-takata/minpac.git ~/.vim/pack/minpac/opt/minpac
 ```
 
 Neovim (use `$XDG_CONFIG_HOME` in place of `~/.config` if set on your system):
 
 ```sh
-git clone https://github.com/k-takata/minpac.git \
-    ~/.config/nvim/pack/minpac/opt/minpac
+git clone https://github.com/k-takata/minpac.git ~/.config/nvim/pack/minpac/opt/minpac
 ```
 
 ### Sample .vimrc
@@ -73,6 +69,15 @@ git clone https://github.com/k-takata/minpac.git \
 #### Basic sample
 
 ```vim
+" Normally this if-block is not needed, because `:set nocp` is done
+" automatically when .vimrc is found. However, this might be useful
+" when you execute `vim -u .vimrc` from the command line.
+if &compatible
+  " `:set nocp` has many side effects. Therefore this should be done
+  " only when 'compatible' is set.
+  set nocompatible
+endif
+
 packadd minpac
 
 call minpac#init()
@@ -87,6 +92,8 @@ call minpac#add('vim-jp/syntax-vim-ex')
 " Load the plugins right now. (optional)
 "packloadall
 ```
+
+Minpac itself requires 'compatible' to be unset. However, the `if &compatible`-block is optional.
 
 #### Customizing 'packpath'
 
@@ -137,15 +144,6 @@ Very interestingly, minpac doesn't need to be loaded every time when you execute
 You can define user commands to load minpac, register the information of plugins, then call `minpac#update()`, `minpac#clean()` or `minpac#status()`.
 
 ```vim
-" Normally this if-block is not needed, because `:set nocp` is done
-" automatically when .vimrc is found. However, this might be useful
-" when you execute `vim -u .vimrc` from the command line.
-if &compatible
-  " `:set nocp` has many side effects. Therefore this should be done
-  " only when 'compatible' is set.
-  set nocompatible
-endif
-
 function! PackInit() abort
   packadd minpac
 
@@ -230,6 +228,8 @@ call minpac#clean()
 " To see plugins status:
 call minpac#status()
 ```
+
+Or define commands by yourself as described in the previous section.
 
 
 ### Functions
