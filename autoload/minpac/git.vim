@@ -8,34 +8,27 @@
 " ---------------------------------------------------------------------
 
 function! s:isabsolute(dir) abort
-  if a:dir =~# '^/' || (has('win32') && a:dir =~? '^\%(\\\|[A-Z]:\)')
-    return v:true
-  endif
-  return v:false
+  return a:dir =~# '^/' || (has('win32') && a:dir =~? '^\%(\\\|[A-Z]:\)')
 endfunction
 
 function! s:get_gitdir(dir) abort
   let l:gitdir = a:dir . '/.git'
   if isdirectory(l:gitdir)
     return l:gitdir
-  elseif filereadable(l:gitdir)
-    try
-      let l:line = readfile(l:gitdir)[0]
-    catch
-      return ''
-    endtry
+  endif
+  try
+    let l:line = readfile(l:gitdir)[0]
     if l:line =~# '^gitdir: '
-      let l:dir = l:line[8:]
-      if s:isabsolute(l:dir)
-        let l:gitdir = l:dir
-      else
-        let l:gitdir = a:dir . '/' . l:dir
+      let l:gitdir = l:line[8:]
+      if !s:isabsolute(l:gitdir)
+        let l:gitdir = a:dir . '/' . l:gitdir
       endif
       if isdirectory(l:gitdir)
         return l:gitdir
       endif
     endif
-  endif
+  catch
+  endtry
   return ''
 endfunction
 
@@ -49,23 +42,17 @@ function! minpac#git#get_revision(dir) abort
     if l:line =~# '^ref: '
       let l:ref = l:line[5:]
       if filereadable(l:gitdir . '/' . l:ref)
-        let l:rev = readfile(l:gitdir . '/' . l:ref)[0]
-      else
-        let l:rev = v:null
-        for l:line in readfile(l:gitdir . '/packed-refs')
-          if l:line =~# ' ' . l:ref
-            let l:rev = substitute(l:line, '^\([0-9a-f]*\) ', '\1', '')
-            break
-          endif
-        endfor
+        return readfile(l:gitdir . '/' . l:ref)[0]
       endif
-    else
-      let l:rev = l:line
+      for l:line in readfile(l:gitdir . '/packed-refs')
+        if l:line =~# ' ' . l:ref
+          return substitute(l:line, '^\([0-9a-f]*\) ', '\1', '')
+        endif
+      endfor
     endif
-    return l:rev
   catch
-    return v:null
   endtry
+  return v:null
 endfunction
 
 function! minpac#git#get_branch(dir) abort
