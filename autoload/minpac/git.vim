@@ -7,7 +7,7 @@
 " URL:          https://github.com/k-takata/minpac
 " ---------------------------------------------------------------------
 
-function! s:isroot(dir) abort
+function! s:isabsolute(dir) abort
   if a:dir =~# '^/' || (has('win32') && a:dir =~? '^\%(\\\|[A-Z]:\)')
     return v:true
   endif
@@ -26,7 +26,7 @@ function! s:get_gitdir(dir) abort
     endtry
     if l:line =~# '^gitdir: '
       let l:dir = l:line[8:]
-      if s:isroot(l:dir)
+      if s:isabsolute(l:dir)
         let l:gitdir = l:dir
       else
         let l:gitdir = a:dir . '/' . l:dir
