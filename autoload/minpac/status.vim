@@ -3,7 +3,7 @@
 "
 " Maintainer:   Ken Takata
 " Created By:   Kristijan Husak
-" Last Change:  2018-09-01
+" Last Change:  2020-01-28
 " License:      VIM License
 " URL:          https://github.com/k-takata/minpac
 " ---------------------------------------------------------------------
