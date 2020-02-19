@@ -164,7 +164,7 @@ endfunction
 " the information of plugins, then performs the task.
 command! PackUpdate call PackInit() | call minpac#update()
 command! PackClean  call PackInit() | call minpac#clean()
-command! PackStatus call PackInit() | call minpac#status()
+command! PackStatus packadd minpac | call minpac#status()
 ```
 
 If you make your .vimrc reloadable, you can reflect the setting of the .vimrc immediately after you edit it by executing `:so $MYVIMRC | PackUpdate`. Or you can define the commands like this:
@@ -172,7 +172,7 @@ If you make your .vimrc reloadable, you can reflect the setting of the .vimrc im
 ```vim
 command! PackUpdate source $MYVIMRC | call PackInit() | call minpac#update()
 command! PackClean  source $MYVIMRC | call PackInit() | call minpac#clean()
-command! PackStatus source $MYVIMRC | call PackInit() | call minpac#status()
+command! PackStatus packadd minpac | call minpac#status()
 ```
 
 To make your .vimrc reloadable:
