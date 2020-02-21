@@ -152,11 +152,16 @@ function! s:decrement_job_count() abort
     endif
 
     " Show the status.
-    if s:error_plugins != 0
+    if s:error_plugins + s:updated_plugins + s:installed_plugins > 0
+      if g:minpac#opt.progress_open !=# 'none'
+        call s:echom_verbose(1, '', '')   " empty line
+      endif
+    endif
+    if s:error_plugins > 0
       call s:echom_verbose(1, 'warning', 'Error plugins: ' . s:error_plugins)
     else
       let l:mes = 'All plugins are up to date.'
-      if s:updated_plugins > 0 || s:installed_plugins > 0
+      if s:updated_plugins + s:installed_plugins > 0
         let l:mes .= ' (Updated: ' . s:updated_plugins . ', Newly installed: ' . s:installed_plugins . ')'
       endif
       call s:echom_verbose(1, '', l:mes)
@@ -166,7 +171,7 @@ function! s:decrement_job_count() abort
     endif
 
     " Open the status window.
-    if s:updated_plugins > 0 || s:installed_plugins > 0
+    if s:updated_plugins + s:installed_plugins > 0
       if g:minpac#opt.status_auto
         call minpac#status()
       endif
