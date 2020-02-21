@@ -281,6 +281,7 @@ Note: Unlike Vundle, a short form without `<github-account>/` is not supported. 
 | `'rev'`    | Commit ID, branch name or tag name to be checked out. If this is specified, `'depth'` will be ignored. Default: empty |
 | `'do'`     | Post-update hook. See [Post-update hooks](#post-update-hooks). Default: empty |
 | `'subdir'` | Subdirectory that contains Vim plugin. Default: empty |
+| `'pullmethod'` | Specify how to update the plugin.<br/>Empty: Update with `--ff-only` option.<br/>`'autostash'`: Update with `--rebase --autostash` options.<br/>Default: empty |
 
 The `'branch'` and `'rev'` options are slightly different.  
 The `'branch'` option is used only when the plugin is newly installed. It clones the plugin by `git clone <URL> --depth=<DEPTH> -b <BRANCH>`. This is faster at the installation, but it can be slow if you want to change the branch (by the `'rev'` option) later. This cannot specify a commit ID.

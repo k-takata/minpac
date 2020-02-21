@@ -62,9 +62,10 @@ func Test_minpac_add()
   call assert_equal('', p.do)
   call assert_equal('', p.rev)
   call assert_equal('', p.subdir)
+  call assert_equal('', p.pullmethod)
 
   " With configuration
-  call minpac#add('k-takata/minpac', {'type': 'opt', 'frozen': v:true, 'branch': 'master', 'depth': 10, 'rev': 'abcdef', 'subdir': 'dir'})
+  call minpac#add('k-takata/minpac', {'type': 'opt', 'frozen': v:true, 'branch': 'master', 'depth': 10, 'rev': 'abcdef', 'subdir': 'dir', 'pullmethod': 'autostash'})
   let p = minpac#getpluginfo('minpac')
   call assert_equal('https://github.com/k-takata/minpac.git', p.url)
   call assert_match('/pack/minpac/opt/minpac$', p.dir)
@@ -75,6 +76,7 @@ func Test_minpac_add()
   call assert_equal('', p.do)
   call assert_equal('abcdef', p.rev)
   call assert_equal('dir', p.subdir)
+  call assert_equal('autostash', p.pullmethod)
 
   " SSH URL
   call minpac#add('git@github.com:k-takata/minpac.git', {'name': 'm'})
