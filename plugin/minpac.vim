@@ -71,8 +71,9 @@ function! minpac#add(plugname, ...) abort
   call s:ensure_initialization()
   let l:opt = extend(copy(get(a:000, 0, {})),
         \ {'name': '', 'type': 'start', 'depth': g:minpac#opt.depth,
-        \  'frozen': v:false, 'branch': '', 'rev': '', 'do': '', 'subdir': ''},
-        \ 'keep')
+        \  'frozen': v:false, 'branch': '', 'rev': '', 'do': '', 'subdir': '',
+        \  'pullmethod': ''
+        \ }, 'keep')
 
   " URL
   if a:plugname =~? '^[-._0-9a-z]\+\/[-._0-9a-z]\+$'
@@ -97,7 +98,13 @@ function! minpac#add(plugname, ...) abort
   elseif l:opt.type ==# 'opt'
     let l:opt.dir = g:minpac#opt.minpac_opt_dir . '/' . l:opt.name
   else
-    echoerr "Wrong type (must be 'start' or 'opt'): " . l:opt.type
+    echoerr a:plugname . ": Wrong type (must be 'start' or 'opt'): " . l:opt.type
+    return
+  endif
+
+  " Check pullmethod
+  if l:opt.pullmethod !=# '' && l:opt.pullmethod !=# 'autostash'
+    echoerr a:plugname . ": Wrong pullmethod (must be empty or 'autostash'): " . l:opt.pullmethod
     return
   endif
 

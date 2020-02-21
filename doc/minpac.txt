@@ -340,6 +340,11 @@ minpac#add({url}[, {config}])			*minpac#add()*
 				Default: empty
 		subdir		Subdirectory that contains Vim plugin.
 				Default: empty
+		pullmethod	Specify how to update the plugin.
+				Empty: Update with `--ff-only` option.
+				"autostash": Update with `--rebase --autostash`
+				options.
+				Default: empty
 
 	The "branch" and "rev" options are slightly different.
 	The "branch" option is used only when the plugin is newly installed.

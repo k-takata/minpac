@@ -538,7 +538,12 @@ function! s:update_single_plugin(name, force) abort
     elseif l:ret == 1
       " Same branch. Update by pull.
       call s:echo_verbose(3, '', 'Updating (pull): ' . a:name)
-      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet', '--ff-only', '--rebase=false']
+      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet']
+      if l:pluginfo.pullmethod ==# 'autostash'
+        let l:cmd += ['--rebase', '--autostash']
+      else
+        let l:cmd += ['--ff-only', '--rebase=false']
+      endif
     elseif l:ret == 2
       " Different branch. Update by fetch & checkout.
       call s:echo_verbose(3, '', 'Updating (fetch): ' . a:name)
