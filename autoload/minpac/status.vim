@@ -10,6 +10,7 @@
 
 let s:results = []
 let s:bufnr = 0
+let s:git_sign = -1   " Support --no-show-signature option.
 
 function! minpac#status#get(opt) abort
   let l:bufname = '[minpac status]'
@@ -29,9 +30,18 @@ function! minpac#status#get(opt) abort
     if !isdirectory(l:dir)
       let l:plugin.status = 'Not installed'
     else
-      let l:commits = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'log',
-            \ '--color=never', '--pretty=format:%h <<<<%D>>>> %s (%cr)', '--no-show-signature', 'HEAD...HEAD@{1}'
-            \ ])
+      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'log',
+            \ '--color=never', '--pretty=format:%h <<<<%D>>>> %s (%cr)', 'HEAD...HEAD@{1}'
+            \ ]
+      let l:commits = minpac#impl#system(l:cmd + (s:git_sign ? ['--no-show-signature'] : []))
+      if s:git_sign == -1
+        if l:commits[0] == 128
+          let s:git_sign = v:false
+          let l:commits = minpac#impl#system(l:cmd)
+        else
+          let s:git_sign = v:true
+        endif
+      endif
 
       let l:plugin.lines = filter(l:commits[1], {-> v:val !=# ''})
       call map(l:plugin.lines,
