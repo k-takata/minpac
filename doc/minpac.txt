@@ -270,6 +270,9 @@ minpac#init([{config}])				*minpac#init()*
 				3: Show start/end messages for each plugin.
 				4: Show debug messages.
 				Default: 2
+		confirm		Show interactive confirmation prompts, such as
+				in |minpac#clean()|.
+				Default: |TRUE|
 		progress_open	Specify how to show the progress of
 				|minpac#update()|.
 				"none": Do not open the progress window.
@@ -407,15 +410,16 @@ minpac#clean([{name}])				*minpac#clean()*
 
 	{name} is a name of a plugin.  It can be a unique plugin name
 	(|minpac-plugin_name|) or a plugin name with wildcards ("*" and "?"
-	are supported).
+	are supported). It can also be a list of plugin names.
 
 	If {name} is omitted, all plugins under the minpac directory will be
 	checked.  If unregistered plugins are found, they are listed and a
 	prompt is shown.  If you type "y", they will be removed.
 
-	If {name} is specified, matched plugins are listed (even they are
-	registered with |minpac#add()|) and a prompt is shown.  If you type
-	"y", they will be removed.  {name} can also be a list of plugin names.
+	When called, matched plugins are listed (even they are registered with
+	|minpac#add()|) and a prompt is shown.  If you type "y", they will be
+	removed.  If the 'confirm' option is not |TRUE|, the prompt will not
+	be shown.
 
 
 minpac#getpluginfo({name})			*minpac#getpluginfo()*

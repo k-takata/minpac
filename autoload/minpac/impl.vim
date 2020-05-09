@@ -673,7 +673,8 @@ function! minpac#impl#clean(...) abort
   endfor
 
   let l:dir = (len(l:to_remove) > 1) ? 'directories' : 'directory'
-  if input('Removing the above ' . l:dir . '. [y/N]? ') =~? '^y'
+
+  if !g:minpac#opt.confirm || input('Removing the above ' . l:dir . '. [y/N]? ') =~? '^y'
     echo "\n"
     let err = 0
     for l:item in l:to_remove
