@@ -2,7 +2,7 @@
 " minpac: A minimal package manager for Vim 8 (and Neovim)
 "
 " Maintainer:   Ken Takata
-" Last Change:  2018-09-01
+" Last Change:  2020-08-22
 " License:      VIM License
 " URL:          https://github.com/k-takata/minpac
 " ---------------------------------------------------------------------
@@ -31,7 +31,10 @@ endfunction
 " Initialize minpac.
 function! minpac#init(...) abort
   let l:opt = extend(copy(get(a:000, 0, {})),
-        \ {'dir': '', 'package_name': 'minpac', 'git': 'git', 'depth': 1, 'jobs': 8, 'verbose': 2, 'status_open': 'vertical'}, 'keep')
+        \ {'dir': '', 'package_name': 'minpac', 'git': 'git', 'depth': 1,
+        \  'jobs': 8, 'verbose': 2, 'confirm': v:true,
+        \  'progress_open': 'horizontal', 'status_open': 'horizontal',
+        \  'status_auto': v:false}, 'keep')
 
   let g:minpac#opt = l:opt
   let g:minpac#pluglist = {}
@@ -41,9 +44,16 @@ function! minpac#init(...) abort
     " If 'dir' is not specified, the first directory of 'packpath' is used.
     let l:packdir = split(&packpath, ',')[0]
   endif
+
   let l:opt.minpac_dir = l:packdir . '/pack/' . l:opt.package_name
   let l:opt.minpac_start_dir = l:opt.minpac_dir . '/start'
   let l:opt.minpac_opt_dir = l:opt.minpac_dir . '/opt'
+
+  " directories for 'subdir'
+  let l:opt.minpac_dir_sub = l:packdir . '/pack/' . l:opt.package_name . '-sub'
+  let l:opt.minpac_start_dir_sub = l:opt.minpac_dir_sub . '/start'
+  let l:opt.minpac_opt_dir_sub = l:opt.minpac_dir_sub . '/opt'
+
   if !isdirectory(l:packdir)
     echoerr 'Pack directory not available: ' . l:packdir
     return
@@ -62,7 +72,9 @@ function! minpac#add(plugname, ...) abort
   call s:ensure_initialization()
   let l:opt = extend(copy(get(a:000, 0, {})),
         \ {'name': '', 'type': 'start', 'depth': g:minpac#opt.depth,
-        \  'frozen': 0, 'branch': '', 'rev': '', 'do': ''}, 'keep')
+        \  'frozen': v:false, 'branch': '', 'rev': '', 'do': '', 'subdir': '',
+        \  'pullmethod': ''
+        \ }, 'keep')
 
   " URL
   if a:plugname =~? '^[-._0-9a-z]\+\/[-._0-9a-z]\+$'
@@ -87,7 +99,13 @@ function! minpac#add(plugname, ...) abort
   elseif l:opt.type ==# 'opt'
     let l:opt.dir = g:minpac#opt.minpac_opt_dir . '/' . l:opt.name
   else
-    echoerr "Wrong type (must be 'start' or 'opt'): " . l:opt.type
+    echoerr a:plugname . ": Wrong type (must be 'start' or 'opt'): " . l:opt.type
+    return
+  endif
+
+  " Check pullmethod
+  if l:opt.pullmethod !=# '' && l:opt.pullmethod !=# 'autostash'
+    echoerr a:plugname . ": Wrong pullmethod (must be empty or 'autostash'): " . l:opt.pullmethod
     return
   endif
 

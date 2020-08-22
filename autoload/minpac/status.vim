@@ -3,14 +3,20 @@
 "
 " Maintainer:   Ken Takata
 " Created By:   Kristijan Husak
-" Last Change:  2018-09-01
+" Last Change:  2020-01-28
 " License:      VIM License
 " URL:          https://github.com/k-takata/minpac
 " ---------------------------------------------------------------------
 
 let s:results = []
+let s:bufnr = 0
+let s:git_sign = -1   " Support --no-show-signature option.
 
 function! minpac#status#get(opt) abort
+  let l:bufname = '[minpac status]'
+  if s:bufnr != 0
+    exec "silent! bwipe" s:bufnr
+  endif
   let l:is_update_ran = minpac#impl#is_update_ran()
   let l:update_count = 0
   let l:install_count = 0
@@ -24,9 +30,18 @@ function! minpac#status#get(opt) abort
     if !isdirectory(l:dir)
       let l:plugin.status = 'Not installed'
     else
-      let l:commits = minpac#impl#system([g:minpac#opt.git, '-C', l:dir, 'log',
-            \ '--color=never', '--pretty=format:%h <<<<%D>>>> %s (%cr)', '--no-show-signature', 'HEAD...HEAD@{1}'
-            \ ])
+      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'log',
+            \ '--color=never', '--pretty=format:%h <<<<%D>>>> %s (%cr)', 'HEAD...HEAD@{1}'
+            \ ]
+      let l:commits = minpac#impl#system(l:cmd + (s:git_sign ? ['--no-show-signature'] : []))
+      if s:git_sign == -1
+        if l:commits[0] == 128
+          let s:git_sign = v:false
+          let l:commits = minpac#impl#system(l:cmd)
+        else
+          let s:git_sign = v:true
+        endif
+      endif
 
       let l:plugin.lines = filter(l:commits[1], {-> v:val !=# ''})
       call map(l:plugin.lines,
@@ -95,6 +110,8 @@ function! minpac#status#get(opt) abort
   call s:syntax()
   call s:mappings()
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nomodifiable nospell
+  exec "silent file" l:bufname
+  let s:bufnr = bufnr()
 endfunction
 
 
