@@ -248,6 +248,7 @@ Initialize minpac.
 | `'depth'` | Default clone depth. Default: 1 |
 | `'jobs'`  | Maximum job numbers. If <= 0, unlimited. Default: 8 |
 | `'verbose'` | Verbosity level (0 to 4).<br/>0: Show only important messages.<br/>1: Show the result of each plugin.<br/>2: Show error messages from external commands.<br/>3: Show start/end messages for each plugin.<br/>4: Show debug messages.<br/>Default: 2 |
+| `'confirm'` | Show interactive confirmation prompts, such as in `minpac#clean()`.<br/>Default: TRUE |
 | `'progress_open'` | Specify how to show the progress of `minpac#update()`.<br/>`'none'`: Do not open the progress window. (Compatible with minpac v2.0.x or earlier.)<br/>`'horizontal'`: Open the progress window by splitting horizontally.<br/>`'vertical'`: Open the progress window by splitting vertically.<br/>`'tab'`: Open the progress window in a new tab.<br/>Default: `'horizontal'` |
 | `'status_open'` | Default setting for the open option of `minpac#status()`. Default: `'horizontal'` |
 | `'status_auto'` | Specify whether the status window will open automatically after `minpac#update()` is finished.<br/>TRUE: Open the status window automatically, when one or more plugins are updated or installed.<br/>FALSE: Do not open the status window automatically.<br/>Default: FALSE |
@@ -324,12 +325,12 @@ Note: This resets the 'more' option temporarily to avoid jobs being interrupted.
 
 Remove all plugins which are not registered, or remove the specified plugin.
 
-`{name}` is a name of a plugin. It can be a unique plugin name (`plugin_name`) or a plugin name with wildcards (`*` and `?` are supported).
+`{name}` is a name of a plugin. It can be a unique plugin name (`plugin_name`) or a plugin name with wildcards (`*` and `?` are supported). It can also be a list of plugin names.
 
 If `{name}` is omitted, all plugins under the `minpac` directory will be checked. If unregistered plugins are found, they are listed and a prompt is shown. If you type `y`, they will be removed.
 
-If `{name}` is specified, matched plugins are listed (even they are registered with `minpac#add()`) and a prompt is shown. If you type `y`, they will be removed.
-`{name}` can also be a list of plugin names.
+When called, matched plugins are listed (even they are registered with `minpac#add()`) and a prompt is shown. If you type `y`, they will be removed.
+`{name}` can also be a list of plugin names. If the `'confirm'` option is not |TRUE|, the prompt will not be shown.
 
 #### minpac#getpluginfo({name})
 
