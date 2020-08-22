@@ -410,7 +410,7 @@ minpac#clean([{name}])				*minpac#clean()*
 
 	{name} is a name of a plugin.  It can be a unique plugin name
 	(|minpac-plugin_name|) or a plugin name with wildcards ("*" and "?"
-	are supported). It can also be a list of plugin names.
+	are supported).  It can also be a list of plugin names.
 
 	If {name} is omitted, all plugins under the minpac directory will be
 	checked.  If unregistered plugins are found, they are listed and a
@@ -418,7 +418,7 @@ minpac#clean([{name}])				*minpac#clean()*
 
 	When called, matched plugins are listed (even they are registered with
 	|minpac#add()|) and a prompt is shown.  If you type "y", they will be
-	removed.  If the 'confirm' option is not |TRUE|, the prompt will not
+	removed.  If the "confirm" option is not |TRUE|, the prompt will not
 	be shown.
 
 
