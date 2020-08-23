@@ -111,7 +111,7 @@ function! minpac#status#get(opt) abort
   call s:mappings()
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nomodifiable nospell
   exec "silent file" l:bufname
-  let s:bufnr = bufnr()
+  let s:bufnr = bufnr('')
 endfunction
 
 
