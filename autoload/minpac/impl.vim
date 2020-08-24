@@ -610,7 +610,9 @@ function! minpac#impl#update(...) abort
   endif
 
   for l:name in l:names
-    let ret = s:update_single_plugin(l:name, l:force)
+    call timer_start(1, function(
+          \ {name, force, id -> s:update_single_plugin(name, force)},
+          \   [l:name, l:force]))
   endfor
 endfunction
 
