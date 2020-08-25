@@ -197,7 +197,7 @@ func Test_minpac_update()
   let g:finish_update = 0
   call minpac#update('', {'do': 'let g:finish_update = 1'})
   while g:finish_update == 0
-    sleep 1
+    sleep 100m
   endwhile
   call assert_equal(1, g:post_update)
   call assert_true(isdirectory('pack/minpac/opt/minpac'))
@@ -219,7 +219,7 @@ func Test_minpac_update()
 	\ l:finish_update
 	\ ]}})
   while l:finish_update == 0
-    sleep 1
+    sleep 100m
   endwhile
   call assert_equal(1, l:post_update)
   call assert_true(isdirectory('pack/minpac/start/hg-vim'))
