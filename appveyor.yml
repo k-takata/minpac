@@ -3,7 +3,7 @@ version: '1.0.{build}'
 shallow_clone: true
 
 environment:
-  VIMPROG: '%APPVEYOR_BUILD_FOLDER%\vim-kaoriya-win64\gvim.exe'
+  VIMPROG: '%APPVEYOR_BUILD_FOLDER%\vim-kt-win64\gvim.exe'
   AUTH_TOKEN: # for GitHub
     secure: wdTzzL05DoG4BZIgqlc3y/Ff50ZOTjfaqMazhdMLcXmxYYbmeCsI9PN01TJCQMaw
   API_TOKEN:  # for AppVeyor
