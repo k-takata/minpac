@@ -49,7 +49,7 @@ nolog:
 RUN_VIMTEST = $(VIMPROG) -u NONE
 
 newtests: newtestssilent
-	@/bin/sh -c "if test -f messages && grep -q 'SKIPPED\|FAILED' messages; then cat messages; fi"
+	@if test -f messages; then cat messages; fi
 
 newtestssilent: $(NEW_TESTS_RES)
 
