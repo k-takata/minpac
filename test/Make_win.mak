@@ -44,7 +44,7 @@ nolog:
 # Limitation: Only works with the +eval feature.
 
 newtests: newtestssilent
-	@if exist messages (findstr "SKIPPED FAILED" messages > nul) && type messages
+	@if exist messages (findstr "SKIPPED FAILED" messages > nul) && type messages || exit 0
 
 newtestssilent: $(NEW_TESTS_RES)
 
