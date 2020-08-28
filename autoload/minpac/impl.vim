@@ -569,6 +569,12 @@ function! s:update_single_plugin(name, force) abort
   return s:start_job(l:cmd, a:name, 0)
 endfunction
 
+function! s:start_update(names, force, id) abort
+  for l:name in a:names
+    call s:update_single_plugin(l:name, a:force)
+  endfor
+endfunction
+
 " Update all or specified plugin(s).
 function! minpac#impl#update(...) abort
   if g:minpac#opt.progress_open !=# 'none'
@@ -609,9 +615,7 @@ function! minpac#impl#update(...) abort
     set nomore
   endif
 
-  for l:name in l:names
-    let ret = s:update_single_plugin(l:name, l:force)
-  endfor
+  call timer_start(1, function('s:start_update', [l:names, l:force]))
 endfunction
 
 
