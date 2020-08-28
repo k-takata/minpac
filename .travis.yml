@@ -1,4 +1,3 @@
-dist: trusty
 language: generic
 sudo: false
 
@@ -15,12 +14,16 @@ env:
 matrix:
   include:
     - os: linux
+      dist: focal
       env: VIM=vim VIMPROG=$OPT/bin/$VIM
     - os: linux
+      dist: focal
       env: VIM=nvim VIMPROG=$VIM
     - os: osx
+      osx_image: xcode12
       env: VIM=vim PACKAGE=vim VIMPROG=$VIM
     - os: osx
+      osx_image: xcode12
       env: VIM=nvim PACKAGE=neovim VIMPROG=$VIM
 
 

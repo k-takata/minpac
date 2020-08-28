@@ -7,8 +7,12 @@
 NO_PLUGINS = --noplugin # --not-a-term
 NO_INITS = -U NONE $(NO_PLUGINS)
 
-# Tests using runtest.vim.
+# Individual tests.
 NEW_TESTS = \
+	    test_minpac
+
+# Test targets that use runtest.vim.
+NEW_TESTS_RES = \
 	    test_minpac.res
 
 # vim: ts=8 sw=8 sts=8

@@ -4,14 +4,18 @@
 
 VIMPROG = vim
 
+# Comment out this line to see the verbose output of tests.
+#
+# Catches SwapExists to avoid hanging at the ATTENTION prompt.
+REDIR_TEST_TO_NULL = --cmd 'au SwapExists * let v:swapchoice = "e"' > /dev/null
+
 # The list of tests is common to all systems.
 # This defines NEW_TESTS.
 include Make_all.mak
 
 .SUFFIXES: .res .vim
 
-#all:	newtests report
-all:	newtestssilent report
+all:	nolog newtests report
 
 report:
 	@echo
@@ -21,9 +25,20 @@ report:
 		else echo ALL DONE; \
 		fi"
 
+# Execute an individual new style test, e.g.:
+# 	make test_largefile
+$(NEW_TESTS):
+	rm -f $@.res test.log messages
+	@MAKEFLAGS=--no-print-directory $(MAKE) -f Makefile $@.res VIMPROG=$(VIMPROG) XXDPROG=$(XXDPROG) SCRIPTSOURCE=$(SCRIPTSOURCE)
+	@cat messages
+	@if test -f test.log; then \
+		exit 1; \
+	fi
+
 clean:
 	-rm -rf *.res test.log messages
 	-rm -rf pack
+
 nolog:
 	-rm -f test.log messages
 
@@ -34,14 +49,15 @@ nolog:
 RUN_VIMTEST = $(VIMPROG) -u NONE
 
 newtests: newtestssilent
-	@/bin/sh -c "if test -f messages && grep -q 'SKIPPED\|FAILED' messages; then cat messages && if test -f test.log; then cat test.log; fi ; fi"
+	@if test -f messages; then cat messages; fi
 
-newtestssilent: $(NEW_TESTS)
+newtestssilent: $(NEW_TESTS_RES)
 
 
 .vim.res:
-	@echo "$(RUN_VIMTEST)" > vimcmd
-	$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim
+	@echo "$(VIMPROG)" > vimcmd
+	@echo "$(RUN_VIMTEST)" >> vimcmd
+	$(RUN_VIMTEST) $(NO_INITS) -S runtest.vim $*.vim $(REDIR_TEST_TO_NULL)
 	@rm vimcmd
 
 # vim: ts=8 sw=8 sts=8
