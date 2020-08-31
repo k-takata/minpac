@@ -50,6 +50,7 @@ function! minpac#git#get_revision(dir) abort
         endif
       endfor
     endif
+    return l:line
   catch
   endtry
   return v:null
