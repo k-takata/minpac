@@ -116,7 +116,7 @@ You can write a .vimrc which can be also used even if minpac is not installed.
 " Try to load minpac.
 packadd minpac
 
-if !exists('*minpac#init')
+if !exists('g:loaded_minpac')
   " minpac is not available.
 
   " Settings for plugin-less environment.
