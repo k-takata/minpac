@@ -7,12 +7,6 @@
 " URL:          https://github.com/k-takata/minpac
 " ---------------------------------------------------------------------
 
-if exists('g:loaded_minpac')
-  finish
-endif
-let g:loaded_minpac = 1
-
-
 " Get a list of package/plugin directories.
 function! minpac#getpackages(...)
   return call("minpac#impl#getpackages", a:000)
