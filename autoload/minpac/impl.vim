@@ -265,11 +265,8 @@ else
 endif
 
 function! s:handle_subdir(pluginfo) abort
-  if a:pluginfo.type ==# 'start'
-    let l:workdir = g:minpac#opt.minpac_start_dir_sub
-  else
-    let l:workdir = g:minpac#opt.minpac_opt_dir_sub
-  endif
+  let l:workdir = g:minpac#opt.minpac_opt_dir_sub
+
   if !isdirectory(l:workdir)
     call mkdir(l:workdir, 'p')
   endif
@@ -353,11 +350,6 @@ function! s:job_exit_cb(id, errcode, event) dict abort
 
         if l:pluginfo.subdir !=# ''
           call s:handle_subdir(l:pluginfo)
-        endif
-
-        if has('nvim') && isdirectory(l:dir . '/rplugin')
-          " Required for :UpdateRemotePlugins.
-          call s:add_rtp(l:dir)
         endif
 
         call s:invoke_hook('post-update', [self.name], l:pluginfo.do)
@@ -474,7 +466,7 @@ endfunction
 function! s:prepare_plugin_dir(pluginfo) abort
   let l:dir = a:pluginfo.dir
   if !isdirectory(l:dir)
-    if a:pluginfo.type ==# 'start'
+    if l:dir =~# '/start/'
       let l:dirtmp = substitute(l:dir, '/start/\ze[^/]\+$', '/opt/', '')
     else
       let l:dirtmp = substitute(l:dir, '/opt/\ze[^/]\+$', '/start/', '')
@@ -488,7 +480,7 @@ function! s:prepare_plugin_dir(pluginfo) abort
   " Check subdir.
   if a:pluginfo.subdir !=# ''
     let l:name = a:pluginfo.name
-    if a:pluginfo.type ==# 'start'
+    if a:pluginfo.subdir =~# g:minpac#opt.minpac_start_dir_sub
       let l:subdir = g:minpac#opt.minpac_start_dir_sub . '/' . l:name
       let l:otherdir = g:minpac#opt.minpac_opt_dir_sub . '/' . l:name
     else

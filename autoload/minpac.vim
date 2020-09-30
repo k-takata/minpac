@@ -22,6 +22,8 @@ function! s:ensure_initialization() abort
   endif
 endfunction
 
+let s:initial_rtp_len = len(&rtp)
+
 " Initialize minpac.
 function! minpac#init(...) abort
   let l:opt = extend(copy(get(a:000, 0, {})),
@@ -87,12 +89,10 @@ function! minpac#add(plugname, ...) abort
     return
   endif
 
-  " Loading type / Local directory
-  if l:opt.type ==# 'start'
-    let l:opt.dir = g:minpac#opt.minpac_start_dir . '/' . l:opt.name
-  elseif l:opt.type ==# 'opt'
-    let l:opt.dir = g:minpac#opt.minpac_opt_dir . '/' . l:opt.name
-  else
+  " We put all plugins in opt dir and then source them as necessary
+  let l:opt.dir = g:minpac#opt.minpac_opt_dir . '/' . l:opt.name
+
+  if l:opt.type !=# 'start' && l:opt.type !=# 'opt'
     echoerr a:plugname . ": Wrong type (must be 'start' or 'opt'): " . l:opt.type
     return
   endif
@@ -108,8 +108,12 @@ function! minpac#add(plugname, ...) abort
 
   " Add to pluglist
   let g:minpac#pluglist[l:opt.name] = l:opt
-endfunction
 
+  " Mark start plugins to be loaded after vimrc is read
+  if l:opt.type ==# 'start'
+    let &rtp = &rtp[0:-s:initial_rtp_len-1] . l:opt.dir . "," . &rtp[-s:initial_rtp_len:-1]
+  endif
+endfunction
 
 " Update all or specified plugin(s).
 function! minpac#update(...)
