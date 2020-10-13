@@ -12,13 +12,11 @@ let s:bufnr = 0
 
 " Add a message to the minpac progress window
 function! minpac#progress#add_msg(type, msg) abort
-  let l:wininfo = getwininfo(s:winid)
-  if l:wininfo == []
+  " Goes to the minpac progress window.
+  if !win_gotoid(s:winid)
     echom 'warning: minpac progress window not found.'
     return
   endif
-  " Goes to the minpac progress window.
-  exec l:wininfo[0].winnr . "wincmd w"
   setlocal modifiable
   let l:markers = {'': '  ', 'warning': 'W:', 'error': 'E:'}
   call append(line('$') - 1, l:markers[a:type] . ' ' . a:msg)
