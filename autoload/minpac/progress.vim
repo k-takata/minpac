@@ -49,11 +49,21 @@ endfunction
 
 function! s:syntax() abort
   syntax clear
-  syn match minpacPrgsError /^E: .*/
-  syn match minpacPrgsWarning /^W: .*/
+  syn match minpacPrgsTitle     /^## .* ##/
+  syn match minpacPrgsError     /^E: .*/
+  syn match minpacPrgsWarning   /^W: .*/
+  syn match minpacPrgsInstalled /^   Installed:/
+  syn match minpacPrgsUpdated   /^   Updated:/
+  syn match minpacPrgsUptodate  /^   Already up-to-date:/
+  syn region minpacPrgsString start='"' end='"'
 
-  hi def link minpacPrgsError   ErrorMsg
-  hi def link minpacPrgsWarning WarningMsg
+  hi def link minpacPrgsTitle     Title
+  hi def link minpacPrgsError     ErrorMsg
+  hi def link minpacPrgsWarning   WarningMsg
+  hi def link minpacPrgsInstalled Constant
+  hi def link minpacPrgsUpdated   Special
+  hi def link minpacPrgsUptodate  Comment
+  hi def link minpacPrgsString    String
 endfunction
 
 function! s:mappings() abort
