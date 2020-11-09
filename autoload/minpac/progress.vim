@@ -43,7 +43,7 @@ function! minpac#progress#open(msg) abort
   call s:syntax()
   call s:mappings()
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nomodifiable nospell
-  exec "silent file" l:bufname
+  silent file `=l:bufname`
   let s:bufnr = bufnr('')
 endfunction
 
