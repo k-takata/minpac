@@ -43,7 +43,7 @@ function! s:echox_verbose(level, echocmd, type, msg) abort
       elseif a:type ==# 'error'
         echohl ErrorMsg
       endif
-      exec a:echocmd . " '" . a:msg . "'"
+      exec a:echocmd . " '" . substitute(a:msg, "'", "''", "g") . "'"
       echohl None
     else
       call minpac#progress#add_msg(a:type, a:msg)
