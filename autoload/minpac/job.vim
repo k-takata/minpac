@@ -263,3 +263,6 @@ function! minpac#job#wait(jobids, ...) abort
     return s:job_wait(a:jobids, l:timeout)
 endfunction
 " }}}
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
