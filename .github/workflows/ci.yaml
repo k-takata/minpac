@@ -44,6 +44,10 @@ jobs:
             os: 'windows-latest'
             download: 'never'
 
+          # FIXME: Neovim doesn't work on Ubuntu. Disable it for now.
+          - vim_type: 'Neovim'
+            os: 'ubuntu-latest'
+
     runs-on: '${{ matrix.os }}'
 
     steps:
