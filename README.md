@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/k-takata/minpac.svg?branch=master)](https://travis-ci.org/k-takata/minpac)
+[![Build status](https://github.com/k-takata/minpac/workflows/CI/badge.svg)](https://github.com/k-takata/minpac/actions)
 [![Build status](https://ci.appveyor.com/api/projects/status/qakftqoyx5m47ns3/branch/master?svg=true)](https://ci.appveyor.com/project/k-takata/minpac/branch/master)
 
 minpac: A minimal package manager for Vim 8 (and Neovim)
