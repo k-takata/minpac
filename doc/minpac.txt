@@ -464,7 +464,7 @@ minpac#getpackages([{packname}[, {packtype}[, {plugname}[, {nameonly}]]]])
 	or an empty string is specified, "*" is used.
 
 	If {nameonly} is |TRUE|, plugin (or package) names are listed instead
-	of the direcotries. Default is |FALSE|.
+	of the directories. Default is |FALSE|.
 
 	E.g.: >
 
