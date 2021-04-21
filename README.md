@@ -370,7 +370,7 @@ If `"NONE"` is specified, package directories are listed instead of plugin direc
 
 `{plugname}` specifies a plugin name. Wildcards can be used. If omitted or an empty string is specified, `"*"` is used.
 
-If `{nameonly}` is TRUE, plugin (or package) names are listed instead of the direcotries. Default is FALSE.
+If `{nameonly}` is TRUE, plugin (or package) names are listed instead of the directories. Default is FALSE.
 
 E.g.:
 
