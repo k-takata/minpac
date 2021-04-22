@@ -136,6 +136,13 @@ else
   let s:t_normal = &t_me
 endif
 
+if has('mac')
+  " In MacOS, when starting a shell in a terminal, a bash deprecation warning
+  " message is displayed. This breaks the terminal test. Disable the warning
+  " message.
+  let $BASH_SILENCE_DEPRECATION_WARNING = 1
+endif
+
 " Prepare for calling test_garbagecollect_now().
 let v:testing = 1
 
@@ -155,7 +162,7 @@ function GetAllocId(name)
 endfunc
 
 func RunTheTest(test)
-  echo 'Executing ' . a:test
+  echoconsole 'Executing ' . a:test
   if has('reltime')
     let func_start = reltime()
   endif
@@ -189,7 +196,12 @@ func RunTheTest(test)
   if a:test =~ 'Test_nocatch_'
     " Function handles errors itself.  This avoids skipping commands after the
     " error.
+    let g:skipped_reason = ''
     exe 'call ' . a:test
+    if g:skipped_reason != ''
+      call add(s:messages, '    Skipped')
+      call add(s:skipped, 'SKIPPED ' . a:test . ': ' . g:skipped_reason)
+    endif
   else
     try
       au VimLeavePre * call EarlyExit(g:testfunc)
@@ -227,7 +239,12 @@ func RunTheTest(test)
 
   " Close any extra tab pages and windows and make the current one not modified.
   while tabpagenr('$') > 1
+    let winid = win_getid()
     quit!
+    if winid == win_getid()
+      echoerr 'Could not quit window'
+      break
+    endif
   endwhile
 
   while 1
@@ -382,7 +399,9 @@ endif
 
 " Names of flaky tests.
 let s:flaky_tests = [
+      \ 'Test_BufWrite_lockmarks()',
       \ 'Test_autocmd_SafeState()',
+      \ 'Test_bufunload_all()',
       \ 'Test_client_server()',
       \ 'Test_close_and_exit_cb()',
       \ 'Test_close_output_buffer()',
