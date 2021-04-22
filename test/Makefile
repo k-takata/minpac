@@ -19,7 +19,7 @@ include Make_all.mak
 all:	nolog newtests report
 
 report:
-	# without the +eval feature test_result.log is a copy of test.log
+	@# without the +eval feature test_result.log is a copy of test.log
 	@/bin/sh -c "if test -f test.log; \
 		then cp test.log test_result.log; \
 		else echo No failures reported > test_result.log; \
