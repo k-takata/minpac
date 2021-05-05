@@ -27,11 +27,14 @@ else
     echom 'job failed to start'
 endif
 
+" If you want to get the process id of the job
+let pid = async#job#pid(jobid)
+
 " If you want to wait the job:
-call async#job#wait([job], 5000)  " timeout: 5 sec
+call async#job#wait([jobid], 5000)  " timeout: 5 sec
 
 " If you want to stop the job:
-call async#job#stop(job)
+call async#job#stop(jobid)
 ```
 
 ## APIs
@@ -43,31 +46,15 @@ APIs are based on neovim's job control APIs.
 * [jobstart()](https://neovim.io/doc/user/eval.html#jobstart%28%29)
 * [jobstop()](https://neovim.io/doc/user/eval.html#jobstop%28%29)
 * [jobwait()](https://neovim.io/doc/user/eval.html#jobwait%28%29)
+* [jobpid()](https://neovim.io/doc/user/eval.html#jobpid%28%29)
 
 ## Embedding
 
 Async.vim can be either embedded with other plugins or be used as an external plugin.
-If you want to embed all you need is to change these 4 function names async#job# to what ever you want. E.g.:
+If you want to embed run the following vim command.
 
 ```vim
-" public apis {{{
-function! yourplugin#job#start(cmd, opts) abort
-    return s:job_start(a:cmd, a:opts)
-endfunction
-
-function! yourplugin#job#stop(jobid) abort
-    call s:job_stop(a:jobid)
-endfunction
-
-function! yourplugin#job#send(jobid, data) abort
-    call s:job_send(a:jobid, a:data)
-endfunction
-
-function! yourplugin#job#wait(jobids, ...) abort
-    let l:timeout = get(a:000, 0, -1)
-    return s:job_wait(a:jobids, l:timeout)
-endfunction
-" }}}
+:AsyncEmbed path=./autoload/myplugin/job.vim namespace=myplugin#job
 ```
 
 ## Todos
@@ -75,4 +62,3 @@ endfunction
 * `job_stop` and `job_send` is treated as noop when using `system()`
 * `on_stderr` doesn't work when using `system()`
 * Fallback to python/ruby threads and vimproc instead of using `system()` for better compatibility (PRs welcome!!!)
-

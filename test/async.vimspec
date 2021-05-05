@@ -1,0 +1,93 @@
+function! s:on_stdout(ctx, id, data, event) abort
+  call add(a:ctx.output, join(a:data, ''))
+  call async#job#stop(a:id)
+endfunction
+
+Describe async
+  Before
+    let scope = themis#helper('scope')
+    let vars = scope.vars('autoload/async/job.vim')
+  End
+
+  Describe async#job#start
+    It can start cmmand and return numbered job-id
+      let job = async#job#start('vim --version', {})
+      Assert Equals(type(job), v:t_number)
+    End
+  End
+
+  Describe async#job#stop
+    It can stop the job specified
+      let job = async#job#start('bash -c "sleep 2 && touch i-love-vim"', {})
+      sleep 3
+      call async#job#stop(job)
+      Assert filereadable('i-love-vim')
+      call delete('i-love-vim')
+
+      let job = async#job#start('bash -c "sleep 2 && touch i-love-vim"', {})
+      sleep 1
+      call async#job#stop(job)
+      Assert !filereadable('i-love-vim')
+    End
+
+    It invokes 'on_exit' callback
+      let ns = { 'called': 0 }
+      let job = async#job#start('bash -c "sleep 2 && touch i-love-vim"', {
+            \ 'on_exit': { -> extend(ns, { 'called': 1 }) },
+            \})
+      call async#job#stop(job)
+      sleep 1m
+      Assert Equals(ns, {'called': 1})
+    End
+
+    It removes a corresponding job from an internal variable
+      let job1 = async#job#start('bash -c "sleep 2 && touch i-love-vim"', {})
+      let job2 = async#job#start('bash -c "sleep 2 && touch i-love-vim"', {})
+      Assert Equals(sort(keys(vars.jobs)), sort([string(job1), string(job2)]))
+      call async#job#stop(job1)
+      sleep 1m
+      Assert Equals(sort(keys(vars.jobs)), sort([string(job2)]))
+      sleep 3
+      Assert Equals(sort(keys(vars.jobs)), [])
+    End
+  End
+
+  Describe async#job#wait
+    It can wait the job specified
+      let job = async#job#start('bash -c "sleep 2"', {})
+      let start = reltime()
+      call async#job#wait([job])
+      let seconds = reltimefloat(reltime(start))
+      call async#job#stop(job)
+      Assert seconds > 2
+    End
+  End
+
+  Describe async#job#send
+    It can send input text to the job
+      let ctx = { 'output': [] }
+      let job = async#job#start('cat', {'on_stdout': function('s:on_stdout', [ctx])})
+      call async#job#send(job, "i-love-vim\n")
+      call async#job#wait([job])
+      let out = join(ctx.output, '')
+      Assert Equals(out, 'i-love-vim')
+    End
+  End
+
+  Describe async#job#connect
+    It can connect tcp-server and return numbered job-id
+      if has('nvim')
+        Skip nvim is not supported
+      endif
+      let ctx = { 'output': [] }
+      let job = async#job#connect('google.com:80', {'on_stdout': function('s:on_stdout', [ctx])})
+      Assert Equals(type(job), v:t_number)
+      call async#job#send(job, "GET / HTTP/1.0\r\n\r\n")
+      sleep 4
+      let out = join(ctx.output, '')
+      let firstline = trim(split(out, '[\r\n]')[0])
+      Assert Equals(firstline, 'HTTP/1.0 200 OK')
+    End
+  End
+
+End
