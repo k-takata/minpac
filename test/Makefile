@@ -7,21 +7,29 @@ VIMPROG = vim
 # Comment out this line to see the verbose output of tests.
 #
 # Catches SwapExists to avoid hanging at the ATTENTION prompt.
-REDIR_TEST_TO_NULL = --cmd 'au SwapExists * let v:swapchoice = "e"' > /dev/null
+REDIR_TEST_TO_NULL = --cmd 'au SwapExists * let v:swapchoice = "e"' | LC_ALL=C LANG=C LANGUAGE=C awk '/Executing Test_/{match($$0, "Executing Test_[^\\)]*\\)"); print substr($$0, RSTART, RLENGTH) "\r"; fflush()}'
 
 # The list of tests is common to all systems.
-# This defines NEW_TESTS.
+# This defines NEW_TESTS and NEW_TESTS_RES.
 include Make_all.mak
+
 
 .SUFFIXES: .res .vim
 
 all:	nolog newtests report
 
 report:
+	@# without the +eval feature test_result.log is a copy of test.log
+	@/bin/sh -c "if test -f test.log; \
+		then cp test.log test_result.log; \
+		else echo No failures reported > test_result.log; \
+		fi"
+	$(VIMPROG) -u NONE $(NO_INITS) -S summarize.vim messages $(REDIR_TEST_TO_NULL)
 	@echo
 	@echo 'Test results:'
+	@cat test_result.log
 	@/bin/sh -c "if test -f test.log; \
-		then cat test.log; echo TEST FAILURE; exit 1; \
+		then echo TEST FAILURE; exit 1; \
 		else echo ALL DONE; \
 		fi"
 
@@ -35,12 +43,17 @@ $(NEW_TESTS):
 		exit 1; \
 	fi
 
+# Delete files that may interfere with running tests.  This includes some files
+# that may result from working on the tests, not only from running them.
 clean:
-	-rm -rf *.res test.log messages
-	-rm -rf pack
+	-rm -rf *.out *.failed *.res *.rej *.orig XfakeHOME Xdir1 Xfind
+	-rm -f opt_test.vim test.log test_result.log messages
+	-rm -f $(RM_ON_RUN) $(RM_ON_START)
+	-rm -f valgrind.*
+	-rm -f asan.*
 
 nolog:
-	-rm -f test.log messages
+	-rm -f test.log test_result.log messages
 
 
 # New style of tests uses Vim script with assert calls.  These are easier
