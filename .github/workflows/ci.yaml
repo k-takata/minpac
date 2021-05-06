@@ -64,6 +64,7 @@ jobs:
 
       - name: 'Run test (Windows)'
         if: ${{ startsWith(matrix.os, 'windows') }}
+        timeout-minutes: 5
         shell: cmd
         run: |
           rem # Show Vim version
@@ -87,6 +88,7 @@ jobs:
 
       - name: 'Run test (Unix)'
         if: ${{ !startsWith(matrix.os, 'windows') }}
+        timeout-minutes: 5
         run: |
           # Show Vim version
           ${{ steps.vim.outputs.executable }} --version
