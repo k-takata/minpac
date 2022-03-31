@@ -21,6 +21,7 @@ function! minpac#progress#add_msg(type, msg) abort
   let l:markers = {'': '  ', 'warning': 'W:', 'error': 'E:'}
   call append(line('$') - 1, l:markers[a:type] . ' ' . a:msg)
   setlocal nomodifiable
+  redraw
 endfunction
 
 " Open the minpac progress window

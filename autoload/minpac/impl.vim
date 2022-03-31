@@ -401,14 +401,16 @@ function! s:job_err_cb(id, message, event) dict abort
   endfor
 endfunction
 
-function! s:start_job(cmds, name, seq) abort
+function! s:start_job(cmds, name, seq, ...) abort
   if len(s:joblist) > 1
     sleep 20m
   endif
   if g:minpac#opt.jobs > 0
-    while len(s:joblist) >= g:minpac#opt.jobs
-      sleep 500m
-    endwhile
+    if len(s:joblist) >= g:minpac#opt.jobs
+      " Call myself with a 500 ms wait.
+      call timer_start(500, function('s:start_job', [a:cmds, a:name, a:seq]))
+      return 0
+    endif
   endif
 
   let l:quote_cmds = s:quote_cmds(a:cmds)
