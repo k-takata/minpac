@@ -570,7 +570,7 @@ If a Funcref is specified, it is called with three arguments; {hooktype},
 E.g.: >
 
 	" Quit Vim immediately after all updates are finished.
-	call minpac#update('', {'do': 'quit'})
+	call minpac#update('', {'do': 'qall'})
 <
 ------------------------------------------------------------------------------
 MAPPINGS					*minpac-mappings*
