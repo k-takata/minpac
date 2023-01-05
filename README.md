@@ -465,7 +465,7 @@ E.g.:
 
 ```vim
 " Quit Vim immediately after all updates are finished.
-call minpac#update('', {'do': 'quit'})
+call minpac#update('', {'do': 'qall'})
 ```
 
 ### Mappings
