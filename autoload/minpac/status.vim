@@ -138,10 +138,10 @@ function! s:syntax() abort
 endfunction
 
 function! s:mappings() abort
-  nnoremap <silent><buffer> <CR> :call <SID>openSha()<CR>
-  nnoremap <silent><buffer> q :q<CR>
-  nnoremap <silent><buffer> <C-j> :call <SID>nextPackage()<CR>
-  nnoremap <silent><buffer> <C-k> :call <SID>prevPackage()<CR>
+  nnoremap <silent><buffer><nowait> <CR> :call <SID>openSha()<CR>
+  nnoremap <silent><buffer><nowait> q :q<CR>
+  nnoremap <silent><buffer><nowait> <C-j> :call <SID>nextPackage()<CR>
+  nnoremap <silent><buffer><nowait> <C-k> :call <SID>prevPackage()<CR>
 endfunction
 
 function! s:nextPackage() abort

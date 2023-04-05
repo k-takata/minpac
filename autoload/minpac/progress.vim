@@ -68,8 +68,8 @@ function! s:syntax() abort
 endfunction
 
 function! s:mappings() abort
-  nnoremap <silent><buffer> q :q<CR>
-  nnoremap <silent><buffer> s :call minpac#status()<CR>
+  nnoremap <silent><buffer><nowait> q :q<CR>
+  nnoremap <silent><buffer><nowait> s :call minpac#status()<CR>
 endfunction
 
 " vim: set ts=8 sw=2 et:
