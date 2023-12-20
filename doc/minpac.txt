@@ -608,5 +608,8 @@ List of mappings available only in status window.
 q                       Exit the status window.
                         (Also works for commit preview window)
 
+The mappings for <C-j> and <C-k> can be disabled with: >
+	let g:no_minpac_maps = 1
+
 ==============================================================================
  vim:tw=78:ts=8:ft=help:norl:

@@ -493,6 +493,10 @@ List of mappings available only in status window.
 |`<C-k>`  | Jump to previous package in list. |
 |`q`      | Exit the status window.<br/>(Also works for commit preview window) |
 
+The mappings for `<C-j>` and `<C-k>` can be disabled with:
+```vim
+let g:no_minpac_maps = 1
+```
 
 Similar projects
 ----------------
