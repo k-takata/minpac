@@ -144,4 +144,9 @@ function! minpac#getpluglist()
   return g:minpac#pluglist
 endfunction
 
+" Abort updating the plugins.
+function! minpac#abort()
+  return minpac#impl#abort()
+endfunction
+
 " vim: set ts=8 sw=2 et:

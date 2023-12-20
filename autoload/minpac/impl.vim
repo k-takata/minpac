@@ -726,4 +726,17 @@ function! minpac#impl#is_update_ran() abort
   return exists('s:installed_plugins')
 endfunction
 
+function! minpac#impl#abort() abort
+  let s:jobqueue = []
+  for l:job in s:joblist
+    call minpac#job#stop(l:job)
+  endfor
+  let s:joblist = []
+  let s:remain_plugins = 0
+  if s:timer_id != -1
+    call timer_stop(s:timer_id)
+    let s:timer_id = -1
+  endif
+endfunction
+
 " vim: set ts=8 sw=2 et:

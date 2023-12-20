@@ -481,6 +481,7 @@ minpac#getpackages([{packname}[, {packtype}[, {plugname}[, {nameonly}]]]])
 	" List package names.
 	echo minpac#getpackages("", "NAME", "", 1)
 <
+
 minpac#status([{config}])			*minpac#status()*
 	Print status of plugins.
 	When ran after |minpac#update()|, shows only installed and updated
@@ -496,6 +497,14 @@ minpac#status([{config}])			*minpac#status()*
 				"tab": Open in a new tab.
 				Default: "horizontal" or specified value by
 				|minpac#init()|.
+
+
+minpac#abort()					*minpac#abort()*
+	Abort updating the plugins. Mainly for debugging.
+
+	If you face any errors while running |minpac#update()| and you cannot
+	run it again, you can try this.
+
 
 ------------------------------------------------------------------------------
 HOOKS						*minpac-hooks*

@@ -403,6 +403,13 @@ Otherwise, shows the status of the plugin and commits of last update (if any).
 |----------|-------------|
 | `'open'` | Specify how to open the status window.<br/>`'vertical'`: Open in vertical split.<br/>`'horizontal'`: Open in horizontal split.<br/>`'tab'`: Open in a new tab.<br/>Default: `'horizontal'` or specified value by `minpac#init()`.  |
 
+#### minpac#abort()
+
+Abort updating the plugins. Mainly for debugging.
+
+If you face any errors while running `minpac#update()` and you cannot run it again, you can try this.
+
+
 ### Hooks
 
 Currently, minpac supports two types of hook: Post-update hooks and Finish-update hooks.
