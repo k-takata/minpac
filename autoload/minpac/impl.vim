@@ -7,9 +7,9 @@
 " URL:          https://github.com/k-takata/minpac
 " ---------------------------------------------------------------------
 
-let s:joblist = []
-let s:jobqueue = []
-let s:remain_jobs = 0
+let s:joblist = []        " Jobs that are currently running.
+let s:jobqueue = []       " Jobs that are waiting to be started.
+let s:remain_plugins = 0
 let s:timer_id = -1
 
 " Get a list of package/plugin directories.
@@ -142,9 +142,9 @@ function! s:get_plugin_branch(name) abort
 endfunction
 
 
-function! s:decrement_job_count() abort
-  let s:remain_jobs -= 1
-  if s:remain_jobs == 0
+function! s:decrement_plugin_count() abort
+  let s:remain_plugins -= 1
+  if s:remain_plugins == 0
     call timer_stop(s:timer_id)
     let s:timer_id = -1
 
@@ -323,7 +323,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
               if l:rev ==# ''
                 let s:error_plugins += 1
                 call s:echom_verbose(1, 'error', 'Error while updating "' . self.name . '".  No tags found.')
-                call s:decrement_job_count()
+                call s:decrement_plugin_count()
                 return
               endif
             endif
@@ -391,7 +391,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     call s:echom_verbose(1, 'error', 'Error while updating "' . self.name . '".  Error code: ' . a:errcode)
   endif
 
-  call s:decrement_job_count()
+  call s:decrement_plugin_count()
 endfunction
 
 function! s:job_err_cb(id, message, event) dict abort
@@ -421,7 +421,7 @@ function! s:start_job_core(cmds, name, seq) abort
     return 0
   else
     call s:echom_verbose(1, 'error', 'Fail to execute: ' . a:cmds[0])
-    call s:decrement_job_count()
+    call s:decrement_plugin_count()
     return 1
   endif
 endfunction
@@ -529,7 +529,7 @@ endfunction
 function! s:update_single_plugin(name, force) abort
   if !has_key(g:minpac#pluglist, a:name)
     call s:echoerr_verbose(1, 'Plugin not registered: ' . a:name)
-    call s:decrement_job_count()
+    call s:decrement_plugin_count()
     return 1
   endif
 
@@ -546,7 +546,7 @@ function! s:update_single_plugin(name, force) abort
     let l:pluginfo.stat.installed = 1
     if l:pluginfo.frozen && !a:force
       call s:echom_verbose(3, '', 'Skipped: ' . a:name)
-      call s:decrement_job_count()
+      call s:decrement_plugin_count()
       return 0
     endif
 
@@ -555,7 +555,7 @@ function! s:update_single_plugin(name, force) abort
     if l:ret == 0
       " No need to update.
       call s:echom_verbose(3, '', 'Already up-to-date: ' . a:name)
-      call s:decrement_job_count()
+      call s:decrement_plugin_count()
       return 0
     elseif l:ret == 1
       " Same branch. Update by pull.
@@ -619,11 +619,11 @@ function! minpac#impl#update(...) abort
     return
   endif
 
-  if s:remain_jobs > 0
+  if s:remain_plugins > 0
     call s:echom_verbose(1, '', 'Previous update has not been finished.')
     return
   endif
-  let s:remain_jobs = len(l:names)
+  let s:remain_plugins = len(l:names)
   let s:error_plugins = 0
   let s:updated_plugins = 0
   let s:installed_plugins = 0
