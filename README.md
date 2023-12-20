@@ -1,13 +1,13 @@
 [![Build status](https://github.com/k-takata/minpac/workflows/CI/badge.svg)](https://github.com/k-takata/minpac/actions)
 [![Build status](https://ci.appveyor.com/api/projects/status/qakftqoyx5m47ns3/branch/master?svg=true)](https://ci.appveyor.com/project/k-takata/minpac/branch/master)
 
-minpac: A minimal package manager for Vim 8 (and Neovim)
-========================================================
+minpac: A minimal package manager for Vim 8+ (and Neovim)
+=========================================================
 
 Overview
 --------
 
-Minpac is a minimal package manager for Vim 8 (and Neovim). This uses the
+Minpac is a minimal package manager for Vim 8+ (and Neovim). This uses the
 [packages](http://vim-jp.org/vimdoc-en/repeat.html#packages) feature and
 the [jobs](http://vim-jp.org/vimdoc-en/channel.html#job-channel-overview)
 feature which have been newly added on Vim 8.
