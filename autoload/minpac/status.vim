@@ -1,5 +1,5 @@
 " ---------------------------------------------------------------------
-" minpac: A minimal package manager for Vim 8 (and Neovim)
+" minpac: A minimal package manager for Vim 8+ (and Neovim)
 "
 " Maintainer:   Ken Takata
 " Created By:   Kristijan Husak
@@ -140,8 +140,10 @@ endfunction
 function! s:mappings() abort
   nnoremap <silent><buffer><nowait> <CR> :call <SID>openSha()<CR>
   nnoremap <silent><buffer><nowait> q :q<CR>
-  nnoremap <silent><buffer><nowait> <C-j> :call <SID>nextPackage()<CR>
-  nnoremap <silent><buffer><nowait> <C-k> :call <SID>prevPackage()<CR>
+  if !exists("no_plugin_maps") && !exists("no_minpac_maps")
+    nnoremap <silent><buffer><nowait> <C-j> :call <SID>nextPackage()<CR>
+    nnoremap <silent><buffer><nowait> <C-k> :call <SID>prevPackage()<CR>
+  endif
 endfunction
 
 function! s:nextPackage() abort

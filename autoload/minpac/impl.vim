@@ -1,14 +1,16 @@
 " ---------------------------------------------------------------------
-" minpac: A minimal package manager for Vim 8 (and Neovim)
+" minpac: A minimal package manager for Vim 8+ (and Neovim)
 "
 " Maintainer:   Ken Takata
-" Last Change:  2020-08-22
+" Last Change:  2023-12-20
 " License:      VIM License
 " URL:          https://github.com/k-takata/minpac
 " ---------------------------------------------------------------------
 
-let s:joblist = []
-let s:remain_jobs = 0
+let s:joblist = []        " Jobs that are currently running.
+let s:jobqueue = []       " Jobs that are waiting to be started.
+let s:remain_plugins = 0
+let s:timer_id = -1
 
 " Get a list of package/plugin directories.
 function! minpac#impl#getpackages(...) abort
@@ -113,7 +115,7 @@ endfunction
 function! minpac#impl#get_plugin_revision(name) abort
   let l:rev = minpac#git#get_revision(g:minpac#pluglist[a:name].dir)
   if l:rev != v:null
-    call s:echom_verbose(4, '', 'revision: ' . l:rev)
+    call s:echom_verbose(4, '', 'revision (' . a:name . '): ' . l:rev)
     return l:rev
   endif
   return s:exec_plugin_cmd(a:name, ['rev-parse', 'HEAD'], 'revision')
@@ -140,9 +142,12 @@ function! s:get_plugin_branch(name) abort
 endfunction
 
 
-function! s:decrement_job_count() abort
-  let s:remain_jobs -= 1
-  if s:remain_jobs == 0
+function! s:decrement_plugin_count() abort
+  let s:remain_plugins -= 1
+  if s:remain_plugins == 0
+    call timer_stop(s:timer_id)
+    let s:timer_id = -1
+
     " `minpac#update()` is finished.
     call s:invoke_hook('finish-update', [s:updated_plugins, s:installed_plugins], s:finish_update_hook)
 
@@ -285,6 +290,7 @@ function! s:handle_subdir(pluginfo) abort
 endfunction
 
 function! s:job_exit_cb(id, errcode, event) dict abort
+  " Remove myself from s:joblist.
   call filter(s:joblist, {-> v:val != a:id})
 
   let l:err = 1
@@ -317,7 +323,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
               if l:rev ==# ''
                 let s:error_plugins += 1
                 call s:echom_verbose(1, 'error', 'Error while updating "' . self.name . '".  No tags found.')
-                call s:decrement_job_count()
+                call s:decrement_plugin_count()
                 return
               endif
             endif
@@ -385,7 +391,7 @@ function! s:job_exit_cb(id, errcode, event) dict abort
     call s:echom_verbose(1, 'error', 'Error while updating "' . self.name . '".  Error code: ' . a:errcode)
   endif
 
-  call s:decrement_job_count()
+  call s:decrement_plugin_count()
 endfunction
 
 function! s:job_err_cb(id, message, event) dict abort
@@ -401,18 +407,7 @@ function! s:job_err_cb(id, message, event) dict abort
   endfor
 endfunction
 
-function! s:start_job(cmds, name, seq, ...) abort
-  if len(s:joblist) > 1
-    sleep 20m
-  endif
-  if g:minpac#opt.jobs > 0
-    if len(s:joblist) >= g:minpac#opt.jobs
-      " Call myself with a 500 ms wait.
-      call timer_start(500, function('s:start_job', [a:cmds, a:name, a:seq]))
-      return 0
-    endif
-  endif
-
+function! s:start_job_core(cmds, name, seq) abort
   let l:quote_cmds = s:quote_cmds(a:cmds)
   call s:echom_verbose(4, '', 'start_job: cmds=' . string(l:quote_cmds))
   let l:job = minpac#job#start(l:quote_cmds, {
@@ -422,13 +417,38 @@ function! s:start_job(cmds, name, seq, ...) abort
         \ })
   if l:job > 0
     " It worked!
+    let s:joblist += [l:job]
+    return 0
   else
     call s:echom_verbose(1, 'error', 'Fail to execute: ' . a:cmds[0])
-    call s:decrement_job_count()
+    call s:decrement_plugin_count()
     return 1
   endif
-  let s:joblist += [l:job]
-  return 0
+endfunction
+
+function! s:timer_worker(timer) abort
+  if (len(s:joblist) >= g:minpac#opt.jobs) || (len(s:jobqueue) == 0)
+    return
+  endif
+  let l:job = remove(s:jobqueue, 0)
+  return s:start_job_core(l:job[0], l:job[1], l:job[2])
+endfunction
+
+function! s:start_job(cmds, name, seq, ...) abort
+  if len(s:joblist) > 1
+    sleep 20m
+  endif
+  if g:minpac#opt.jobs > 0
+    if len(s:joblist) >= g:minpac#opt.jobs
+      if s:timer_id == -1
+        let s:timer_id = timer_start(500, 's:timer_worker', {'repeat': -1})
+      endif
+      " Add the job to s:jobqueue.
+      let s:jobqueue += [[a:cmds, a:name, a:seq]]
+      return 0
+    endif
+  endif
+  return s:start_job_core(a:cmds, a:name, a:seq)
 endfunction
 
 function! s:is_same_commit(a, b) abort
@@ -509,7 +529,7 @@ endfunction
 function! s:update_single_plugin(name, force) abort
   if !has_key(g:minpac#pluglist, a:name)
     call s:echoerr_verbose(1, 'Plugin not registered: ' . a:name)
-    call s:decrement_job_count()
+    call s:decrement_plugin_count()
     return 1
   endif
 
@@ -526,7 +546,7 @@ function! s:update_single_plugin(name, force) abort
     let l:pluginfo.stat.installed = 1
     if l:pluginfo.frozen && !a:force
       call s:echom_verbose(3, '', 'Skipped: ' . a:name)
-      call s:decrement_job_count()
+      call s:decrement_plugin_count()
       return 0
     endif
 
@@ -535,7 +555,7 @@ function! s:update_single_plugin(name, force) abort
     if l:ret == 0
       " No need to update.
       call s:echom_verbose(3, '', 'Already up-to-date: ' . a:name)
-      call s:decrement_job_count()
+      call s:decrement_plugin_count()
       return 0
     elseif l:ret == 1
       " Same branch. Update by pull.
@@ -599,11 +619,11 @@ function! minpac#impl#update(...) abort
     return
   endif
 
-  if s:remain_jobs > 0
+  if s:remain_plugins > 0
     call s:echom_verbose(1, '', 'Previous update has not been finished.')
     return
   endif
-  let s:remain_jobs = len(l:names)
+  let s:remain_plugins = len(l:names)
   let s:error_plugins = 0
   let s:updated_plugins = 0
   let s:installed_plugins = 0
@@ -704,6 +724,19 @@ endfunction
 
 function! minpac#impl#is_update_ran() abort
   return exists('s:installed_plugins')
+endfunction
+
+function! minpac#impl#abort() abort
+  let s:jobqueue = []
+  for l:job in s:joblist
+    call minpac#job#stop(l:job)
+  endfor
+  let s:joblist = []
+  let s:remain_plugins = 0
+  if s:timer_id != -1
+    call timer_stop(s:timer_id)
+    let s:timer_id = -1
+  endif
 endfunction
 
 " vim: set ts=8 sw=2 et:
