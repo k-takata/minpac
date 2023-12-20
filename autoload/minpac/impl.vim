@@ -8,7 +8,9 @@
 " ---------------------------------------------------------------------
 
 let s:joblist = []
+let s:jobqueue = []
 let s:remain_jobs = 0
+let s:timer_id = -1
 
 " Get a list of package/plugin directories.
 function! minpac#impl#getpackages(...) abort
@@ -113,7 +115,7 @@ endfunction
 function! minpac#impl#get_plugin_revision(name) abort
   let l:rev = minpac#git#get_revision(g:minpac#pluglist[a:name].dir)
   if l:rev != v:null
-    call s:echom_verbose(4, '', 'revision: ' . l:rev)
+    call s:echom_verbose(4, '', 'revision (' . a:name . '): ' . l:rev)
     return l:rev
   endif
   return s:exec_plugin_cmd(a:name, ['rev-parse', 'HEAD'], 'revision')
@@ -143,6 +145,9 @@ endfunction
 function! s:decrement_job_count() abort
   let s:remain_jobs -= 1
   if s:remain_jobs == 0
+    call timer_stop(s:timer_id)
+    let s:timer_id = -1
+
     " `minpac#update()` is finished.
     call s:invoke_hook('finish-update', [s:updated_plugins, s:installed_plugins], s:finish_update_hook)
 
@@ -285,6 +290,7 @@ function! s:handle_subdir(pluginfo) abort
 endfunction
 
 function! s:job_exit_cb(id, errcode, event) dict abort
+  " Remove myself from s:joblist.
   call filter(s:joblist, {-> v:val != a:id})
 
   let l:err = 1
@@ -401,18 +407,7 @@ function! s:job_err_cb(id, message, event) dict abort
   endfor
 endfunction
 
-function! s:start_job(cmds, name, seq, ...) abort
-  if len(s:joblist) > 1
-    sleep 20m
-  endif
-  if g:minpac#opt.jobs > 0
-    if len(s:joblist) >= g:minpac#opt.jobs
-      " Call myself with a 500 ms wait.
-      call timer_start(500, function('s:start_job', [a:cmds, a:name, a:seq]))
-      return 0
-    endif
-  endif
-
+function! s:start_job_core(cmds, name, seq) abort
   let l:quote_cmds = s:quote_cmds(a:cmds)
   call s:echom_verbose(4, '', 'start_job: cmds=' . string(l:quote_cmds))
   let l:job = minpac#job#start(l:quote_cmds, {
@@ -422,13 +417,38 @@ function! s:start_job(cmds, name, seq, ...) abort
         \ })
   if l:job > 0
     " It worked!
+    let s:joblist += [l:job]
+    return 0
   else
     call s:echom_verbose(1, 'error', 'Fail to execute: ' . a:cmds[0])
     call s:decrement_job_count()
     return 1
   endif
-  let s:joblist += [l:job]
-  return 0
+endfunction
+
+function! s:timer_worker(timer) abort
+  if (len(s:joblist) >= g:minpac#opt.jobs) || (len(s:jobqueue) == 0)
+    return
+  endif
+  let l:job = remove(s:jobqueue, 0)
+  return s:start_job_core(l:job[0], l:job[1], l:job[2])
+endfunction
+
+function! s:start_job(cmds, name, seq, ...) abort
+  if len(s:joblist) > 1
+    sleep 20m
+  endif
+  if g:minpac#opt.jobs > 0
+    if len(s:joblist) >= g:minpac#opt.jobs
+      if s:timer_id == -1
+        let s:timer_id = timer_start(500, 's:timer_worker', {'repeat': -1})
+      endif
+      " Add the job to s:jobqueue.
+      let s:jobqueue += [[a:cmds, a:name, a:seq]]
+      return 0
+    endif
+  endif
+  return s:start_job_core(a:cmds, a:name, a:seq)
 endfunction
 
 function! s:is_same_commit(a, b) abort
