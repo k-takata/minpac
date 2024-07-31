@@ -1,13 +1,13 @@
 [![Build status](https://github.com/k-takata/minpac/workflows/CI/badge.svg)](https://github.com/k-takata/minpac/actions)
 [![Build status](https://ci.appveyor.com/api/projects/status/qakftqoyx5m47ns3/branch/master?svg=true)](https://ci.appveyor.com/project/k-takata/minpac/branch/master)
 
-minpac: A minimal package manager for Vim 8 (and Neovim)
-========================================================
+minpac: A minimal package manager for Vim 8+ (and Neovim)
+=========================================================
 
 Overview
 --------
 
-Minpac is a minimal package manager for Vim 8 (and Neovim). This uses the
+Minpac is a minimal package manager for Vim 8+ (and Neovim). This uses the
 [packages](http://vim-jp.org/vimdoc-en/repeat.html#packages) feature and
 the [jobs](http://vim-jp.org/vimdoc-en/channel.html#job-channel-overview)
 feature which have been newly added on Vim 8.
@@ -403,6 +403,13 @@ Otherwise, shows the status of the plugin and commits of last update (if any).
 |----------|-------------|
 | `'open'` | Specify how to open the status window.<br/>`'vertical'`: Open in vertical split.<br/>`'horizontal'`: Open in horizontal split.<br/>`'tab'`: Open in a new tab.<br/>Default: `'horizontal'` or specified value by `minpac#init()`.  |
 
+#### minpac#abort()
+
+Abort updating the plugins. Mainly for debugging.
+
+If you face any errors while running `minpac#update()` and you cannot run it again, you can try this.
+
+
 ### Hooks
 
 Currently, minpac supports two types of hook: Post-update hooks and Finish-update hooks.
@@ -486,6 +493,10 @@ List of mappings available only in status window.
 |`<C-k>`  | Jump to previous package in list. |
 |`q`      | Exit the status window.<br/>(Also works for commit preview window) |
 
+The mappings for `<C-j>` and `<C-k>` can be disabled with:
+```vim
+let g:no_minpac_maps = 1
+```
 
 Similar projects
 ----------------
