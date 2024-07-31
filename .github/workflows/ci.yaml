@@ -44,9 +44,6 @@ jobs:
             os: 'windows-latest'
             download: 'never'
 
-          # FIXME: Neovim doesn't work on Ubuntu. Disable it for now.
-          - vim_type: 'Neovim'
-            os: 'ubuntu-latest'
           # FIXME: Oldest vim doesn't work on macOS. Disable it for now.
           - vim_type: 'Vim'
             version: 'oldest'
