@@ -12,7 +12,6 @@ jobs:
         vim_type: ['Vim', 'Neovim']
         version: ['head', 'stable', 'oldest']
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        download: ['available', 'never']
 
         include:
           - vim_type: 'Vim'
@@ -29,25 +28,10 @@ jobs:
           - vim_type: 'Neovim'
             version: 'oldest'
 
-          # download == 'available' is preferred, but it doesn't work well on
-          # Ubuntu with Vim. (Appimage versions of Vim cause troubles because
-          # it changes LD_LIBRARY_PATH.)
-          - vim_type: 'Neovim'
-            download: 'never'
-          - vim_type: 'Vim'
-            os: 'ubuntu-latest'
-            download: 'available'
-          - vim_type: 'Vim'
-            os: 'macos-latest'
-            download: 'never'
-          - vim_type: 'Vim'
-            os: 'windows-latest'
-            download: 'never'
-
-          # FIXME: Oldest vim doesn't work on macOS. Disable it for now.
+          # Oldest vim doesn't work on macOS any more.
           - vim_type: 'Vim'
             version: 'oldest'
-            os: 'mac-latest'
+            os: 'macos-latest'
 
     runs-on: '${{ matrix.os }}'
 
@@ -61,7 +45,11 @@ jobs:
         with:
           vim_version: '${{ matrix.vim_version || matrix.version }}'
           vim_type: '${{ matrix.vim_type }}'
-          download: '${{ matrix.download }}'
+
+          # download == 'available' is preferred, but it doesn't work well on
+          # Ubuntu with Vim. (Appimage versions of Vim cause troubles because
+          # it changes LD_LIBRARY_PATH.)
+          download: ${{ (matrix.vim_type == 'Vim' && matrix.os == 'ubuntu-latest') && 'never' || 'available' }}
 
       - name: 'Run test (Windows)'
         if: ${{ startsWith(matrix.os, 'windows') }}
