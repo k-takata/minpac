@@ -12,12 +12,11 @@ jobs:
         vim_type: ['Vim', 'Neovim']
         version: ['head', 'stable', 'oldest']
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        download: ['available', 'never']
 
         include:
           - vim_type: 'Vim'
             version: 'stable'
-            vim_version: 'v8.2.0000'
+            vim_version: 'v9.1.0000'
 
           # minpac requires Vim v8.0.0050 or later.
           - vim_type: 'Vim'
@@ -29,38 +28,28 @@ jobs:
           - vim_type: 'Neovim'
             version: 'oldest'
 
-          # download == 'available' is preferred, but it doesn't work well on
-          # Ubuntu with Vim. (Appimage versions of Vim cause troubles because
-          # it changes LD_LIBRARY_PATH.)
-          - vim_type: 'Neovim'
-            download: 'never'
+          # Oldest vim doesn't work on macOS any more.
           - vim_type: 'Vim'
-            os: 'ubuntu-latest'
-            download: 'available'
-          - vim_type: 'Vim'
+            version: 'oldest'
             os: 'macos-latest'
-            download: 'never'
-          - vim_type: 'Vim'
-            os: 'windows-latest'
-            download: 'never'
-
-          # FIXME: Neovim doesn't work on Ubuntu. Disable it for now.
-          - vim_type: 'Neovim'
-            os: 'ubuntu-latest'
 
     runs-on: '${{ matrix.os }}'
 
     steps:
       - name: 'Checkout'
-        uses: 'actions/checkout@v2'
+        uses: 'actions/checkout@v4'
 
       - name: 'Setup Vim'
         id: 'vim'
-        uses: 'thinca/action-setup-vim@v1'
+        uses: 'thinca/action-setup-vim@v2'
         with:
           vim_version: '${{ matrix.vim_version || matrix.version }}'
           vim_type: '${{ matrix.vim_type }}'
-          download: '${{ matrix.download }}'
+
+          # download == 'available' is preferred, but it doesn't work well on
+          # Ubuntu with Vim. (Appimage versions of Vim cause troubles because
+          # it changes LD_LIBRARY_PATH.)
+          download: ${{ (matrix.vim_type == 'Vim' && matrix.os == 'ubuntu-latest') && 'never' || 'available' }}
 
       - name: 'Run test (Windows)'
         if: ${{ startsWith(matrix.os, 'windows') }}
