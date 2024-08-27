@@ -101,7 +101,8 @@ endfunction
 function! s:exec_plugin_cmd(name, cmd, mes) abort
   let l:pluginfo = g:minpac#pluglist[a:name]
   let l:dir = l:pluginfo.dir
-  let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir] + a:cmd)
+  let l:res = minpac#impl#system([g:minpac#opt.git, '-C', l:dir]
+        \ + ['-c', 'core.fsmonitor=false'] + a:cmd)
   if l:res[0] == 0 && len(l:res[1]) > 0
     call s:echom_verbose(4, '', a:mes . ': ' . l:res[1][0])
     return l:res[1][0]
@@ -327,8 +328,9 @@ function! s:job_exit_cb(id, errcode, event) dict abort
                 return
               endif
             endif
-            let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'checkout',
-                  \ l:rev, '--']
+            let l:cmd = [g:minpac#opt.git, '-C', l:dir,
+                  \ '-c', 'core.fsmonitor=false',
+                  \ 'checkout', l:rev, '--']
             call s:echom_verbose(3, '', 'Checking out the revison: ' . self.name
                   \ . ': ' . l:rev)
             call s:start_job(l:cmd, self.name, self.seq + 1)
@@ -336,8 +338,9 @@ function! s:job_exit_cb(id, errcode, event) dict abort
           elseif self.seq == 1
                 \ && s:get_plugin_branch(self.name) == l:rev
             " Checked out the branch. Update to the upstream.
-            let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'merge', '--quiet',
-                  \ '--ff-only', '@{u}']
+            let l:cmd = [g:minpac#opt.git, '-C', l:dir,
+                  \ '-c', 'core.fsmonitor=false',
+                  \ 'merge', '--quiet', '--ff-only', '@{u}']
             call s:echom_verbose(3, '', 'Update to the upstream: ' . self.name)
             call s:start_job(l:cmd, self.name, self.seq + 1)
             return
@@ -347,8 +350,9 @@ function! s:job_exit_cb(id, errcode, event) dict abort
           let l:pluginfo.stat.submod = 1
           if filereadable(l:dir . '/.gitmodules')
             " Update git submodule.
-            let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'submodule', '--quiet',
-                  \ 'update', '--init', '--recursive']
+            let l:cmd = [g:minpac#opt.git, '-C', l:dir,
+                  \ '-c', 'core.fsmonitor=false',
+                  \ 'submodule', '--quiet', 'update', '--init', '--recursive']
             call s:echom_verbose(3, '', 'Updating submodules: ' . self.name)
             call s:start_job(l:cmd, self.name, self.seq + 1)
             return
@@ -560,7 +564,9 @@ function! s:update_single_plugin(name, force) abort
     elseif l:ret == 1
       " Same branch. Update by pull.
       call s:echo_verbose(3, '', 'Updating (pull): ' . a:name)
-      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'pull', '--quiet']
+      let l:cmd = [g:minpac#opt.git, '-C', l:dir,
+            \ '-c', 'core.fsmonitor=false',
+            \ 'pull', '--quiet']
       if l:pluginfo.pullmethod ==# 'autostash'
         let l:cmd += ['--rebase', '--autostash']
       else
@@ -569,7 +575,9 @@ function! s:update_single_plugin(name, force) abort
     elseif l:ret == 2
       " Different branch. Update by fetch & checkout.
       call s:echo_verbose(3, '', 'Updating (fetch): ' . a:name)
-      let l:cmd = [g:minpac#opt.git, '-C', l:dir, 'fetch', '--depth', '999999']
+      let l:cmd = [g:minpac#opt.git, '-C', l:dir,
+            \ '-c', 'core.fsmonitor=false',
+            \ 'fetch', '--depth', '999999']
     endif
   else
     let l:pluginfo.stat.installed = 0
@@ -580,7 +588,9 @@ function! s:update_single_plugin(name, force) abort
     endif
     call s:echo_verbose(3, '', 'Cloning ' . a:name)
 
-    let l:cmd = [g:minpac#opt.git, 'clone', '--quiet', l:url, l:dir, '--no-single-branch']
+    let l:cmd = [g:minpac#opt.git,
+          \ '-c', 'core.fsmonitor=false',
+          \ 'clone', '--quiet', l:url, l:dir, '--no-single-branch']
     if l:pluginfo.depth > 0 && l:pluginfo.rev ==# ''
       let l:cmd += ['--depth=' . l:pluginfo.depth]
     endif
