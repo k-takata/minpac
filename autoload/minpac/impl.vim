@@ -2,7 +2,7 @@
 " minpac: A minimal package manager for Vim 8+ (and Neovim)
 "
 " Maintainer:   Ken Takata
-" Last Change:  2023-12-20
+" Last Change:  2024-12-06
 " License:      VIM License
 " URL:          https://github.com/k-takata/minpac
 " ---------------------------------------------------------------------
@@ -441,7 +441,7 @@ function! s:start_job(cmds, name, seq, ...) abort
   if g:minpac#opt.jobs > 0
     if len(s:joblist) >= g:minpac#opt.jobs
       if s:timer_id == -1
-        let s:timer_id = timer_start(500, 's:timer_worker', {'repeat': -1})
+        let s:timer_id = timer_start(500, function('s:timer_worker'), {'repeat': -1})
       endif
       " Add the job to s:jobqueue.
       let s:jobqueue += [[a:cmds, a:name, a:seq]]
