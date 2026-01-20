@@ -69,6 +69,13 @@ git clone https://github.com/k-takata/minpac.git ~/.config/nvim/pack/minpac/opt/
 #### Basic sample
 
 ```vim
+" Install minpac (uncomment your platform)
+" Linux, macOS
+" Vim:
+"if empty(glob('~/.vim/pack/minpac/opt/minpac'))
+"  !git clone --depth=1 https://github.com/k-takata/minpac.git ~/.vim/pack/minpac/opt/minpac
+"endif
+
 " Normally this if-block is not needed, because `:set nocp` is done
 " automatically when .vimrc is found. However, this might be useful
 " when you execute `vim -u .vimrc` from the command line.
