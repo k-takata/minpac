@@ -65,7 +65,7 @@ git clone https://github.com/k-takata/minpac.git ~/.config/nvim/pack/minpac/opt/
 ```
 
 ### Sample .vimrc
-
+Any `packadd` commands in a Vim ~/.vimrc file will not run when you start Neovim. If you add it to .vimrc by mistake, you can transfer to neovim `mkdir -p ~/.config/nvim && cp ~/.vimrc ~/.config/nvim/init.vim`
 #### Basic sample
 
 ```vim
