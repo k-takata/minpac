@@ -52,7 +52,7 @@ git clone https://github.com/k-takata/minpac.git %LOCALAPPDATA%\nvim\pack\minpac
 
 ### Linux, macOS
 
-Vim:
+Vim (use `${XDG_CONFIG_HOME:-~/.config}/vim` in place of `~/.vim` if your `vimrc` is in there):
 
 ```sh
 git clone https://github.com/k-takata/minpac.git ~/.vim/pack/minpac/opt/minpac
